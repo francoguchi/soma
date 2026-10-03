@@ -5,8 +5,8 @@ This file records provenance only. Current behavior is owned by `docs/LLD/00/`.
 | Beta source | New scope-00 authority |
 |---|---|
 | LLD-01 LocalHostLifecycle | `RUNTIME.INSTANCE`, `RUNTIME.LIFECYCLE`, `RUNTIME.HEALTH`, `RUNTIME.SHUTDOWN` |
-| LLD-01 ConnectionFactoryAndUnitOfWork | `PERSISTENCE.CONNECTION`, `TX.UOW`, `PERSISTENCE.SNAPSHOT` |
-| LLD-01 migration runner/status | `MIGRATION.MANIFEST`, `DEV.DB_RESET`, `M00.001` |
+| LLD-01 ConnectionFactoryAndUnitOfWork | `PERSISTENCE.CONNECTION`, `PERSISTENCE.READ_SNAPSHOT`, `TX.UOW`, `PERSISTENCE.SNAPSHOT` |
+| LLD-01 migration runner/status/schema verification | `MIGRATION.MANIFEST`, `MIGRATION.STATUS`, `PERSISTENCE.SCHEMA_VERIFY`, `DEV.DB_RESET`, `M00.001` |
 | LLD-01 StrictVersionedJson | `SERIALIZATION.STRICT_JSON`, `CONTRACT.SOURCE` |
 | LLD-01 exact command receipts/results | `COMMAND.REPLAY`, `M00.002` |
 | LLD-01 AuditWriter | `AUDIT.APPEND_ONLY`, `M00.003` |
@@ -18,6 +18,7 @@ This file records provenance only. Current behavior is owned by `docs/LLD/00/`.
 | Beta launcher implementation `fbe3821...` | `DEV.SOURCE_LAUNCHERS`, `DIAGNOSTICS.OPERATOR_LOGS` |
 | LLD-12 Shell_NotifyIconW design | `UI.SYSTEM_TRAY` |
 | LLD-12 BrowserSessionAndCsrfV1 | `SECURITY.BROWSER_SESSION` |
+| LLD-12 DeliberateActionProofV1 | `SECURITY.DELIBERATE_PROOF` |
 | LLD-12 diagnostic sanitization | `DIAGNOSTICS.SAFE`, `UI.DIAGNOSTICS_STATE` |
 | LLD-10 technology/static SPA | `PLATFORM.BASELINE`, `STATIC.ASSETS`, `UI.BOOTSTRAP` |
 | LLD-10 semantic tokens/typography | `UI.BRAND`, `UI.TOKENS`, `UI.ACCESSIBILITY` |
@@ -25,7 +26,7 @@ This file records provenance only. Current behavior is owned by `docs/LLD/00/`.
 | LLD-10 scroll ownership | `UI.SCROLL`, `UI.DIALOG_FOCUS` |
 | LLD-10 bounded collection/autocomplete rules | `QUERY.PAGE`, `UI.COLLECTIONS`, `UI.AUTOCOMPLETE` |
 | LLD-10 responsive workbench | `UI.SHELL`, `UI.RESPONSIVE` |
-| LLD-10 working copies | `UI.WORKING_COPY`, `M00.005` |
+| LLD-10 working copies | `WORKING_COPY.STORE`, `UI.WORKING_COPY`, `M00.005` |
 | LLD-10 confirmation tiers | `UI.CONFIRMATION` |
 | LLD-10 Safe Undo | `UI.SAFE_UNDO` |
 | LLD-10 error/loading/conflict presentation | `UI.ERROR_STATE` |
