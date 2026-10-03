@@ -7,7 +7,7 @@
     {
       "id": "M01.001",
       "anchor": "m01-001",
-      "depends_on": ["CUSTOMER.ORGANIZATION", "CUSTOMER.ACCOUNT_CODE", "PROFILE.LOCAL_USER", "MIGRATION.MANIFEST", "M00.002"],
+      "depends_on": ["CUSTOMER.ORGANIZATION", "CUSTOMER.ACCOUNT_CODE", "PROFILE.LOCAL_USER", "MIGRATION.MANIFEST", "M00.006"],
       "code_paths": ["src/core/soma/db/migrations/01/001_customer_profile.sql"]
     },
     {
@@ -60,14 +60,14 @@ Protected triggers increment `customer_reference_generation` for accepted Custom
 
 Singleton descriptive metadata only:
 
-- `local_user_profile_id TEXT PRIMARY KEY`
+- `local_user_profile_id TEXT PRIMARY KEY REFERENCES local_admin_credentials(actor_id) ON UPDATE RESTRICT ON DELETE RESTRICT`
 - `singleton_guard INTEGER NOT NULL UNIQUE CHECK(singleton_guard=1)`
 - `display_name TEXT NOT NULL`
 - `revision INTEGER NOT NULL DEFAULT 1`
 - `created_at_utc INTEGER NOT NULL`
 - `updated_at_utc INTEGER NOT NULL`
 
-No password, verifier, username/login-name, session, auto-login or encryption material exists here.
+No password, verifier, username/login-name, session, auto-login or encryption material exists here. The foreign key enforces the approved singleton-model identity equality with Foundation Local Administrator `actor_id`; scope 01 still does not own credential state.
 
 ### `customer_organizations`
 
