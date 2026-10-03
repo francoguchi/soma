@@ -9,7 +9,8 @@ Implement the current user request in runnable increments. `src/main` is the use
 3. Read the active implementation goal, then only its linked LLD items, consumed interfaces, migration rows, affected source and directly relevant tests.
 4. Read `docs/architecture.md` only when the active work needs a repository-wide coding rule or when changing architecture/documentation mechanics; do not reread it mechanically for every goal.
 5. Expand reading only when dependencies or the requested change require it. Do not reread unrelated LLD scopes or run repository-wide archaeology for a focused goal.
-6. Treat SOMA Alpha/Beta as reference sources only. Follow donor rows/references named by the migration ledger or current LLD/goal; do not recursively inspect Beta unless required behavior is missing or contradictory.
+6. Treat SOMA Alpha/Beta as reference sources only. Follow donor rows/references named by the scope migration ledger or current LLD/goal; do not recursively inspect Beta unless required behavior is missing or contradictory.
+7. Read `docs/LLD/MIGRATION.md` only when allocating/migrating a new scope or checking cross-scope donor coverage; ordinary focused implementation does not reread the global queue.
 
 The user can revise design. Current LLD items define behavior; goals define the active increment. README files state purpose. Beta material supplies reuse references.
 
@@ -21,7 +22,7 @@ The user can revise design. Current LLD items define behavior; goals define the 
 - Use shared frontend interactions, API contracts, and time formatting.
 - Make internal choices that preserve stated behavior. Ask for a missing material product decision and continue independent work.
 - Record unfinished behavior in the goal; do not present a stub as a completed operation.
-- Reuse and revise existing code. For Beta donor code, process the current goal's rows in the scope migration ledger and record REUSED/REWRITTEN/REJECTED/DEFERRED before marking the goal working. Create abstractions/documents only when actual work requires them.
+- Reuse and revise existing code. For Beta donor code, process the current goal's rows in the scope migration ledger and record `REUSED`, `REWRITTEN`, `REJECTED`, or `DEFERRED` before marking the goal working. Never mark `REUSED` from file-copy success alone; compare the donor behavior to the current LLD and carry over/rewrite the focused regression evidence. Create abstractions/documents only when actual work requires them.
 - Do not make `.tmp/` content an application dependency or source of truth.
 
 ## Development database
