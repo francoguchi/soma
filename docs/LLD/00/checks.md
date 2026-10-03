@@ -388,4 +388,4 @@ Exercise a synthetic registered deliberate action. Verify continuous 3000 ms cli
 <a id="chk-doc-impact"></a>
 ## CHK00.DOC.IMPACT
 
-Validate metadata/index creation, modify one item and one mapped source path, and verify direct/indirect impact paths. Remove an edge and verify baseline/current union still reports the former dependent. Unmapped changed code is reported as a gap.
+Validate metadata/index creation, modify one item and one mapped source path, and verify direct/indirect impact paths. Remove an edge and verify baseline/current union still reports the former dependent. Unmapped changed code is reported as a gap. Verify `docs/LLD/CONTINUE.md` resolves to an existing scope/goal/ledger, duplicate or malformed migration-row IDs fail validation, and a goal marked `working` fails while any matching `RNN.KK-*` row remains unchecked/PENDING.
