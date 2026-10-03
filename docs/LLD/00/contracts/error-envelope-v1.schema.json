@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:soma:00:error-envelope:v1",
+  "title": "ErrorEnvelopeV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "code",
+    "summary",
+    "recoverability",
+    "safe_next_action",
+    "correlation_id"
+  ],
+  "properties": {
+    "code": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_.-]{1,95}$"
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "recoverability": {
+      "type": "string",
+      "enum": [
+        "correct_input",
+        "retry",
+        "refresh",
+        "reauthenticate",
+        "restart",
+        "none"
+      ]
+    },
+    "safe_next_action": {
+      "type": ["string", "null"],
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "correlation_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "fields": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "code", "summary"],
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "code": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_.-]{1,95}$"
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          }
+        }
+      }
+    }
+  }
+}
