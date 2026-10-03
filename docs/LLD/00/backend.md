@@ -170,7 +170,7 @@
       "id": "DEV.DB_RESET",
       "anchor": "dev-db-reset",
       "depends_on": ["RUNTIME.INSTANCE", "MIGRATION.MANIFEST", "DEV.SEED"],
-      "code_paths": ["src/core/soma/foundation/persistence/", "src/core/soma/db/"]
+      "code_paths": ["src/core/soma/foundation/development/reset.py", "src/core/soma/db/migrations/manifest.json"]
     },
     {
       "id": "SERIALIZATION.STRICT_JSON",
@@ -217,7 +217,7 @@
       "id": "STATIC.ASSETS",
       "anchor": "static-assets",
       "depends_on": ["BUILD.IDENTITY", "FS.SAFE"],
-      "code_paths": ["src/core/soma/runtime/static_assets.py", "src/main/"]
+      "code_paths": ["src/core/soma/runtime/static_assets.py", "src/main/index.html", "src/main/vite.config.ts"]
     },
     {
       "id": "TEST.SEAMS",
@@ -245,7 +245,7 @@
     {
       "id": "CONTRACT.SOURCE",
       "anchor": "contract-source",
-      "code_paths": ["docs/LLD/00/contracts/", "src/core/soma/"]
+      "code_paths": ["docs/LLD/00/contracts/", "src/core/soma/transport/contracts/", "src/main/shared/api/generated/"]
     },
     {
       "id": "TOOLING.IMPACT",
