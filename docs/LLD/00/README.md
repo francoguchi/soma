@@ -5,4 +5,5 @@ Provide the runtime, persistence, security, time, API-contract, interaction, and
 - [Backend](backend.md)
 - [Frontend](frontend.md)
 - [Checks](checks.md)
+- [Contracts](contracts/README.md)
 - [Migrations](migrations/README.md)
