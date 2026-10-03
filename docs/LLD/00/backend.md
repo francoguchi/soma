@@ -7,24 +7,98 @@
     {
       "id": "RUNTIME.INSTANCE",
       "anchor": "runtime-instance",
+      "depends_on": ["CONFIG.RUNTIME", "FS.SAFE"],
       "code_paths": ["src/core/soma/runtime/", "src/core/soma/foundation/persistence/"]
     },
     {
       "id": "RUNTIME.TRUSTED_CONTROL",
       "anchor": "runtime-trusted-control",
-      "depends_on": ["RUNTIME.INSTANCE"],
+      "depends_on": ["RUNTIME.INSTANCE", "RUNTIME.HEALTH", "SECURITY.LIVE_DATA_KEY"],
       "code_paths": ["src/core/soma/runtime/control.py", "src/core/soma/runtime/trust.py"]
     },
     {
       "id": "DEV.SOURCE_LAUNCHERS",
       "anchor": "dev-source-launchers",
-      "depends_on": ["RUNTIME.TRUSTED_CONTROL", "PERSISTENCE.CONNECTION", "DIAGNOSTICS.OPERATOR_LOGS"],
+      "depends_on": ["RUNTIME.TRUSTED_CONTROL", "RUNTIME.LIFECYCLE", "PERSISTENCE.CONNECTION", "DIAGNOSTICS.OPERATOR_LOGS", "BUILD.IDENTITY"],
       "code_paths": ["soma_setup.bat", "soma_run.bat", "soma_run_console.bat", "soma_stop.bat", "tools/source_launcher.py"]
+    },
+    {
+      "id": "PLATFORM.BASELINE",
+      "anchor": "platform-baseline",
+      "code_paths": ["pyproject.toml", "src/main/package.json"]
+    },
+    {
+      "id": "CONFIG.RUNTIME",
+      "anchor": "config-runtime",
+      "depends_on": ["FS.SAFE"],
+      "code_paths": ["src/core/soma/foundation/config/"]
+    },
+    {
+      "id": "BUILD.IDENTITY",
+      "anchor": "build-identity",
+      "code_paths": ["src/core/soma/foundation/build/", "src/main/shared/build/"]
+    },
+    {
+      "id": "IDENTITY.UUID",
+      "anchor": "identity-uuid",
+      "code_paths": ["src/core/soma/foundation/identity/"]
+    },
+    {
+      "id": "TRACE.CORRELATION",
+      "anchor": "trace-correlation",
+      "depends_on": ["IDENTITY.UUID"],
+      "code_paths": ["src/core/soma/foundation/context/"]
+    },
+    {
+      "id": "ERROR.CONTRACT",
+      "anchor": "error-contract",
+      "depends_on": ["TRACE.CORRELATION"],
+      "code_paths": ["src/core/soma/foundation/errors/", "docs/LLD/00/contracts/"]
     },
     {
       "id": "TIME.UTC",
       "anchor": "time-utc",
       "code_paths": ["src/core/soma/foundation/time/"]
+    },
+    {
+      "id": "TIME.MONOTONIC",
+      "anchor": "time-monotonic",
+      "code_paths": ["src/core/soma/foundation/time/"]
+    },
+    {
+      "id": "FS.SAFE",
+      "anchor": "fs-safe",
+      "code_paths": ["src/core/soma/foundation/filesystem/"]
+    },
+    {
+      "id": "FS.TEMP",
+      "anchor": "fs-temp",
+      "depends_on": ["FS.SAFE", "RUNTIME.INSTANCE"],
+      "code_paths": ["src/core/soma/foundation/filesystem/"]
+    },
+    {
+      "id": "RUNTIME.LIFECYCLE",
+      "anchor": "runtime-lifecycle",
+      "depends_on": ["RUNTIME.INSTANCE", "TIME.MONOTONIC", "BUILD.IDENTITY"],
+      "code_paths": ["src/core/soma/runtime/host.py", "src/core/soma/runtime/lifecycle.py"]
+    },
+    {
+      "id": "CAPABILITY.REGISTRY",
+      "anchor": "capability-registry",
+      "depends_on": ["BUILD.IDENTITY"],
+      "code_paths": ["src/core/soma/composition/capabilities.py"]
+    },
+    {
+      "id": "RUNTIME.HEALTH",
+      "anchor": "runtime-health",
+      "depends_on": ["RUNTIME.LIFECYCLE", "CAPABILITY.REGISTRY", "BUILD.IDENTITY"],
+      "code_paths": ["src/core/soma/runtime/health.py", "docs/LLD/00/contracts/"]
+    },
+    {
+      "id": "RUNTIME.SHUTDOWN",
+      "anchor": "runtime-shutdown",
+      "depends_on": ["RUNTIME.LIFECYCLE", "JOBS.COORDINATOR", "PERSISTENCE.CONNECTION"],
+      "code_paths": ["src/core/soma/runtime/host.py", "src/core/soma/runtime/control.py"]
     },
     {
       "id": "SECURITY.LIVE_DATA_KEY",
@@ -33,10 +107,22 @@
       "code_paths": ["src/core/soma/foundation/security/"]
     },
     {
+      "id": "SECURITY.BROWSER_SESSION",
+      "anchor": "security-browser-session",
+      "depends_on": ["RUNTIME.INSTANCE", "TIME.MONOTONIC", "IDENTITY.UUID"],
+      "code_paths": ["src/core/soma/foundation/security/browser_session.py", "src/core/soma/transport/security.py"]
+    },
+    {
       "id": "PERSISTENCE.CONNECTION",
       "anchor": "persistence-connection",
       "depends_on": ["RUNTIME.INSTANCE", "SECURITY.LIVE_DATA_KEY"],
       "code_paths": ["src/core/soma/foundation/persistence/"]
+    },
+    {
+      "id": "PERSISTENCE.SNAPSHOT",
+      "anchor": "persistence-snapshot",
+      "depends_on": ["PERSISTENCE.CONNECTION", "FS.SAFE", "RUNTIME.INSTANCE"],
+      "code_paths": ["src/core/soma/foundation/persistence/snapshot.py"]
     },
     {
       "id": "TX.UOW",
@@ -53,13 +139,19 @@
     {
       "id": "DEV.DB_RESET",
       "anchor": "dev-db-reset",
-      "depends_on": ["RUNTIME.INSTANCE", "MIGRATION.MANIFEST"],
+      "depends_on": ["RUNTIME.INSTANCE", "MIGRATION.MANIFEST", "DEV.SEED"],
       "code_paths": ["src/core/soma/foundation/persistence/", "src/core/soma/db/"]
     },
     {
       "id": "SERIALIZATION.STRICT_JSON",
       "anchor": "serialization-strict-json",
       "code_paths": ["src/core/soma/foundation/"]
+    },
+    {
+      "id": "AUDIT.APPEND_ONLY",
+      "anchor": "audit-append-only",
+      "depends_on": ["TX.UOW", "SERIALIZATION.STRICT_JSON", "TRACE.CORRELATION", "TIME.UTC"],
+      "code_paths": ["src/core/soma/foundation/audit/"]
     },
     {
       "id": "COMMAND.REPLAY",
@@ -72,6 +164,36 @@
       "anchor": "jobs-coordinator",
       "depends_on": ["TX.UOW", "SERIALIZATION.STRICT_JSON"],
       "code_paths": ["src/core/soma/foundation/jobs/"]
+    },
+    {
+      "id": "JOBS.EXECUTION",
+      "anchor": "jobs-execution",
+      "depends_on": ["JOBS.COORDINATOR", "RUNTIME.LIFECYCLE", "TIME.MONOTONIC"],
+      "code_paths": ["src/core/soma/foundation/jobs/executor.py", "src/core/soma/runtime/workers.py"]
+    },
+    {
+      "id": "DEV.SEED",
+      "anchor": "dev-seed",
+      "depends_on": ["MIGRATION.MANIFEST", "TX.UOW"],
+      "code_paths": ["src/core/soma/foundation/development/seed.py"]
+    },
+    {
+      "id": "QUERY.PAGE",
+      "anchor": "query-page",
+      "depends_on": ["SERIALIZATION.STRICT_JSON"],
+      "code_paths": ["src/core/soma/foundation/query/"]
+    },
+    {
+      "id": "STATIC.ASSETS",
+      "anchor": "static-assets",
+      "depends_on": ["BUILD.IDENTITY", "FS.SAFE"],
+      "code_paths": ["src/core/soma/runtime/static_assets.py", "src/main/"]
+    },
+    {
+      "id": "TEST.SEAMS",
+      "anchor": "test-seams",
+      "depends_on": ["TIME.UTC", "TIME.MONOTONIC", "IDENTITY.UUID", "FS.SAFE"],
+      "code_paths": ["tests/core/foundation/", "src/core/soma/foundation/testing/"]
     },
     {
       "id": "DIAGNOSTICS.SAFE",
@@ -102,6 +224,416 @@
 
 # Foundation backend
 
+<a id="platform-baseline"></a>
+## PLATFORM.BASELINE
+
+**Trigger/input:** SOMA source setup, build, or runtime composition.
+
+**Result:** Use one pinned local-first technology baseline that is compatible with the proven Beta architecture while remaining replaceable through an explicit LLD revision.
+
+**Rules:**
+- Core runtime is CPython x64 on supported Windows; initial supported interpreter lines are Python 3.13 and 3.14.
+- Local HTTP host uses Starlette + Uvicorn as a single-worker programmatic ASGI host bound only to `127.0.0.1`; proxy headers, reload, server banner, and websockets are disabled unless a later LLD item proves a need.
+- Authoritative persistence uses the `sqlcipher3` DB-API-compatible provider with SQLCipher 4.17.0 semantics, raw bound-parameter SQL, no ORM, and a SOMA-owned migration runner.
+- Main is a prebuilt static React + TypeScript SPA built with Vite; Node is development/build-only and is not required by a running SOMA instance.
+- No Electron, SSR, React Server Components, external CDN modules/styles/fonts, runtime package downloads, `eval`, or dynamically downloaded executable dependencies.
+- Exact dependency versions/hashes live in dependency/build metadata rather than being duplicated in behavioral prose.
+
+**Failure:** Unsupported interpreter/platform, unavailable pinned dependency, or runtime requirement that violates this baseline blocks setup/build rather than silently changing architecture.
+
+**Side effects:** none.
+
+Reuse provenance: Beta LLD-01/10/12 technology baselines.
+
+<a id="config-runtime"></a>
+## CONFIG.RUNTIME
+
+**Trigger/input:** Composition, launcher, runtime, persistence, diagnostics, or tests request installation/runtime configuration.
+
+**Result:** Return one validated immutable runtime configuration object and canonical owned paths.
+
+**Rules:**
+- Configuration discovery is centralized; modules do not independently read environment variables, current working directory, registry values, or LocalAppData.
+- Initial source-development instance root is Windows KnownFolder LocalAppData + `SOMA/Development/instance-v1`; future packaged-release roots may differ without changing domain code.
+- Owned relative roots include `data/`, `runtime/`, `diagnostics/`, `tmp/`, and `backups/`; feature-specific subpaths must remain beneath their declared owner root.
+- Repository checkout paths are code/build inputs only and never become authoritative data-instance paths.
+- Development overrides are explicit, validated, test-scoped/config-scoped, and cannot silently redirect an existing canonical instance.
+- Configuration values that affect trust, storage, or contracts are resolved before application composition and then treated as immutable for that run.
+
+**Failure:** Missing, conflicting, unsafe, unsupported, or path-escaping configuration blocks composition with ERROR.CONTRACT output.
+
+**Side effects:** none.
+
+<a id="build-identity"></a>
+## BUILD.IDENTITY
+
+**Trigger/input:** Host startup, diagnostics, API bootstrap, static asset verification, or support output requests build identity.
+
+**Result:** Supply a non-secret immutable identity for the running application/build.
+
+**Rules:**
+- Expose application version, runtime protocol version, contract/schema generation identifiers, and source commit/build identity when available.
+- A dirty/source build is identified honestly; it is never presented as a release-certified build.
+- Build identity is consistent across runtime health, diagnostics, main bootstrap, and logs for one run.
+- Missing optional source-control metadata does not prevent development startup; required protocol/schema identity does.
+
+**Failure:** Contradictory required build/protocol metadata blocks readiness rather than publishing ambiguous identity.
+
+**Side effects:** none.
+
+<a id="identity-uuid"></a>
+## IDENTITY.UUID
+
+**Trigger/input:** Foundation needs a new technical identity such as command, correlation, run, job, audit, or temporary operation identity.
+
+**Result:** Generate and validate lowercase canonical UUIDv4 technical identifiers.
+
+**Rules:**
+- Use OS-CSPRNG-backed UUID generation.
+- Foundation technical IDs use one canonical textual representation.
+- Domain-visible identifiers remain owned by their domain LLD and are not replaced by UUIDs merely for convenience.
+- Tests may inject a deterministic generator through TEST.SEAMS.
+
+**Failure:** Invalid externally supplied UUID text fails validation before authoritative work.
+
+**Side effects:** none.
+
+<a id="trace-correlation"></a>
+## TRACE.CORRELATION
+
+**Trigger/input:** Browser request, launcher operation, application command/query, durable job, or nested internal operation enters SOMA.
+
+**Result:** Establish one bounded non-secret correlation context that can be carried through transport, application, logs, audit, jobs, and returned failures.
+
+**Rules:**
+- A missing external correlation ID causes SOMA to generate one; untrusted arbitrary values are not accepted as authoritative internal IDs without validation.
+- Correlation propagates across synchronous boundaries and is copied explicitly into durable job/audit records when their contract supports it.
+- Correlation is diagnostic linkage only; it never grants identity, authorization, replay, or transaction authority.
+- Raw secrets/customer bodies are not added merely because correlation exists.
+
+**Failure:** Invalid inbound correlation metadata is replaced or rejected according to the closed transport contract; it never becomes executable/log-injection content.
+
+**Side effects:** context/log/audit metadata only.
+
+<a id="error-contract"></a>
+## ERROR.CONTRACT
+
+**Trigger/input:** Any transport/application/foundation operation returns a handled failure across an ownership boundary.
+
+**Result:** Produce one stable safe error envelope.
+
+**Required shape:** `code`, bounded operator-safe `summary`, `recoverability`, optional `safe_next_action`, and `correlation_id`; field-level validation details may be added only by their closed contract.
+
+**Rules:**
+- Stable machine code is the API contract; HTTP status is transport mapping only.
+- Raw SQL/Starlette/Uvicorn/OS/Python exception text, file paths, secrets, tokens, and unbounded provider text never cross the application boundary.
+- Foundation defines common categories such as validation, unauthenticated, forbidden, not-found, stale/conflict, persistence, migration, readiness, busy/retry, integrity, and internal error.
+- Domain scopes define domain-specific codes while preserving this envelope.
+- Retryability/recoverability is explicit; UI does not infer it from HTTP status.
+
+**Failure:** An unknown internal exception maps to bounded `INTERNAL_ERROR` with correlation; diagnostic classification may be retained safely out of band.
+
+**Side effects:** diagnostic emission only where configured.
+
+<a id="time-monotonic"></a>
+## TIME.MONOTONIC
+
+**Trigger/input:** SOMA measures an elapsed duration, timeout, idle/absolute session deadline, debounce, retry delay, hold duration, shutdown budget, or runtime interval.
+
+**Result:** Measure elapsed time using a monotonic clock independent of wall-clock changes.
+
+**Rules:**
+- Python elapsed timing uses `time.monotonic_ns()` or an injected equivalent.
+- Browser elapsed interaction timing uses `performance.now()`.
+- Monotonic values are process-local measurements and are never stored as business chronology.
+- TIME.UTC remains the only authoritative wall-clock chronology mechanism.
+- Tests can inject deterministic monotonic clocks through TEST.SEAMS.
+
+**Failure:** Unsupported/invalid timer configuration fails before the timed operation begins.
+
+**Side effects:** none.
+
+<a id="fs-safe"></a>
+## FS.SAFE
+
+**Trigger/input:** Foundation/runtime needs to read, create, publish, replace, or delete owned local files/directories.
+
+**Result:** Provide canonical-path, ownership-aware, crash-resistant filesystem primitives.
+
+**Rules:**
+- Canonicalize beneath an explicit owned root and reject path traversal or unexpected symlink/reparse redirection where ownership/security depends on the path.
+- Provide same-directory atomic file publication using temporary file + flush/fsync where supported + replace.
+- Provide atomic same-parent directory publication for complete artifact sets when required by the owning feature.
+- Deletion requires exact-owned target validation; unknown/replaced artifacts are preserved rather than blindly removed.
+- Security-sensitive files use owner-appropriate ACL enforcement through the platform adapter.
+- Callers define semantic content; Foundation owns only safe filesystem mechanics.
+
+**Failure:** Unsafe path, ownership ambiguity, replacement race, ACL failure, or partial publication fails closed and leaves recoverable evidence where safe.
+
+**Side effects:** bounded owned filesystem mutation.
+
+<a id="fs-temp"></a>
+## FS.TEMP
+
+**Trigger/input:** A SOMA operation needs scratch/staging space for parsing, generation, snapshots, or atomic publication.
+
+**Result:** Allocate an operation-scoped directory beneath the canonical instance `tmp/` root with explicit ownership and cleanup semantics.
+
+**Rules:**
+- Runtime temp is distinct from repository `.tmp/`; repository `.tmp/` remains ignored human/agent scratch material.
+- Temporary workspaces use unpredictable operation identities and never become authoritative merely by existing.
+- Successful operations clean exact-owned scratch state; crash leftovers may be pruned only after ownership/age/activity checks.
+- Secrets are not written to temp unless an owning security contract explicitly permits a protected representation.
+
+**Failure:** Temp allocation/ownership failure aborts the operation before authoritative mutation.
+
+**Side effects:** temporary local files/directories only.
+
+<a id="runtime-lifecycle"></a>
+## RUNTIME.LIFECYCLE
+
+**Trigger/input:** The SOMA host process starts, progresses toward readiness, fails, or shuts down.
+
+**Result:** Maintain one authoritative host state machine:
+
+`STOPPED -> STARTING -> MIGRATING -> VERIFYING -> LISTENING_NOT_READY -> READY -> QUIESCING -> STOPPED`
+
+Any active startup/ready state may enter `FAILED` on unrecoverable host failure; retry/cleanup is explicit.
+
+**Rules:**
+- `READY` means canonical instance ownership is held; live DEK/cipher verification succeeded; accepted migrations/schema/integrity checks succeeded; required foundation providers are composed; the retained loopback socket is serving; runtime control is valid; and required static/main bootstrap assets verify.
+- Only `READY` accepts ordinary application queries/mutations.
+- `LISTENING_NOT_READY` may expose only explicitly allowed authenticated control/status routes.
+- State transitions are one-way per startup/shutdown attempt except explicit failed-cleanup/retry.
+- State changes are observable through RUNTIME.HEALTH and tray/console presentation; they do not fabricate domain facts.
+- Host runtime owns one request executor (initial max 4 workers) and one background executor (initial max 2 workers); blocking DB/file/application work never blocks the ASGI event loop.
+
+**Failure:** Illegal transition or failed required readiness check enters `FAILED`, preserves sanitized diagnostics, and never publishes false READY.
+
+**Side effects:** runtime/process state only.
+
+Reuse provenance: Beta `LocalHostLifecycle`.
+
+<a id="capability-registry"></a>
+## CAPABILITY.REGISTRY
+
+**Trigger/input:** Application composition finishes or main/diagnostics asks what this build can actually perform.
+
+**Result:** Return a deterministic registry of assembled capability IDs and availability state.
+
+**Rules:**
+- A capability is `available` only when its required provider/transport contract is actually composed; placeholders/stubs are never advertised as working.
+- Registry may distinguish `available`, `unavailable`, and `development` with an optional safe reason/remediation identifier.
+- Capability state does not alter domain truth and is not business authorization.
+- Main uses this registry to avoid fake routes/actions while iterative implementation is incomplete.
+- IDs are stable capability names owned by their scope; Foundation owns registry mechanics only.
+
+**Failure:** Duplicate/conflicting registrations fail composition; unknown capability consumers treat it as unavailable.
+
+**Side effects:** none.
+
+<a id="runtime-health"></a>
+## RUNTIME.HEALTH
+
+**Trigger/input:** Authenticated run-control health request or authenticated browser diagnostics request.
+
+**Result:** Report truthful bounded technical state for the current run.
+
+**Run-control health includes:** protocol version, `run_id`, `data_instance_id`, host state, build identity, PID/process birth identity, current migration identity/schema state, integrity state, and startup UTC.
+
+**Browser diagnostics may additionally include:** capability registry, executor queue-depth categories, open connection/active transaction counts, durable jobs by technical state, last migration identity, and sanitized recent foundation error codes.
+
+**Rules:**
+- No credential, DEK, run secret, CSRF/session token, customer body, raw exception, or unrestricted filesystem path is returned.
+- Health never redirects.
+- READY is reported only when RUNTIME.LIFECYCLE readiness invariants hold.
+- Health is observational and cannot create defaults, repair, migrate, checkpoint, or mutate domain state.
+
+**Failure:** If truthful health cannot be produced, return a stable bounded failure; never default to READY.
+
+**Side effects:** none.
+
+<a id="runtime-shutdown"></a>
+## RUNTIME.SHUTDOWN
+
+**Trigger/input:** Freshly authenticated exact-run shutdown command, console Ctrl+C, or equivalent owned host-stop request.
+
+**Result:** Quiesce and stop the exact current host without losing committed state or granting stale workers/control artifacts authority.
+
+**Sequence:**
+1. Revalidate exact run/data identity and transition to `QUIESCING`.
+2. Reject new ordinary mutations and stop new durable-job claims.
+3. Allow bounded in-flight request transactions to finish; signal cooperative job cancellation/checkpoint behavior.
+4. Close request/background executors after their governed budget.
+5. Checkpoint/close persistence resources as required without fabricating domain completion.
+6. Remove tray and exact-owned runtime registry/secret artifacts only after ownership is proven.
+7. Release canonical instance lock and enter `STOPPED`.
+
+**Rules:**
+- Graceful shutdown budget is initially 10 seconds for launcher/tray control.
+- Repeated exact shutdown is idempotent.
+- Timeout never authorizes process-name/PID/port-only termination; any future forced termination requires fresh exact process-birth/image validation.
+- Unknown or replaced runtime artifacts are preserved.
+
+**Failure:** Partial shutdown returns explicit failure/timeout state with safe diagnostics; it never reports graceful completion falsely.
+
+**Side effects:** runtime quiescence/cleanup only.
+
+<a id="security-browser-session"></a>
+## SECURITY.BROWSER_SESSION
+
+**Trigger/input:** A future authentication provider proves an operator and requests a browser session, or a browser query/mutation presents existing session context.
+
+**Result:** Provide same-origin loopback browser-session and CSRF mechanics independent of run-control authentication.
+
+**Rules:**
+- Session store is host-memory only; persist only SHA-256(session-token) lookup material, never raw reusable tokens.
+- Issue independent random 32-byte session and CSRF tokens; bind session to current `run_id`, actor identity, canonical origin, and monotonic issue/last-seen deadlines.
+- Session cookie is opaque, HttpOnly, SameSite=Strict, host-only, Path=/, with no Domain. Loopback HTTP means the cookie is not `Secure`; exact Host/Origin/CSRF rules are mandatory compensating controls.
+- Query validation requires exact current Host, valid current-run session, and valid deadlines.
+- Mutation validation additionally requires exact current Origin, constant-time matching `X-SOMA-CSRF`, and same-origin/none Fetch Metadata when present.
+- CORS is disabled; forwarded/proxy headers do not influence trust.
+- Initial inherited bounds are 12-hour idle, 24-hour absolute lifetime, and maximum 4 sessions; a later owning security/auth scope may tighten them.
+- Run end invalidates all sessions. Authentication/password changes may invalidate sessions through the provider contract.
+- This item does not define passwords, local profile semantics, or business authorization; it defines the transport/session substrate.
+
+**Failure:** Missing/stale/wrong-run/cross-origin/session/CSRF context fails before application dispatch.
+
+**Side effects:** bounded in-memory session state only.
+
+Reuse provenance: Beta `BrowserSessionAndCsrfV1`.
+
+<a id="persistence-snapshot"></a>
+## PERSISTENCE.SNAPSHOT
+
+**Trigger/input:** Backup/recovery/dev tooling requests a transactionally consistent database snapshot.
+
+**Result:** Produce a verified consistent snapshot of the authoritative encrypted database through Foundation-owned persistence mechanics without transferring backup-format ownership to Foundation.
+
+**Rules:**
+- Snapshot acquisition proves canonical instance/data identity and uses SQLite/SQLCipher-supported consistent snapshot mechanics.
+- Snapshot creation is bounded with respect to writer authority; expensive compression/encryption/export occurs after the database-consistency step.
+- Snapshot output is staged/published through FS.SAFE and is never declared a complete portable backup by this mechanism alone.
+- Future backup/recovery scopes own artifact envelope, retention, recovery secrets, restore policy, and UX.
+
+**Failure:** Busy/integrity/cipher/snapshot/publication failure yields no apparently complete snapshot artifact.
+
+**Side effects:** owned snapshot/staging files only.
+
+<a id="audit-append-only"></a>
+## AUDIT.APPEND_ONLY
+
+**Trigger/input:** An authoritative command declares a required audit event inside its existing UnitOfWork.
+
+**Result:** Validate and append one immutable typed audit event plus bounded resulting-event references atomically with the owning command.
+
+**Rules:**
+- Required core context includes audit event ID, action type/version, actor kind/ID when applicable, target type/ID, command ID, payload schema/version, canonical payload, correlation ID when present, and Foundation-assigned recording UTC.
+- Action/payload contracts are statically registered by the owning scope; Foundation never invents domain audit payload meaning.
+- Sensitive-field classification and canonical byte bounds are validated before insert.
+- Audit repository exposes no update/delete API; database guards reject UPDATE/DELETE.
+- Correction/reversal uses a new event referencing prior identity; prior audit bytes are never edited.
+- Any required audit validation/persistence failure rolls back the owning authoritative command.
+- Audit is evidence, not a mutable business-state store.
+
+**Failure:** Unknown action contract, invalid/oversized/sensitive payload, duplicate identity, or append-only integrity failure fails the whole owning mutation.
+
+**Side effects:** append-only technical evidence inside caller UoW.
+
+Reuse provenance: Beta `AuditWriter`.
+
+<a id="jobs-execution"></a>
+## JOBS.EXECUTION
+
+**Trigger/input:** Runtime becomes READY, durable work is available, or shutdown begins.
+
+**Result:** Execute registered durable jobs through a bounded host-owned background executor while JOBS.COORDINATOR remains the durable authority.
+
+**Rules:**
+- Initial background executor maximum is 2 workers; the bound is configuration-controlled but not unbounded.
+- Handler execution never holds a database transaction during external/file/CPU-heavy work.
+- Each accepted domain mutation performed by a job uses the owning application command/UoW.
+- Cancellation signal is cooperative optimization only; persisted claim/state validation is authoritative.
+- QUIESCING stops new claims; running handlers finish a safe checkpoint/terminal result within budget or remain recoverable on next startup.
+- Retry/backoff classification comes from each registered job contract; Foundation never invents domain lifecycle outcomes.
+
+**Failure:** Handler crash/timeout is converted to bounded stable job error state without persisting raw exception/provider secret text.
+
+**Side effects:** technical job attempts/checkpoints and owner-command effects.
+
+<a id="dev-seed"></a>
+## DEV.SEED
+
+**Trigger/input:** Explicit development reset/reseed operation after current migrations are applied.
+
+**Result:** Populate a deterministic useful development dataset through registered scope seed contributors.
+
+**Rules:**
+- Ordinary startup never seeds data.
+- Seed execution is explicit, development-only, versioned with the current design, and safe to discard.
+- Foundation owns seed orchestration/order and deterministic technical helpers; each domain scope owns its seed facts/invariants.
+- Seed contributors use application/domain interfaces or declared development-loading interfaces, never raw cross-module table writes.
+- Seed data is clearly synthetic and must not be confused with imported/customer evidence.
+- Reset/reseed may change freely during development; no Alpha/Beta data carryover is implied.
+
+**Failure:** Any required seed contributor failure marks reset/reseed incomplete and is reported explicitly; no false READY-with-seed-success claim.
+
+**Side effects:** development database population only.
+
+<a id="query-page"></a>
+## QUERY.PAGE
+
+**Trigger/input:** A module exposes a bounded collection/list/query surface.
+
+**Result:** Supply shared typed keyset-page/cursor mechanics while the module owns filter/order/business semantics.
+
+**Rules:**
+- Default page size 100; hard maximum 200 unless an owning LLD explicitly defines a stricter bound.
+- Cursor is versioned, filter/order-bound, opaque to UI, and validated against the exact query contract.
+- Collection ordering is deterministic and includes a unique tie-breaker.
+- A page/projection captures one `as_of_utc` or equivalent read-snapshot reference when derived ages/counts require consistency.
+- No silent truncation: partial/additional-results/capacity state is explicit.
+- Foundation does not invent domain filters, ranking, eligibility, or SQL across another module's private tables.
+
+**Failure:** Malformed/stale/wrong-filter cursor fails validation instead of returning a different page silently.
+
+**Side effects:** none.
+
+<a id="static-assets"></a>
+## STATIC.ASSETS
+
+**Trigger/input:** Local host starts or browser requests Main application/static assets.
+
+**Result:** Serve the verified prebuilt Main SPA from the local Python application with no Node/runtime network dependency.
+
+**Rules:**
+- Production-format runtime serves only locally built/packaged assets whose manifest/hash set matches BUILD.IDENTITY.
+- Source development may rebuild assets explicitly during setup/build; normal runtime does not invoke npm/Vite.
+- SPA fallback is allowed only for registered Main application routes; API/static-missing paths do not silently return HTML.
+- Static responses use safe content types/headers and a Content Security Policy compatible with no remote code/style/font dependency and no unsafe eval.
+- Asset verification is a readiness prerequisite when the user plane is required by the assembled build.
+
+**Failure:** Missing/tampered/incompatible required assets block READY or return explicit static-asset failure; no CDN fallback.
+
+**Side effects:** HTTP static responses only.
+
+<a id="test-seams"></a>
+## TEST.SEAMS
+
+**Trigger/input:** Focused automated/integration tests need deterministic control over foundation mechanisms.
+
+**Result:** Allow composition to inject bounded test providers without weakening production/source runtime contracts.
+
+**Rules:**
+- Injectable seams include UTC clock, monotonic clock, UUID generator, filesystem root/provider, process/runtime probes, browser opener, and test database/config factories.
+- Production composition uses concrete providers explicitly; tests do not mutate module globals to replace security/time/filesystem behavior.
+- Security/adversarial integration tests still exercise real Windows/DPAPI/SQLCipher providers where their behavior is under test.
+- A test seam cannot become a runtime configuration switch that bypasses authentication/encryption/trust in ordinary source execution.
+
+**Failure:** Missing required provider fails composition explicitly.
+
+**Side effects:** test-only dependency substitution.
+
 <a id="runtime-instance"></a>
 ## RUNTIME.INSTANCE
 
@@ -111,7 +643,7 @@
 
 **Rules:**
 - One running authoritative instance owns its configured database at a time.
-- The initial Windows canonical instance root is the LocalAppData known folder plus `SOMA/instance-v1`; source checkout location never becomes the data root.
+- The initial source-development instance root comes from CONFIG.RUNTIME and defaults to LocalAppData `SOMA/Development/instance-v1`; source checkout location never becomes the data root.
 - Runtime identity and database paths are configuration-derived, never inferred from the current working directory.
 - Startup must prove ownership before migrations or authoritative reads/writes.
 - Ordinary startup never destroys or resets data.
@@ -279,7 +811,7 @@ Reuse provenance: Beta migration manifest lessons; new owner-scoped identity rep
 
 **Trigger/input:** Explicit development reset operation for the configured SOMA development instance.
 
-**Result:** Stop/quiesce that instance, destroy only its disposable database state, recreate from the current manifest, and apply the declared development seed.
+**Result:** Stop/quiesce that instance, destroy only its disposable database state, recreate from the current manifest, and execute DEV.SEED.
 
 **Rules:**
 - Reset is never implicit in normal startup.
@@ -311,7 +843,6 @@ Reuse provenance: Beta migration manifest lessons; new owner-scoped identity rep
 
 Reuse provenance: Beta LLD-01 strict JSON and audit findings around incomplete container validation.
 
-<a id="command-replay"></a>
 ## COMMAND.REPLAY
 
 **Trigger/input:** Authoritative command carrying command identity and canonical request identity.
