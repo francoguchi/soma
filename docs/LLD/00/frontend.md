@@ -206,6 +206,28 @@ Reuse provenance: Beta LLD-10 presentation lessons and LLD-09 chronology refinem
 
 **Side effects:** client bootstrap/session presentation state only.
 
+<a id="ui-auth-gate"></a>
+## UI.AUTH_GATE
+
+**Trigger/input:** UI.BOOTSTRAP receives the current AUTH.LOCAL_ADMIN state for the current run.
+
+**Visible result:** Gate ordinary SOMA workspaces behind one minimal Local Administrator first-run setup/login flow.
+
+**Rules:**
+- Bootstrap states are at least `setup_required`, `login_required`, and `authenticated`.
+- `setup_required` presents password + confirmation only; there is no username field or profile editor.
+- `login_required` presents password only plus concise recovery guidance appropriate to the current development phase.
+- Password fields use secure input semantics, never persist to local/session storage, never populate URLs, and are never copied into diagnostic/error context.
+- First-run setup and login use exact current-origin authentication contracts; stale prior-run pages must rebootstrap before submitting credentials.
+- Successful setup/login transitions through SECURITY.BROWSER_SESSION and reboots the authenticated shell state rather than manually marking the UI authenticated.
+- Logout destroys the current browser session and returns to `login_required`.
+- Generic credential failure text is uniform and does not disclose whether verifier/schema/internal security state differs.
+- Password change/reset and profile/display-name controls are intentionally absent from this foundation surface.
+
+**Failure:** Invalid credentials/setup input, stale run, unavailable authentication service, or session issuance failure remains on the auth gate with safe actionable error state; no ordinary domain route/action becomes available.
+
+**Side effects:** authentication request/session presentation state only.
+
 <a id="ui-routing"></a>
 ## UI.ROUTING
 
@@ -362,6 +384,24 @@ Reuse provenance: Beta LLD-10 safe-undo principle, moved into shared user-plane 
 **Failure:** A shared component that cannot meet its required accessible interaction must not be used for a consequential operation.
 
 **Side effects:** presentation/interaction only.
+
+<a id="ui-appearance"></a>
+## UI.APPEARANCE
+
+**Trigger/input:** Main initializes its shared presentation theme or a later settings owner supplies an accepted appearance preference.
+
+**Visible result:** SOMA starts in **SOMA Core Dark** when no accepted preference exists and all components consume theme-independent semantic tokens.
+
+**Rules:**
+- `core-dark` is the initial development and product default.
+- Scope 00 establishes the appearance abstraction so future `system` and `light` preferences can be exposed without feature-level CSS rewrites; those alternatives need not be user-selectable before their owning settings surface exists.
+- Components never branch on raw palette values to infer business meaning.
+- Theme changes, when later exposed, preserve selection/focus/warning/destructive distinctions and accessibility requirements.
+- Brand assets and semantic state remain legible in Core Dark; small text/focus colors may use accessible derived blues rather than forcing raw brand blue.
+
+**Failure:** Missing/invalid appearance preference falls back deterministically to `core-dark`.
+
+**Side effects:** presentation theme state only.
 
 <a id="ui-brand"></a>
 ## UI.BRAND
