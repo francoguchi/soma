@@ -1,0 +1,48 @@
+# Local design and scratch material
+.tmp/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# JavaScript / frontend
+node_modules/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Environment and local secrets
+.env
+.env.*
+!.env.example
+
+# Local databases and runtime state
+*.db
+*.sqlite
+*.sqlite3
+
+# Packaging
+*.egg-info/
+.eggs/
+wheels/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
