@@ -33,6 +33,12 @@
       "anchor": "m00-005",
       "depends_on": ["WORKING_COPY.STORE", "UI.WORKING_COPY", "M00.004"],
       "code_paths": ["src/core/soma/db/migrations/00/005_working_copies.sql"]
+    },
+    {
+      "id": "M00.006",
+      "anchor": "m00-006",
+      "depends_on": ["AUTH.LOCAL_ADMIN", "M00.005"],
+      "code_paths": ["src/core/soma/db/migrations/00/006_local_admin_auth.sql"]
     }
   ],
   "tags": ["foundation", "migration", "persistence"]
@@ -182,3 +188,26 @@ Rules:
 - A restored copy retains its original base revision and must pass owner conflict review before accepted save.
 - Expiry/pruning removes only working-copy technical state; it never deletes accepted owner records.
 - Initial shared bounds remain 256 active recoverable copies per installation, 262144 canonical draft bytes per copy, 7-day expiry, 5-second idle checkpoint delay, minimum 30 seconds between successful checkpoints, and pruning batches of at most 100.
+
+<a id="m00-006"></a>
+## M00.006 — Local Administrator credential
+
+Creates the minimal singleton credential authority for AUTH.LOCAL_ADMIN. It does not create a profile, display name, settings record, or alternate user/account model.
+
+### `local_admin_credentials`
+
+- `singleton_key INTEGER PRIMARY KEY CHECK(singleton_key = 1)`.
+- `actor_id TEXT NOT NULL UNIQUE` — stable canonical Foundation technical UUID created once during first-run setup.
+- `password_phc TEXT NOT NULL` — Argon2id PHC verifier only; raw password is never persisted.
+- `credential_version INTEGER NOT NULL DEFAULT 1 CHECK(credential_version >= 1)`.
+- `created_at_utc INTEGER NOT NULL` — canonical UTC whole seconds.
+- `updated_at_utc INTEGER NOT NULL` — canonical UTC whole seconds.
+
+Rules:
+
+- A freshly migrated development database contains the table but zero rows; this means `setup_required`.
+- First-run setup may insert exactly one row with `singleton_key=1`; a second setup attempt is rejected rather than replacing credentials.
+- Login reads the single verifier and never writes successful/failed attempt history to this table.
+- Authentication throttle state and browser sessions are run-memory state, not durable account lockout.
+- Password/profile management added later may update this row only through an explicit governing contract; Foundation setup/login never edits it after successful creation.
+- The PHC/verifier, raw password, and confirmation never appear in audit payloads, command replay bodies/results, diagnostics, or support exports.
