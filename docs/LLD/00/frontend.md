@@ -400,7 +400,8 @@ Reuse provenance: Beta LLD-10 safe-undo principle, moved into shared user-plane 
 
 **Rules:**
 - `core-dark` is the initial development and product default.
-- Scope 00 establishes the appearance abstraction so future `system` and `light` preferences can be exposed without feature-level CSS rewrites; those alternatives need not be user-selectable before their owning settings surface exists.
+- Scope 00 owns appearance semantics. The accepted current/future mode enum is `core_dark | system | light`; `core_dark` is the default. When a typed settings store is available, Foundation may register/persist this preference through that generic store without transferring appearance meaning to the settings module.
+- Beta terminal-green/amber/violet decorative skins are not part of the current Foundation contract; adding skins later requires a new accepted appearance decision rather than inheriting old Beta values.
 - Components never branch on raw palette values to infer business meaning.
 - Theme changes, when later exposed, preserve selection/focus/warning/destructive distinctions and accessibility requirements.
 - Brand assets and semantic state remain legible in Core Dark; small text/focus colors may use accessible derived blues rather than forcing raw brand blue.
