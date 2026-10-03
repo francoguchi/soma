@@ -8,16 +8,16 @@ Beta LLD-02 contains 40 design files. The migration is organized by behavior own
 
 ## Design behavior clusters
 
-- [ ] **D01-A — PENDING:** immutable opaque reference identities and shared ID convention; reconcile with Foundation `IDENTITY.UUID` so scope 01 does not duplicate technical UUID generation.
-- [ ] **D01-B — PENDING:** singleton Local User Profile identity + descriptive `display_name`; preserve separation from Foundation `AUTH.LOCAL_ADMIN` credentials/session authority.
-- [ ] **D01-C — PENDING:** Customer Organization identity, descriptive metadata, lifecycle, external Customer Account Code claims/history, reviewed shared-claim/reassignment workflow.
-- [ ] **D01-D — PENDING:** Contact identity, lifecycle, optional channels, channel validation/use, current affiliation + affiliation history.
-- [ ] **D01-E — PENDING:** Dispatch Location identity/lifecycle, standalone addresses, Site-derived address boundary and cross-scope ownership with Infrastructure.
-- [ ] **D01-F — PENDING:** deterministic Unicode matching/candidate semantics for organizations/contacts; unresolved/unique/ambiguous are evidence states only and never implicit identity mutation.
-- [ ] **D01-G — PENDING:** archive/reactivation dependency-validator registry and bounded blocker previews; owner domains validate their own dependencies in the caller UnitOfWork.
-- [ ] **D01-H — PENDING:** typed SettingDefinition registry/store, code-defined defaults, bounded strict values, and ownership split between shared storage and semantic setting owners.
-- [ ] **D01-I — PENDING:** semantic NO_CHANGE, revisions, replay/audit/error contracts, pagination/bounds and current/reference history queries.
-- [ ] **D01-J — PENDING:** UI handoff/workbench behavior for references, conflicts, channels, settings and profile metadata using Foundation shared interactions instead of importing Beta LLD-10 component ownership.
+- [x] **D01-A — REWRITTEN:** immutable opaque reference identity is retained, but allocation now consumes Foundation `IDENTITY.UUID`; scope 01 owns reference identity semantics, not a duplicate `DomainIdFactory` implementation.
+- [x] **D01-B — REWRITTEN:** singleton Local User Profile metadata remains scope 01, while password/login/session authority is Foundation `AUTH.LOCAL_ADMIN`; first-run creation is an injected same-UoW participant and no username/login-name returns.
+- [x] **D01-C — REWRITTEN:** Customer Organization and Account Code semantics, history, reviewed shared-claim/reassignment and conservative conflict freshness are carried into `CUSTOMER.ORGANIZATION` / `CUSTOMER.ACCOUNT_CODE` under current Foundation mechanics.
+- [x] **D01-D — REWRITTEN:** Contact, optional channels, just-in-time email usability and append-preserving affiliation history are carried into the current scope-01 ownership model.
+- [x] **D01-E — REWRITTEN:** Dispatch Location remains Customer-neutral; standalone address stays scope 01 while Site-derived relationship/address authority remains explicitly deferred to the future Infrastructure owner.
+- [x] **D01-F — REWRITTEN:** deterministic `UNICODE_MATCH_V1` and unresolved/unique/ambiguous candidate evidence are retained; matching continues to forbid fuzzy/implicit merge authority.
+- [x] **D01-G — REWRITTEN:** dependency-validator registry, same-UoW fail-closed guards and bounded read-only blocker previews are retained while concrete validators stay with their future owner domains.
+- [x] **D01-H — REWRITTEN:** typed registry/store mechanics and no-write defaults are retained. Scope 01 owns ordinary nonsecret setting persistence; semantic definitions remain with their capability owners.
+- [x] **D01-I — REWRITTEN:** semantic NO_CHANGE, revisions/history, privacy-minimized audit, bounded keyset queries and stable errors are translated onto current Foundation replay/audit/query/error contracts.
+- [x] **D01-J — REWRITTEN:** reference/profile/settings UI behavior is now scope 01 while selection/scroll/dialog/working-copy/confirmation components remain Foundation-owned; Beta domain component ownership is not copied.
 
 ## Beta design donors
 
@@ -60,4 +60,4 @@ Do not migrate domain workspace React components from other Beta packets into sc
 
 Each design row becomes `REUSED`, `REWRITTEN`, `REJECTED`, `DEFERRED`, or `NEW` only after the current owner behavior is explicit in the scope-01 LLD.
 
-Implementation donor rows will be added only after design clusters are stable enough to partition into `IMP-01-xx` goals. Do not pre-allocate goals merely to mirror Beta files.
+Design behavior clusters are now mapped into the current backend/frontend/check/migration documents. Implementation donor rows remain intentionally unallocated until implementation goals are partitioned from the completed design rather than from Beta file layout.
