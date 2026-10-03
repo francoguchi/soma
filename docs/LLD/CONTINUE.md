@@ -8,7 +8,8 @@ This is the single current-state entry point for humans and agents. Do not appen
 | Active branch | `feat/00-foundation` |
 | Active goal | `IMP-00-01 — Foundation primitives and tooling` |
 | Goal file | `docs/implementation/00/00.01.md` |
-| Migration ledger | `docs/LLD/00/migration.md` |
+| Scope migration ledger | `docs/LLD/00/migration.md` |
+| Overall migration map | `docs/LLD/MIGRATION.md` |
 | Mode | fast iterative implementation |
 | Blockers | none |
 | Certification | deferred until whole-application implementation and live testing |
@@ -18,7 +19,7 @@ This is the single current-state entry point for humans and agents. Do not appen
 The intended handoff can be as small as: **“Read `docs/LLD/CONTINUE.md` and continue.”** A coding agent may use the same instruction; `AGENTS.md` supplies the standing implementation rules.
 
 1. Read the active goal file.
-2. Read only the LLD items referenced by that goal and the matching active-goal rows in the migration ledger.
+2. Read only the LLD items referenced by that goal and the matching active-goal rows in the scope migration ledger.
 3. Reuse/restructure donor code only where the current LLD still wants the same behavior.
 4. Implement, run the goal's focused checks plus directly affected tests, and fix failures.
 5. Update the goal's Run/Remaining/status, close its migration rows, then change this file to the next goal.
