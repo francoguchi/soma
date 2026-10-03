@@ -54,6 +54,10 @@ soma/
   AGENTS.md
   README.md
   pyproject.toml
+  soma_setup.bat
+  soma_run.bat
+  soma_run_console.bat
+  soma_stop.bat
   docs/
     architecture.md
     LLD/
@@ -100,6 +104,9 @@ soma/
             00/
               001_bootstrap.sql
         runtime/
+          control.py
+          trust.py
+          tray.py
         composition/
     main/
       package.json
@@ -123,6 +130,7 @@ soma/
     core/
     integration/
   tools/
+    source_launcher.py
 ~~~
 
 The tree defines placement, not a requirement to create empty wrappers or folders. Add a file when it has real behavior. One feature may begin with a small number of files and split when responsibilities require it.
@@ -133,6 +141,14 @@ Executable SQL exists only under `src/core/soma/db/migrations`. Foundation persi
 
 Local design references and scratch material may live under ignored `.tmp/`. Nothing under `.tmp/` may become an application dependency or source of truth. Accepted permanent assets move to owned repository paths such as `src/main/assets/brand/`.
 
+## Source runtime controls
+
+The repository-root `soma_setup.bat`, `soma_run.bat`, `soma_run_console.bat`, and `soma_stop.bat` are stable development/operator buttons. They remain thin adapters over `tools/source_launcher.py` and shared core runtime/security providers; BAT files never duplicate trust or lifecycle logic.
+
+`soma_run` and `soma_run_console` start the same authoritative application composition. Detached and console modes differ only in operator presentation/logging and process attachment, not in domain/runtime behavior. Both expose the same system tray control surface when available.
+
+Source launchers are development infrastructure. They may later inform installer shortcuts, but packaging/release mechanics do not own the authoritative runtime lifecycle. Host control always passes through the same verified local-instance protocol, and system tray actions never become alternate kill/business authority.
+
 ## System plane: core
 
 | Layer or role | Owns | Allowed dependency direction |
@@ -142,7 +158,7 @@ Local design references and scratch material may live under ignored `.tmp/`. Not
 | Domain | Entities, identities, policies, and valid business transitions. | Uses pure domain types/utilities. Imports no HTTP, SQL, UI, filesystem, or OS implementation. |
 | Ports/contracts | Typed operations provided or required by a module. | Describe a boundary without importing its concrete provider. |
 | Adapters | Persistence, source readers, exports, and native mechanisms. | Implement ports and use foundation infrastructure or external libraries. |
-| Runtime | Process lifecycle, readiness, scheduling, and workers. | Runs application operations; owns no independent business mutation rules. |
+| Runtime | Process lifecycle, readiness, trusted local control, source-launch integration, native tray lifecycle, scheduling, and workers. | Runs application operations; owns no independent business mutation rules. |
 | Composition | Construction and wiring of concrete providers. | Imports implementations required to assemble the application. |
 
 Transport does not execute SQL or decide business transitions. The application operation owns the transaction; participating adapters use its context and do not commit independently. A query may use a dedicated read adapter without constructing entities.
