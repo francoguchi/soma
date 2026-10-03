@@ -20,7 +20,7 @@
       "id": "DEV.SOURCE_LAUNCHERS",
       "anchor": "dev-source-launchers",
       "depends_on": ["RUNTIME.TRUSTED_CONTROL", "RUNTIME.LIFECYCLE", "PERSISTENCE.CONNECTION", "DIAGNOSTICS.OPERATOR_LOGS", "BUILD.IDENTITY"],
-      "code_paths": ["soma_setup.bat", "soma_run.bat", "soma_run_console.bat", "soma_stop.bat", "tools/source_launcher.py"]
+      "code_paths": ["soma_setup.bat", "soma_run.bat", "soma_run_console.bat", "soma_stop.bat", "soma_reset_dev.bat", "tools/source_launcher.py"]
     },
     {
       "id": "PLATFORM.BASELINE",
@@ -111,6 +111,12 @@
       "anchor": "security-browser-session",
       "depends_on": ["RUNTIME.INSTANCE", "TIME.MONOTONIC", "IDENTITY.UUID"],
       "code_paths": ["src/core/soma/foundation/security/browser_session.py", "src/core/soma/transport/security.py"]
+    },
+    {
+      "id": "AUTH.LOCAL_ADMIN",
+      "anchor": "auth-local-admin",
+      "depends_on": ["PERSISTENCE.CONNECTION", "TX.UOW", "SECURITY.BROWSER_SESSION", "TIME.MONOTONIC", "IDENTITY.UUID"],
+      "code_paths": ["src/core/soma/foundation/security/local_admin.py", "src/core/soma/transport/auth.py"]
     },
     {
       "id": "SECURITY.DELIBERATE_PROOF",
@@ -266,6 +272,7 @@
 - Local HTTP host uses Starlette + Uvicorn as a single-worker programmatic ASGI host bound only to `127.0.0.1`; proxy headers, reload, server banner, and websockets are disabled unless a later LLD item proves a need.
 - Authoritative persistence uses the `sqlcipher3` DB-API-compatible provider with SQLCipher 4.17.0 semantics, raw bound-parameter SQL, no ORM, and a SOMA-owned migration runner.
 - Main is a prebuilt static React + TypeScript SPA built with Vite; Node is development/build-only and is not required by a running SOMA instance.
+- Local Administrator password verification uses Argon2id through `argon2-cffi`; the accepted initial profile is version 19, 65536 KiB memory, time cost 3, parallelism 4, 16-byte random salt, and 32-byte output.
 - No Electron, SSR, React Server Components, external CDN modules/styles/fonts, runtime package downloads, `eval`, or dynamically downloaded executable dependencies.
 - Exact dependency versions/hashes live in dependency/build metadata rather than being duplicated in behavioral prose.
 
@@ -721,10 +728,12 @@ Reuse provenance: Beta LLD-12 `RuntimeRegistryV2` and `TrustedLocalInstanceV1`.
 | `soma_run.bat` | Reuse and open an already verified READY instance, or start SOMA detached, capture an owner-only run log, wait up to 30 seconds for authenticated READY, then open only the verified origin. |
 | `soma_run_console.bat` | Start the real SOMA host in the foreground, mirror sanitized runtime logging to the terminal, print the verified READY origin, and perform graceful owned shutdown on Ctrl+C. If a verified instance already runs, report/open that instance instead of creating a second host. |
 | `soma_stop.bat` | Freshly verify the current run, request graceful authenticated shutdown, and wait up to 10 seconds. No valid running instance is an idempotent success. Timeout reports failure and does not kill by process name, stale PID, or port alone. |
+| `soma_reset_dev.bat` | Resolve and display the exact development instance, require the operator to type literal `RESET`, gracefully stop a verified live host if required, recreate only the disposable development database from the current migration manifest, run DEV.SEED, and leave SOMA stopped. It never resets a packaged/non-development instance and never treats a double-click alone as confirmation. |
 
 **Rules:**
 - The BAT files are intentionally thin adapters. Runtime/setup/trust logic lives in `tools/source_launcher.py` and shared core providers; do not duplicate security logic across scripts.
 - Runtime actions never install or update dependencies. Environment mutation belongs only to explicit setup.
+- `soma_reset_dev.bat` is the only root-level destructive development button; it requires the explicit typed confirmation above and refuses a target whose CONFIG.RUNTIME mode/root is not the canonical development instance.
 - Source launchers operate against the canonical development instance, not a database under the checkout.
 - Concurrent run attempts converge on the single instance lock; the losing launcher waits for/verifies the winning host rather than creating a second authoritative instance.
 - Setup is rerunnable and preserves unrelated checkout/user data.
