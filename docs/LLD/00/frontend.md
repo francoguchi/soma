@@ -13,8 +13,14 @@
     {
       "id": "API.CLIENT",
       "anchor": "api-client",
-      "depends_on": ["CONTRACT.SOURCE"],
+      "depends_on": ["CONTRACT.SOURCE", "SECURITY.BROWSER_SESSION", "ERROR.CONTRACT", "TRACE.CORRELATION"],
       "code_paths": ["src/main/shared/api/"]
+    },
+    {
+      "id": "UI.BOOTSTRAP",
+      "anchor": "ui-bootstrap",
+      "depends_on": ["STATIC.ASSETS", "BUILD.IDENTITY", "API.CLIENT", "CAPABILITY.REGISTRY"],
+      "code_paths": ["src/main/app/bootstrap/", "src/main/shared/build/"]
     },
     {
       "id": "UI.BRAND",
@@ -30,8 +36,20 @@
     {
       "id": "UI.SHELL",
       "anchor": "ui-shell",
-      "depends_on": ["UI.TOKENS", "API.CLIENT"],
+      "depends_on": ["UI.TOKENS", "API.CLIENT", "UI.BOOTSTRAP"],
       "code_paths": ["src/main/app/", "src/main/shared/components/"]
+    },
+    {
+      "id": "UI.ROUTING",
+      "anchor": "ui-routing",
+      "depends_on": ["UI.SHELL"],
+      "code_paths": ["src/main/app/routing/", "src/main/shared/navigation/"]
+    },
+    {
+      "id": "UI.CAPABILITY_STATE",
+      "anchor": "ui-capability-state",
+      "depends_on": ["CAPABILITY.REGISTRY", "UI.SHELL"],
+      "code_paths": ["src/main/app/capabilities/", "src/main/shared/components/"]
     },
     {
       "id": "UI.SYSTEM_TRAY",
@@ -52,6 +70,24 @@
       "code_paths": ["src/main/shared/interactions/"]
     },
     {
+      "id": "UI.COLLECTIONS",
+      "anchor": "ui-collections",
+      "depends_on": ["QUERY.PAGE", "API.CLIENT", "UI.SELECTION", "UI.SCROLL"],
+      "code_paths": ["src/main/shared/collections/", "src/main/shared/components/"]
+    },
+    {
+      "id": "UI.AUTOCOMPLETE",
+      "anchor": "ui-autocomplete",
+      "depends_on": ["UI.COLLECTIONS", "UI.SELECTION", "UI.SCROLL"],
+      "code_paths": ["src/main/shared/components/autocomplete/", "src/main/shared/interactions/"]
+    },
+    {
+      "id": "UI.DIALOG_FOCUS",
+      "anchor": "ui-dialog-focus",
+      "depends_on": ["UI.SHELL", "UI.SCROLL"],
+      "code_paths": ["src/main/shared/components/dialog/", "src/main/shared/interactions/"]
+    },
+    {
       "id": "UI.RESPONSIVE",
       "anchor": "ui-responsive",
       "depends_on": ["UI.SHELL", "UI.SELECTION", "UI.SCROLL"],
@@ -70,9 +106,27 @@
       "code_paths": ["src/main/shared/interactions/", "src/main/shared/components/"]
     },
     {
+      "id": "UI.SAFE_UNDO",
+      "anchor": "ui-safe-undo",
+      "depends_on": ["API.CLIENT", "UI.CONFIRMATION"],
+      "code_paths": ["src/main/shared/interactions/undo/", "src/main/shared/components/"]
+    },
+    {
+      "id": "UI.DIAGNOSTICS_STATE",
+      "anchor": "ui-diagnostics-state",
+      "depends_on": ["RUNTIME.HEALTH", "DIAGNOSTICS.OPERATOR_LOGS", "UI.CAPABILITY_STATE", "UI.SHELL"],
+      "code_paths": ["src/main/features/system/", "src/main/shared/components/"]
+    },
+    {
+      "id": "UI.ACCESSIBILITY",
+      "anchor": "ui-accessibility",
+      "depends_on": ["UI.TOKENS", "UI.SELECTION", "UI.DIALOG_FOCUS", "UI.CONFIRMATION"],
+      "code_paths": ["src/main/shared/interactions/", "src/main/styles/"]
+    },
+    {
       "id": "UI.ERROR_STATE",
       "anchor": "ui-error-state",
-      "depends_on": ["API.CLIENT", "UI.TOKENS"],
+      "depends_on": ["API.CLIENT", "UI.TOKENS", "ERROR.CONTRACT"],
       "code_paths": ["src/main/shared/components/", "src/main/shared/api/"]
     }
   ],
@@ -121,6 +175,180 @@ Reuse provenance: Beta LLD-10 presentation lessons and LLD-09 chronology refinem
 **Failure:** Contract mismatch, unavailable host/session, network failure, or invalid response returns typed failure to feature state; no fabricated success.
 
 **Side effects:** local request state only, except commands explicitly sent to core.
+
+<a id="ui-bootstrap"></a>
+## UI.BOOTSTRAP
+
+**Trigger/input:** Browser loads the verified Main bundle for the current SOMA origin.
+
+**Visible result:** Establish one current-run UI bootstrap state before feature routes/actions become active.
+
+**Rules:**
+- Bootstrap verifies compatible frontend/build/protocol identity, current session/authentication state when available, capability registry, and required foundation API availability.
+- A stale browser tab from a prior run cannot silently operate against a new `run_id`; it must refresh/rebootstrap before mutations.
+- Bootstrap failure renders a bounded recovery screen rather than partially enabling domain actions.
+- Main assets are local STATIC.ASSETS only; no remote scripts/fonts/styles/runtime package downloads.
+- Bootstrap does not manufacture unavailable capabilities or domain records.
+
+**Failure:** Build/protocol mismatch, unavailable host, session failure, or invalid bootstrap contract produces explicit reload/restart/login/remediation as applicable.
+
+**Side effects:** client bootstrap/session presentation state only.
+
+<a id="ui-routing"></a>
+## UI.ROUTING
+
+**Trigger/input:** Operator opens a SOMA route, follows a record action, or uses browser history.
+
+**Visible result:** Resolve through one closed route registry over the browser History API while retaining eligible navigation context.
+
+**Rules:**
+- Route IDs/patterns are statically registered by the owning feature; arbitrary strings do not become executable feature routes.
+- A route records enough restoration context to preserve filters, active/selected IDs, pane/tab, scroll anchor, and focus token where applicable.
+- Back/forward navigation replays navigation state, not accepted business mutation.
+- Unknown/unavailable capability routes show explicit unavailable/not-found state and safe return navigation.
+- No routing library/runtime download is required by the baseline.
+
+**Failure:** Malformed route or unavailable owner does not dispatch owner API calls until route/capability validation succeeds.
+
+**Side effects:** browser history/navigation state only.
+
+<a id="ui-capability-state"></a>
+## UI.CAPABILITY_STATE
+
+**Trigger/input:** UI bootstrap or runtime capability update provides CAPABILITY.REGISTRY.
+
+**Visible result:** Navigation/actions truthfully reflect what this assembled build can perform.
+
+**Rules:**
+- `available` capability surfaces may be entered; `unavailable` surfaces remain explicitly unavailable rather than invoking stubs/500s.
+- `development` may be shown with a concise non-authoritative development indicator.
+- Capability state controls exposure/availability only; it is never business authorization or a replacement for owner action blockers.
+- A route/bookmark to an unavailable feature remains understandable and provides safe navigation back.
+- Unknown capability is treated as unavailable.
+
+**Failure:** Missing/invalid registry yields conservative unavailable behavior except for foundation recovery/diagnostics surfaces.
+
+**Side effects:** presentation/navigation availability only.
+
+<a id="ui-collections"></a>
+## UI.COLLECTIONS
+
+**Trigger/input:** A feature presents a bounded server-owned collection/list/table/tree result.
+
+**Visible result:** Render deterministic bounded pages with explicit loading/partial/continuation state while preserving selection and evidence context.
+
+**Rules:**
+- Default requested page size is 100 and no shared collection requests more than QUERY.PAGE's maximum 200.
+- Main never decodes or edits opaque server cursor internals.
+- At most 200 rows/items from one collection surface are retained in the ordinary DOM at once unless an owning item explicitly defines a stricter/specialized presentation.
+- New filter/order input supersedes prior request identity; stale responses are discarded.
+- Reaching a bound exposes partial/additional-results state and never silently drops selected IDs, warnings, dirty fields, or accepted rows.
+- Server/owner owns total/filter/order semantics; UI does not resort a partial page as though it were the complete dataset.
+
+**Failure:** Cursor/transport/stale error preserves current safe context and exposes refresh/retry rather than mixing result generations.
+
+**Side effects:** client collection/request state only.
+
+<a id="ui-autocomplete"></a>
+## UI.AUTOCOMPLETE
+
+**Trigger/input:** Operator enters text into a bounded searchable chooser.
+
+**Visible result:** Present a bounded, keyboard/pointer/touch-equivalent suggestion list without enumerating an unbounded population or creating entities implicitly.
+
+**Rules:**
+- Initial shared defaults: minimum 2 entered characters, page size 25, maximum 50 loaded options, 150 ms debounce; an owning feature may select a documented minimum in the range 1–4.
+- Focus alone never enumerates an unbounded population; an owner may expose an explicit bounded disclosure.
+- Each query has identity; new input cancels/supersedes stale work.
+- Arrow keys change active option without accepting; Enter accepts one eligible active option; Escape closes without change; Tab never commits ambiguity.
+- Typed/highlighted text never creates an entity or relationship. Missing-entity creation is a separate owner command.
+- Popup is its own scroll owner and remains viewport-safe.
+
+**Failure:** Loading, minimum-input, no-match, partial, stale, source-warning, and error are distinct states.
+
+**Side effects:** local chooser state only.
+
+Reuse provenance: Beta LLD-10 bounded chooser/autocomplete contract.
+
+<a id="ui-dialog-focus"></a>
+## UI.DIALOG_FOCUS
+
+**Trigger/input:** A modal/dialog/impact preview is opened or closed.
+
+**Visible result:** Provide safe accessible focus, scroll isolation, dismissal, and return behavior.
+
+**Rules:**
+- Dialog exposes accessible title/purpose, target/material consequence where applicable, validation/warnings, primary action, and cancellation/safe exit.
+- Initial focus is safe/context-appropriate and never automatically destructive.
+- Focus is contained within the active modal; background is inert/non-interactive and cannot scroll.
+- Escape closes a dismissible modal without acceptance; blocking dismissal requires a genuine atomic/domain reason and visible explanation.
+- Close restores the invoker when it survives, otherwise a deterministic safe fallback.
+- Long dialog content scrolls inside its owned surface.
+
+**Failure:** If focus isolation cannot be established, consequential dialog action remains unavailable rather than leaking interaction into the background.
+
+**Side effects:** presentation/focus state only.
+
+<a id="ui-safe-undo"></a>
+## UI.SAFE_UNDO
+
+**Trigger/input:** An owning domain exposes an explicitly registered currently valid inverse/correction preview for an accepted reversible action.
+
+**Visible result:** Offer bounded action-scoped Undo only while that exact inverse remains safe.
+
+**Rules:**
+- There is no global rollback writer and no generic database undo.
+- Owner supplies inverse/correction command contract, current preview/fingerprint, eligibility, blockers, and consequence text.
+- UI revalidates owner preview immediately before dispatching the inverse.
+- Independent reversible actions may retain independent bounded opportunities; one action does not replace unrelated undo state.
+- Stale/unsafe/unregistered inverse becomes unavailable with reason.
+- Accepted evidence/lifecycle that requires correction/cancellation/supersession uses the owner's named command rather than rewriting history.
+
+**Failure:** Missing/indeterminate/stale inverse registration fails closed; original accepted action remains unchanged.
+
+**Side effects:** inverse owner command only after successful fresh validation.
+
+Reuse provenance: Beta LLD-10 safe-undo principle, moved into shared user-plane foundation.
+
+<a id="ui-diagnostics-state"></a>
+## UI.DIAGNOSTICS_STATE
+
+**Trigger/input:** Operator opens the foundation System/Diagnostics surface.
+
+**Visible result:** Show concise live-test state without requiring log-file hunting.
+
+**Minimum content:** host/build identity, run state/uptime, instance/schema/migration state, capability availability, technical job counts, safe executor/connection/transaction counts when available, current log identity/path action, and recent sanitized foundation error codes.
+
+**Rules:**
+- This surface is observational; it does not mutate jobs, migrations, database, capabilities, or runtime except through separately labelled trusted controls.
+- Secrets, customer/domain bodies, raw exceptions, raw SQL, reusable credentials, and unrestricted filesystem paths are never displayed.
+- Time uses TIME.DISPLAY while an evidence/detail affordance may expose canonical UTC.
+- Open-log/log-folder actions use declared diagnostics/trusted local mechanisms.
+- Failed diagnostic subpanels remain visibly partial rather than making the whole application unavailable.
+
+**Failure:** Diagnostic provider failure shows unavailable/partial state and never changes authoritative readiness/domain results.
+
+**Side effects:** presentation only except separately labelled local open-file/folder actions.
+
+<a id="ui-accessibility"></a>
+## UI.ACCESSIBILITY
+
+**Trigger/input:** Any shared SOMA interaction renders or receives keyboard/pointer/touch input, zoom/text enlargement, reduced-motion, high-contrast, or forced-color preferences.
+
+**Visible result:** Equivalent operability and meaning across supported input/presentation modes.
+
+**Rules:**
+- Every operable element has visible unclipped focus distinct from hover/selection.
+- State/consequence never depends only on hue, blinking, motion, position, or one sensory channel.
+- Initial support target includes 200% text zoom and a shared minimum pointer target of 32 CSS px where density permits; compact table cells may use equivalent enlarged labelled action affordances.
+- Reduced motion preserves final state, chronology, progress, warning, and operability.
+- Forced colors/high contrast preserve selection/focus/warning/destructive distinctions.
+- Pointer, keyboard, and touch paths converge on the same owner command result.
+- Icon-only actions require accessible name and a labelled alternative/tooltip; tooltip is never the only label.
+
+**Failure:** A shared component that cannot meet its required accessible interaction must not be used for a consequential operation.
+
+**Side effects:** presentation/interaction only.
 
 <a id="ui-brand"></a>
 ## UI.BRAND
