@@ -100,6 +100,7 @@ Scope 01 is **not approved** until all four passes are complete. Keep the result
 Completed against the current design branch.
 
 - Scope-01 metadata resolves Foundation mechanisms through explicit dependencies; it does not create competing UUID, UoW, replay, audit, paging, auth/session, shell, working-copy, confirmation or appearance authorities.
+- Post-review reconciliation is now accepted on `main`: `docs/LLD/00/{backend,frontend,migration}.md` are byte-identical between `main` and this design branch; scope-00 checks/schema were unchanged. The active implementation branch remains intentionally untouched until Codex reconciles those accepted docs with its local work.
 - `UI.APPEARANCE` remains scope 00 semantic authority. Scope 01 only offers a generic ordinary-nonsecret Setting provider.
 - Local User Profile is descriptive metadata only; `PROFILE.AUTH_PARTICIPANT` uses Foundation's existing setup UoW/receipt/actor identity and never commits or stores credential/session/key material.
 - Cross-scope code-path audit found no scope-00/scope-01 ownership overlap after narrowing three overly broad Foundation impact mappings (`DEV.DB_RESET`, `STATIC.ASSETS`, `CONTRACT.SOURCE`).
