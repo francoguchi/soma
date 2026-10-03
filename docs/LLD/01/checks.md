@@ -15,6 +15,7 @@
     {"id":"CHK01.SETTINGS","anchor":"chk01-settings","covers":["SETTING.REGISTRY","SETTING.VALUE","SETTING.PROVIDER","M01.004"]},
     {"id":"CHK01.NO_CHANGE","anchor":"chk01-no-change","covers":["REF.NO_CHANGE"]},
     {"id":"CHK01.QUERY","anchor":"chk01-query","covers":["REF.QUERY","CUSTOMER.SCOPE_PROVIDER"]},
+    {"id":"CHK01.SCHEMA","anchor":"chk01-schema","covers":["M01.001","M01.002","M01.003","M01.004"]},
     {"id":"CHK01.ADVERSARIAL","anchor":"chk01-adversarial","covers":[]},
     {"id":"CHK01.UI.REFERENCE","anchor":"chk01-ui-reference","covers":["UI.REF.WORKSPACE","UI.REF.CANDIDATES","UI.REF.ACCOUNT_CODE_REVIEW","UI.REF.CONTACT","UI.REF.DISPATCH","UI.REF.LIFECYCLE"]},
     {"id":"CHK01.UI.SETTINGS","anchor":"chk01-ui-settings","covers":["UI.PROFILE.METADATA","UI.SETTINGS.REGISTRY"]}
@@ -86,6 +87,13 @@ For descriptive, Account Code, Contact channel/affiliation and setting updates, 
 
 Exercise active lists, historical detail, Account Code history, Contact channels/affiliation history, lifecycle preview and setting queries over datasets larger than one page. Require stable keyset order, bounded nested collections, no N+1 query explosion, no side-effecting default materialization, and exact counts only where semantics require them. Resolve Customer scopes `all`, `specific`, and `unassigned` in one read snapshot; a missing specific Customer fails rather than silently broadening scope, and archived identity remains explicit rather than being rewritten.
 
+<a id="chk01-schema"></a>
+## CHK01.SCHEMA
+
+Build a fresh disposable database through the Foundation migration manifest and exact-schema verifier. Require every scope-01 table to be SQLite STRICT with the documented columns/checks, every declared index/partial unique constraint, all 22 named protection/generation triggers, and leading-prefix coverage for every FK child path.
+
+Drop/rename one required index or trigger, weaken STRICT/channel-kind/current-affiliation/profile-FK protection, or tamper the stored matching-profile singleton and require readiness/schema verification to fail. No scope-01 migration may use SQLite wall-clock functions to invent accepted chronology.
+
 <a id="chk01-adversarial"></a>
 ## CHK01.ADVERSARIAL
 
@@ -100,9 +108,11 @@ Run the high-risk Beta regressions against current ownership rather than reprodu
 - direct SQL attempts to violate immutable profile/master identities, one-current-affiliation, history append-only, channel-kind=email, master-delete or lifecycle guards fail;
 - 100000 dependency blockers change preview cost only, not archive writer-path materialization;
 - malformed/duplicate-key/nonfinite/oversized setting JSON and unsafe state-dependent validators fail before accepted mutation;
-- replay after lost NO_CHANGE response never turns into a later mutation;
+- candidate evidence that was UNIQUE becomes stale when another candidate appears; consumers must revalidate rather than treating the old preview as authority;
+- replay after lost NO_CHANGE response never turns into a later mutation, and same command ID with a different request hash fails idempotency integrity;
 - injected SQL/cursor/reference-type payloads remain data and fail before repository identifier selection;
-- missing/partial future dependency providers return explicit unavailable/indeterminate state rather than optimistic eligibility.
+- missing/partial future dependency providers return explicit unavailable/indeterminate state rather than optimistic eligibility;
+- forced failure of Customer-reference generation trigger rolls back Customer/identifier/revision/receipt/audit changes atomically.
 
 This pass also verifies query statement counts remain bounded independently of page row count and that exact matching/keyset navigation uses declared indexes on representative synthetic populations.
 
