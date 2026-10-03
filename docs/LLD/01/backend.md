@@ -209,6 +209,15 @@ Current domain catalogue includes:
 
 Foundation supplies generic not-found, stale-revision, validation, replay/idempotency, persistence and internal categories. Candidate states `UNRESOLVED|UNIQUE_CANDIDATE|AMBIGUOUS`, channel prerequisite states, affiliation mismatch warnings and `NO_CHANGE` are not errors.
 
+Scope-01 codes map only to Foundation's closed recoverability enum:
+
+- `correct_input`: `MATCH_INPUT_INVALID`, `CHANNEL_INVALID`, `SETTING_UNKNOWN`, `SETTING_SECRET_FORBIDDEN`, `FIELD_BOUND_EXCEEDED`, malformed reviewed-command input;
+- `refresh`: lifecycle/reference staleness/blockers, Account Code review/source changes, Customer inactive, channel ownership/usability/selection changes, singleton-profile already present;
+- `retry`: `DEPENDENCY_VALIDATION_FAILED` only when the safe next action is a bounded retry after the dependency owner recovers;
+- `none`: unsupported matching profile or setting contract/version requiring a compatible build/governed upgrader rather than blind retry.
+
+No scope-01 error invents additional recoverability strings. More specific operator guidance belongs in bounded `safe_next_action`.
+
 Raw names, addresses, emails, setting values, SQL/provider exceptions or unrestricted source evidence never enter safe error summaries merely to explain a failure.
 
 <a id="profile-local-user"></a>
