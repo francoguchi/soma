@@ -131,6 +131,7 @@ soma/
           capabilities.py
     main/
       package.json
+      package-lock.json
       app/
         auth/
         bootstrap/
@@ -160,12 +161,13 @@ soma/
     core/
     integration/
   tools/
+    contracts.py
     source_launcher.py
 ~~~
 
 The tree defines placement, not a requirement to create empty wrappers or folders. Add a file when it has real behavior. One feature may begin with a small number of files and split when responsibilities require it.
 
-The root `pyproject.toml`, when introduced, packages the `soma` Python package from `src/core`. Frontend dependency/build configuration lives in `src/main/package.json`. Frontend unit and browser tests belong in `src/main/tests` and `src/main/browser-tests`; cross-plane integration tests belong in `tests/integration`.
+The root `pyproject.toml`, when introduced, packages the `soma` Python package from `src/core`. Runtime/development Python dependencies used by SOMA are pinned deliberately in project metadata during development rather than floating at execution time. Frontend dependency/build configuration lives in `src/main/package.json` with npm's committed `src/main/package-lock.json`; Node is build/test tooling only. Frontend unit and browser tests belong in `src/main/tests` and `src/main/browser-tests`; cross-plane integration tests belong in `tests/integration`.
 
 Executable SQL exists only under `src/core/soma/db/migrations`. Foundation persistence provides database connections and the migration runner. Documentation under `docs/LLD/NN/migrations` explains and links to SQL; it never contains a second executable copy.
 
