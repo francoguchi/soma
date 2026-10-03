@@ -47,7 +47,7 @@ The pinned Beta donor inventory contains 132 design files: LLD-01 Foundation Run
 
 ## Implementation donor checklist
 
-When closing a donor row, replace **PENDING** with `REUSED`, `REWRITTEN`, `REJECTED`, or `DEFERRED`, and append the new destination path(s) plus commit/check result if useful. Never edit a row merely because a donor file was read.
+When closing a donor row, replace **PENDING** with `REUSED`, `REWRITTEN`, `REJECTED`, or `DEFERRED`, and append the new destination path(s) plus commit/check result when available. `REUSED` requires behavior comparison against the current LLD plus focused regression evidence; copying/importing a donor file is never sufficient by itself. `NEW` rows are already closed because no donor implementation exists.
 
 ### IMP-00-01 — Foundation primitives and tooling
 
@@ -58,17 +58,17 @@ When closing a donor row, replace **PENDING** with `REUSED`, `REWRITTEN`, `REJEC
 ### IMP-00-02 — Protected persistence bootstrap
 
 - [ ] **R00.02-A — PENDING:** inspect/restructure `src/soma/security/crypto/{dpapi.py,live_key.py,sqlcipher_provider.py}` into Foundation security/persistence adapters; reuse only behavior compatible with current paths/trust boundaries.
-- [ ] **R00.02-B — PENDING:** inspect/restructure `src/soma/foundation/persistence/{connections.py,backup_snapshot.py}` and `migrations/{manifest.py,runner.py,verification.py}` into current persistence/migration ownership, including read-snapshot cleanup and schema verification.
+- [ ] **R00.02-B — PENDING:** inspect/restructure `src/soma/foundation/persistence/{connections.py,backup_snapshot.py}`, `src/soma/foundation/migrations/{manifest.py,runner.py,verification.py}`, `src/soma/foundation/queries/status.py`, `src/soma/migrations/{0001_foundation.sql,0013_fk_index_coverage.sql,manifest.json}`, and `src/soma/schema_manifest.json` into current persistence/migration ownership, including read-snapshot cleanup and schema verification.
 - [ ] **R00.02-C — PENDING:** selectively migrate focused regressions from `tests/test_foundation_{connection_safety,persistence,backup_snapshot,schema_verification,fk_index_coverage}.py` and `tests/test_security_{sqlcipher_native,windows_native}.py`; do not transplant unrelated Beta suite scaffolding.
 
 ### IMP-00-03 — Authoritative execution mechanics
 
-- [ ] **R00.03-A — PENDING:** inspect/restructure `persistence/uow.py`, `application/{command_boundary.py,command_receipts.py}`, `audit/{registry.py,writer.py}`, and `jobs/coordinator.py`; preserve one-outer-UoW, exact replay, append-only audit and claim/checkpoint invariants.
+- [ ] **R00.03-A — PENDING:** inspect/restructure `persistence/uow.py`, `application/{command_boundary.py,command_receipts.py}`, `audit/{registry.py,writer.py}`, `jobs/coordinator.py`, `queries/jobs.py`, and donor schema slices `src/soma/migrations/{0001_foundation.sql,0005_command_replay_results.sql,0008_durable_job_coalescing.sql}`; preserve one-outer-UoW, exact replay, append-only audit and claim/checkpoint invariants.
 - [ ] **R00.03-B — PENDING:** selectively migrate focused replay/audit/job regressions from `tests/test_foundation_{replay_results,exact_response_guard,audit_allocations,multi_audit,durable_jobs,durable_job_claim_guard,durable_job_terminal_cancel}.py`.
 
 ### IMP-00-04 — Trusted local runtime
 
-- [ ] **R00.04-A — PENDING:** inspect/restructure `src/soma/foundation/runtime/{host.py,instance_lock.py,loopback.py,registry.py,server.py}` and Foundation status queries/routes into current runtime/lifecycle/health composition.
+- [ ] **R00.04-A — PENDING:** inspect/restructure `src/soma/foundation/runtime/{host.py,instance_lock.py,loopback.py,registry.py,server.py}`, `src/soma/foundation/{contracts/foundation.py,queries/status.py,queries/data_instance_identity.py,api/routes_foundation.py}`, and composition hints in `src/soma/application.py` into current runtime/lifecycle/health composition.
 - [ ] **R00.04-B — PENDING:** inspect/restructure `src/soma/security/runtime/{control.py,trust.py,source_control.py,windows.py,installation.py}`, `tools/source_launcher.py`, and the four Beta BAT launchers. Add the new guarded `soma_reset_dev.bat`; do not preserve Beta path/packet ownership.
 - [ ] **R00.04-C — PENDING:** migrate an approved SOMA logo/icon master from ignored `.tmp/` into `src/main/assets/brand/` and derive deterministic tray/runtime variants. The ignored design files are references, never runtime dependencies.
 - [ ] **R00.04-D — PENDING:** inspect `src/soma/ui/assets.py` and static-manifest logic only for useful serving/integrity behavior. **Do not copy** Beta's compiled `src/soma/ui/static/*` bundle; Main is rebuilt from current source.
@@ -77,14 +77,14 @@ When closing a donor row, replace **PENDING** with `REUSED`, `REWRITTEN`, `REJEC
 
 ### IMP-00-05 — Runnable user-plane shell
 
-- [ ] **R00.05-A — PENDING:** inspect/restructure `src/soma/security/auth/{passwords.py,sessions.py}` and `services/auth.py` for minimal setup/login/logout only. Reject Beta password-management/auto-login behavior that current Foundation intentionally defers.
-- [ ] **R00.05-B — PENDING:** inspect/restructure `src/web/app/router.ts`, `components/SomaShell.tsx`, `data/{http.ts,query-controller.ts}`, `state/appearance.ts`, and `styles/soma.css` into current `src/main` shell/API/appearance ownership.
+- [ ] **R00.05-A — PENDING:** inspect/restructure `src/soma/security/auth/{passwords.py,sessions.py}`, `src/soma/security/{services/auth.py,contracts/security.py}`, and the auth portion of `src/soma/application.py` for minimal setup/login/logout only. Reject Beta password-management/auto-login behavior that current Foundation intentionally defers.
+- [ ] **R00.05-B — PENDING:** inspect/restructure `src/web/app/{main.tsx,router.ts}`, `src/web/components/SomaShell.tsx`, `src/web/data/{http.ts,query-controller.ts}`, `src/web/state/{appearance.ts,ui-store.ts}`, `src/web/styles/soma.css`, and `src/web/index.html` into current `src/main` shell/API/appearance ownership.
 - [ ] **R00.05-C — PENDING:** selectively reuse auth/navigation/appearance assertions from `tests/test_security_passwords.py`, `src/web/browser-tests/{navigation.spec.mjs,appearance.spec.mjs}`, and relevant source-runtime browser checks.
 - [x] **R00.05-D — DEFERRED:** Beta domain workspace React components are not Foundation donors. Their useful layouts/behaviors migrate later with the owning domain scopes; future workspaces remain visible but disabled in the Foundation shell.
 
 ### IMP-00-06 — Shared interaction system
 
-- [ ] **R00.06-A — PENDING:** inspect/restructure `src/soma/ui/{contracts.py,repository.py,commands.py,queries.py,routes.py,audit.py}` into `WORKING_COPY.STORE` and its transport/application boundaries.
+- [ ] **R00.06-A — PENDING:** inspect/restructure `src/soma/ui/{contracts.py,repository.py,commands.py,queries.py,routes.py,audit.py,composition.py}` plus working-copy portions of `registry.json`; `settings.py` remains a presentation-settings donor for the later settings owner rather than Foundation persistence into `WORKING_COPY.STORE` and its transport/application boundaries.
 - [ ] **R00.06-B — PENDING:** inspect/restructure `src/web/interactions/{selection-open.ts,scroll-owner.ts,autocomplete.tsx,deliberate-hold.ts,safe-undo.ts,HoldButton.tsx}`, `layout/responsive.ts`, `working-copy/client.ts`, and shared components such as `BoundedCollection.tsx`, `SelectableCollection.tsx`, `Modal.tsx`, `UndoOpportunity.tsx`, and `WorkbenchShell.tsx`.
 - [ ] **R00.06-C — PENDING:** selectively migrate `tests/test_ui_working_copies.py`, `src/web/tests/interactions.test.mjs`, and only the browser-workbench assertions that exercise shared interactions.
 - [x] **R00.06-D — DEFERRED:** Beta visual fixture manifests/pixel baselines are not required for rapid Foundation implementation. Revisit visual-regression governance after the shared shell is stable.
@@ -92,5 +92,7 @@ When closing a donor row, replace **PENDING** with `REUSED`, `REWRITTEN`, `REJEC
 ## Completion rule
 
 Before an implementation goal becomes `working`, every migration row for that goal must be checked and carry an explicit disposition. Reuse is never assumed: reading a donor may result in `REWRITTEN` or `REJECTED`.
+
+A donor-path audit against Beta implementation tree `710d975e38519ccd73ac048bbc8a07e8d1e88cca` verified the paths referenced above after correcting the old migration/frontend namespace locations. If a necessary donor is discovered outside these rows, add it here before relying on it.
 
 Do not create another migration/progress ledger for Foundation. This file is the migration tracker; `docs/LLD/CONTINUE.md` is the current-state pointer; implementation goal files hold execution results.
