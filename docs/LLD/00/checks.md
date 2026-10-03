@@ -32,7 +32,7 @@
     {
       "id": "CHK00.BUILD.STATIC",
       "anchor": "chk-build-static",
-      "covers": ["PLATFORM.BASELINE", "BUILD.IDENTITY", "STATIC.ASSETS", "UI.BOOTSTRAP", "UI.BRAND"]
+      "covers": ["PLATFORM.BASELINE", "BUILD.IDENTITY", "STATIC.ASSETS", "BRAND.ASSETS"]
     },
     {
       "id": "CHK00.ERROR.TRACE",
@@ -82,12 +82,12 @@
     {
       "id": "CHK00.CAPABILITIES",
       "anchor": "chk-capabilities",
-      "covers": ["CAPABILITY.REGISTRY", "UI.CAPABILITY_STATE"]
+      "covers": ["CAPABILITY.REGISTRY", "UI.BOOTSTRAP", "UI.CAPABILITY_STATE"]
     },
     {
       "id": "CHK00.PAGE.COLLECTION",
       "anchor": "chk-page-collection",
-      "covers": ["QUERY.PAGE", "UI.COLLECTIONS", "API.CLIENT"]
+      "covers": ["QUERY.PAGE", "API.CLIENT"]
     },
     {
       "id": "CHK00.UI.ROUTING",
@@ -142,7 +142,12 @@
     {
       "id": "CHK00.MIGRATION.REBUILD",
       "anchor": "chk-migration-rebuild",
-      "covers": ["MIGRATION.MANIFEST", "DEV.DB_RESET", "PERSISTENCE.SCHEMA_VERIFY", "MIGRATION.STATUS", "M00.001"]
+      "covers": ["MIGRATION.MANIFEST", "PERSISTENCE.SCHEMA_VERIFY", "M00.001"]
+    },
+    {
+      "id": "CHK00.MIGRATION.STATUS",
+      "anchor": "chk-migration-status",
+      "covers": ["MIGRATION.STATUS"]
     },
     {
       "id": "CHK00.REPLAY.EXACT",
@@ -338,7 +343,12 @@ Execute one application operation with multiple persistence participants, inject
 <a id="chk-migration-rebuild"></a>
 ## CHK00.MIGRATION.REBUILD
 
-Build a fresh disposable database from the manifest, verify declared owner order/dependencies/hashes plus committed schema tables/indexes/triggers, columns, foreign keys, effective FK indexes, ledger agreement, quick/FK checks, and append-only probes; then reset the exact configured development instance and rebuild it again. A tampered SQL hash, unresolved dependency, extra/missing authoritative schema object, ledger mismatch, or FK-index gap blocks readiness. Query migration status through both verified live and safely locked offline paths and verify it remains strictly observational.
+Build a fresh disposable database from the manifest and verify declared owner order/dependencies/hashes plus committed schema tables/indexes/triggers, columns, foreign keys, effective FK indexes, ledger agreement, quick/FK checks, and append-only probes. Rebuild a fresh test instance again from zero. A tampered SQL hash, unresolved dependency, extra/missing authoritative schema object, ledger mismatch, or FK-index gap blocks readiness.
+
+<a id="chk-migration-status"></a>
+## CHK00.MIGRATION.STATUS
+
+With no live host, safely inspect a locked development instance and distinguish not-initialized/current/pending/drift/future/unsafe-sidecar/inspection-failure states without creating or repairing anything. Then start a verified host and confirm status prefers authenticated live state. A potentially owned or unsafe offline database never gets opened as though exclusive access were proven.
 
 <a id="chk-replay-exact"></a>
 ## CHK00.REPLAY.EXACT
