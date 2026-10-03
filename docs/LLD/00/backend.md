@@ -271,7 +271,8 @@
 - Core runtime is CPython x64 on supported Windows; initial supported interpreter lines are Python 3.13 and 3.14.
 - Local HTTP host uses Starlette + Uvicorn as a single-worker programmatic ASGI host bound only to `127.0.0.1`; proxy headers, reload, server banner, and websockets are disabled unless a later LLD item proves a need.
 - Authoritative persistence uses the `sqlcipher3` DB-API-compatible provider with SQLCipher 4.17.0 semantics, raw bound-parameter SQL, no ORM, and a SOMA-owned migration runner.
-- Main is a prebuilt static React + TypeScript SPA built with Vite; Node is development/build-only and is not required by a running SOMA instance.
+- Main is a prebuilt static React + TypeScript SPA built with Vite; Node is development/build-only and is not required by a running SOMA instance. npm with a committed package lock is the frontend package manager.
+- Development tests use pytest for Python, Vitest + Testing Library for Main unit/component tests, and Playwright only for browser behavior that genuinely requires a browser. Ruff is the default Python lint/format checker; TypeScript runs in strict mode and uses `tsc --noEmit` when a frontend increment changes typed code. There is no development coverage threshold.
 - Local Administrator password verification uses Argon2id through `argon2-cffi`; the accepted initial profile is version 19, 65536 KiB memory, time cost 3, parallelism 4, 16-byte random salt, and 32-byte output.
 - No Electron, SSR, React Server Components, external CDN modules/styles/fonts, runtime package downloads, `eval`, or dynamically downloaded executable dependencies.
 - Exact dependency versions/hashes live in dependency/build metadata rather than being duplicated in behavioral prose.
