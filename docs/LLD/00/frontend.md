@@ -96,13 +96,13 @@
     {
       "id": "UI.WORKING_COPY",
       "anchor": "ui-working-copy",
-      "depends_on": ["API.CLIENT"],
+      "depends_on": ["API.CLIENT", "WORKING_COPY.STORE"],
       "code_paths": ["src/main/shared/interactions/"]
     },
     {
       "id": "UI.CONFIRMATION",
       "anchor": "ui-confirmation",
-      "depends_on": ["UI.SHELL"],
+      "depends_on": ["UI.SHELL", "SECURITY.DELIBERATE_PROOF"],
       "code_paths": ["src/main/shared/interactions/", "src/main/shared/components/"]
     },
     {
@@ -518,8 +518,10 @@ Reuse provenance: Beta LLD-10 shared workbench shell and responsive composition.
 - A copy based on an older accepted revision never overwrites newer truth; conflict review distinguishes current truth from proposed edits.
 - Last-write-wins is prohibited for identity/evidence/lifecycle facts.
 - Navigation within the same flow preserves working intent; abandoning it warns when loss would occur.
+- Recoverable checkpointing uses WORKING_COPY.STORE; shared initial bounds are 262144 canonical draft bytes, 256 nonexpired copies, 7-day expiry, checkpoint after 5 seconds idle, and at least 30 seconds between successful checkpoints for the same copy.
+- Restoring a recoverable copy never accepts it; current owner revision/freshness is shown and stale copies enter conflict review.
 
-**Failure:** stale/invalid/unsupported restoration remains a working-copy conflict/unavailable state and never becomes accepted truth.
+**Failure:** stale/invalid/unsupported restoration, generation conflict, capacity, or checkpoint failure preserves safe in-memory input and never becomes accepted truth.
 
 **Side effects:** local/recoverable draft state only; accepted mutation only through owner commands.
 
@@ -535,9 +537,9 @@ Reuse provenance: Beta LLD-10 working-copy semantics.
 **Rules:**
 - Tiers: ordinary activation, deliberate hold, impact preview, impact preview plus hold, or domain-specific authority.
 - Confirmation tier is owner-declared/registered; UI does not invent consequences.
-- Deliberate hold lasts one continuous `3000 ms` measured by a monotonic source.
-- Release/cancel/route or target change, lost activation, stale dependency, or scroll-classified movement resets the hold and submits nothing.
-- Completion triggers at most one command and owner state is revalidated before commit.
+- Deliberate hold lasts one continuous `3000 ms` measured by browser TIME.MONOTONIC semantics (`performance.now()`) and is paired with SECURITY.DELIBERATE_PROOF server challenge/proof for tiers that require a hold.
+- Release/cancel/route or target/revision/preview change, lost activation, visibility suspension that invalidates continuity, stale dependency, challenge expiry, or scroll-classified movement resets/abandons the hold and submits nothing.
+- Completion obtains at most one proof and triggers at most one owning command; owner state is revalidated and proof consumed at the owner-declared boundary before mutation.
 - Impact preview shows material targets/effects/blockers; hold never substitutes for required preview.
 - Pointer, keyboard, and touch provide equivalent consequence/label semantics.
 
