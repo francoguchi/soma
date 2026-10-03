@@ -83,12 +83,22 @@ soma/
     core/
       soma/
         foundation/
-          time/
-          security/
+          audit/
+          build/
+          config/
+          context/
+          diagnostics/
+          errors/
+          filesystem/
+          identity/
           persistence/
+          query/
+          security/
+          testing/
+          time/
           transactions/
           jobs/
-          diagnostics/
+          development/
         modules/
           tickets/
             domain/
@@ -105,18 +115,31 @@ soma/
               001_bootstrap.sql
         runtime/
           control.py
-          trust.py
+          health.py
+          host.py
+          lifecycle.py
+          static_assets.py
           tray.py
+          trust.py
+          workers.py
         composition/
+          capabilities.py
     main/
       package.json
       app/
+        bootstrap/
+        capabilities/
+        routing/
       shared/
+        api/
+        build/
+        collections/
         components/
         interactions/
+        navigation/
         time/
-        api/
       features/
+        system/
         tickets/
           views/
           state/
@@ -149,6 +172,16 @@ The repository-root `soma_setup.bat`, `soma_run.bat`, `soma_run_console.bat`, an
 
 Source launchers are development infrastructure. They may later inform installer shortcuts, but packaging/release mechanics do not own the authoritative runtime lifecycle. Host control always passes through the same verified local-instance protocol, and system tray actions never become alternate kill/business authority.
 
+The source-development instance defaults beneath Windows LocalAppData at `SOMA/Development/instance-v1`. This intentionally separates disposable development data from a future packaged release instance.
+
+## Foundation boundary
+
+Scope 00 owns mechanisms required before domain capabilities can safely exist: configuration/paths, build identity, UTC and monotonic clocks, technical IDs/correlation, errors, safe filesystem/temp, protected persistence/migrations/snapshots, transactions/replay/audit, jobs, trusted runtime/control, browser-session/CSRF substrate, static serving, API/query mechanics, diagnostics, capability discovery, testing seams, and shared user-plane interactions.
+
+Foundation never owns ticket, customer, Objective, Task, SLA, inventory, infrastructure, communication, import, or other business meaning. A generic mechanism may validate/transport an owner contract, but it may not infer owner lifecycle, eligibility, ranking, relationship, or audit semantics.
+
+A later module registers only the minimum data needed by a foundation registry (for example a job contract, audit payload contract, capability descriptor, route, seed contributor, or query DTO). Registration does not transfer business ownership to Foundation.
+
 ## System plane: core
 
 | Layer or role | Owns | Allowed dependency direction |
@@ -164,6 +197,10 @@ Source launchers are development infrastructure. They may later inform installer
 Transport does not execute SQL or decide business transitions. The application operation owns the transaction; participating adapters use its context and do not commit independently. A query may use a dedicated read adapter without constructing entities.
 
 A background worker invokes an application operation. Cross-module calls use an exported provider interface; consumers do not query another module's private tables. Cross-module orchestration belongs to one named application coordinator. Do not add reciprocal module imports; resolve a cycle through a provider interface and composition.
+
+Every externally visible operation carries stable safe error semantics and an opaque correlation context. Correlation supports tracing only; it never grants identity, authorization, replay, transaction, or domain authority.
+
+Wall-clock chronology and elapsed timing are separate mechanisms: UTC records facts; monotonic clocks govern durations/timeouts. Feature code does not call wall-clock/local-time APIs directly when an owned clock/provider exists.
 
 Shared foundation provides mechanisms. Domain-specific customer, ticket, SLA, inventory, and communication policies belong to their modules. Foundation must not become a domain catch-all.
 
@@ -197,6 +234,8 @@ This is control flow; source imports still follow the layer rules above.
 ## Contract seam
 
 Core and main must not independently invent the same transport contract. Runtime request/response schemas live in one authoritative contract source and are validated or used to generate bindings for both planes.
+
+The shared seam also standardizes the safe error envelope, correlation identity, build/protocol bootstrap, capability registry, keyset-page/cursor mechanics, authenticated browser context, and current-run identity. Domain payloads remain owned by their scope.
 
 A contract change updates its owner LLD item, provider implementation, generated/validated consumer binding, and affected goal in the same iteration.
 
