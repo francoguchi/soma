@@ -18,7 +18,7 @@ This is the single current-state entry point for humans and agents. Do not appen
 | Overall migration map | `docs/LLD/MIGRATION.md` |
 | Mode | parallel design N+1 / implementation N |
 | Implementation blockers | none known in this design branch |
-| Design blockers | none; scope 01 remains unapproved until PASS-1..PASS-4 in `docs/LLD/01/migration.md` complete |
+| Design blockers | PASS-1..PASS-4 complete; awaiting owner approval of scope 01 before implementation goals are created |
 | Certification | deferred until whole-application implementation and live testing |
 
 ## Resume
@@ -48,7 +48,7 @@ Current next action: continue `IMP-00-01` on `feat/00-foundation`.
 4. Record every donor behavior/code slice as reused, rewritten, rejected, deferred, or new.
 5. Update the design scope backend/frontend/checks/contracts/migrations and create implementation goals only after ownership and behavior are clear.
 
-Current next action: run scope-01 pre-approval PASS-1 through PASS-4 from `docs/LLD/01/migration.md`; only after all four pass should the design be approved and partitioned into `IMP-01-xx` goals.
+Current next action: owner reviews the completed PASS-1..PASS-4 evidence in `docs/LLD/01/migration.md`. If approved, mark scope 01 approved, partition `IMP-01-xx` goals, add implementation donor rows by goal, then advance the design lane to scope 02.
 
 ## Do not
 
