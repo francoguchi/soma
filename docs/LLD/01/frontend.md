@@ -62,7 +62,7 @@
 <a id="ui-ref-workspace"></a>
 ## UI.REF.WORKSPACE
 
-Provide dense Reference workspaces for Customer Organizations, Contacts, and Dispatch Locations using Foundation shell/collection/selection/working-copy primitives. Lists are bounded and preserve filters, active/selected identity, scroll and open-workbench context.
+Provide dense Reference workspaces for **Customers** (domain `CustomerOrganization`), Contacts, and Dispatch Locations using Foundation shell/collection/selection/working-copy primitives. Lists are bounded and preserve filters, active/selected identity, scroll and open-workbench context.
 
 Active references are available for new work; archived references remain history-visible and visually ineligible until explicit reactivation.
 
@@ -73,7 +73,7 @@ Reference workspaces expose immutable identity and lifecycle/revision evidence w
 
 Candidate matching displays `UNRESOLVED`, `UNIQUE_CANDIDATE`, and `AMBIGUOUS` explicitly. A unique candidate is never silently accepted as a link/merge.
 
-Ambiguous state shows exact candidate count plus bounded/paginated candidate evidence; page size does not change ambiguity. Customer Account Code evidence is visually distinguishable from descriptive-name evidence.
+Ambiguous state shows exact candidate count plus bounded/paginated candidate evidence; page size does not change ambiguity. Customer Account Code evidence is visually distinguishable from descriptive-name evidence. Ordinary operator labels say **Customer**; transport/domain identifiers may retain `CustomerOrganization` where precision is required.
 
 Creating a new reference or choosing an existing candidate is always an explicit owner action.
 
