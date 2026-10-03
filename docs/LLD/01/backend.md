@@ -326,7 +326,7 @@ Accepted create/archive/reactivate/descriptive-correction facts append reference
 <a id="setting-registry"></a>
 ## SETTING.REGISTRY
 
-Settings use a closed code-defined registry. Each definition owns: stable key, semantic owner, contract name/version, default provider, strict validator, semantic equality, unknown-field policy, ordinary-nonsecret storage class, and field/depth/collection byte bounds.
+Settings use a closed code-defined registry. Each definition owns: stable key, semantic owner, contract name/version, default provider, strict validator, semantic equality, ordinary-nonsecret storage class, and field/depth/collection byte bounds. The first scope-01 implementation accepts only `unknown_field_policy=reject`; there is no generic preserve/quarantine fallback.
 
 Scope 01 owns registry/store mechanics; each semantic owner owns the meaning and state-dependent validation of its settings. Unknown keys are rejected and do not create generic storage.
 
@@ -339,7 +339,7 @@ Reading an absent setting returns the registered default with source `DEFAULT` a
 
 Explicit writes validate through the registered contract, revalidate expected revision/absence and owner checks inside one UnitOfWork, then INSERT or explicit UPDATE with next revision and command/audit evidence. SQL REPLACE is forbidden.
 
-Persisted contract mismatch fails unless an explicit registered upgrader handles that exact origin/version. A registered upgrade parses/validates old bytes, produces/validates new bytes, and updates atomically.
+Persisted contract mismatch fails unless an explicit registered upgrader handles that exact origin/version. A registered upgrade parses/validates old bytes, produces/validates new bytes, and updates atomically. Unsupported/unknown fields or versions are never moved into a generic quarantine store and never become loosely typed authority.
 
 <a id="ref-no-change"></a>
 ## REF.NO_CHANGE
