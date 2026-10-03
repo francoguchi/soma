@@ -73,7 +73,7 @@
     {
       "id": "FS.TEMP",
       "anchor": "fs-temp",
-      "depends_on": ["FS.SAFE", "RUNTIME.INSTANCE"],
+      "depends_on": ["FS.SAFE", "CONFIG.RUNTIME"],
       "code_paths": ["src/core/soma/foundation/filesystem/"]
     },
     {
@@ -103,7 +103,7 @@
     {
       "id": "SECURITY.LIVE_DATA_KEY",
       "anchor": "security-live-data-key",
-      "depends_on": ["RUNTIME.INSTANCE"],
+      "depends_on": ["CONFIG.RUNTIME", "FS.SAFE"],
       "code_paths": ["src/core/soma/foundation/security/"]
     },
     {
@@ -127,7 +127,7 @@
     {
       "id": "PERSISTENCE.CONNECTION",
       "anchor": "persistence-connection",
-      "depends_on": ["RUNTIME.INSTANCE", "SECURITY.LIVE_DATA_KEY"],
+      "depends_on": ["CONFIG.RUNTIME", "SECURITY.LIVE_DATA_KEY"],
       "code_paths": ["src/core/soma/foundation/persistence/"]
     },
     {
@@ -151,7 +151,7 @@
     {
       "id": "PERSISTENCE.SNAPSHOT",
       "anchor": "persistence-snapshot",
-      "depends_on": ["PERSISTENCE.CONNECTION", "FS.SAFE", "RUNTIME.INSTANCE"],
+      "depends_on": ["PERSISTENCE.CONNECTION", "FS.SAFE", "CONFIG.RUNTIME"],
       "code_paths": ["src/core/soma/foundation/persistence/snapshot.py"]
     },
     {
