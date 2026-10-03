@@ -5,10 +5,11 @@ Implement the current user request in runnable increments. `src/main` is the use
 ## Start
 
 1. Inspect branch and working tree; preserve unrelated changes.
-2. Read `docs/architecture.md` for coding rules, then the goal selected by the current request under `docs/implementation/NN/`. If none exists, create it from that outcome before substantial implementation.
-3. Read linked LLD items, consumed interfaces, and affected source/tests.
-4. Expand reading only when dependencies or the requested change require it. Do not reread unrelated LLD scopes or run repository-wide archaeology for a focused goal.
-5. Treat SOMA Alpha/Beta as reference sources only. Follow Beta references named by the current LLD/goal; do not recursively inspect Beta unless required behavior is missing or contradictory.
+2. Read `docs/LLD/CONTINUE.md`. It is the only current-state/handover pointer and names the active scope, branch, goal, and migration ledger.
+3. Read the active implementation goal, then only its linked LLD items, consumed interfaces, migration rows, affected source and directly relevant tests.
+4. Read `docs/architecture.md` only when the active work needs a repository-wide coding rule or when changing architecture/documentation mechanics; do not reread it mechanically for every goal.
+5. Expand reading only when dependencies or the requested change require it. Do not reread unrelated LLD scopes or run repository-wide archaeology for a focused goal.
+6. Treat SOMA Alpha/Beta as reference sources only. Follow donor rows/references named by the migration ledger or current LLD/goal; do not recursively inspect Beta unless required behavior is missing or contradictory.
 
 The user can revise design. Current LLD items define behavior; goals define the active increment. README files state purpose. Beta material supplies reuse references.
 
@@ -20,7 +21,7 @@ The user can revise design. Current LLD items define behavior; goals define the 
 - Use shared frontend interactions, API contracts, and time formatting.
 - Make internal choices that preserve stated behavior. Ask for a missing material product decision and continue independent work.
 - Record unfinished behavior in the goal; do not present a stub as a completed operation.
-- Reuse and revise existing code. Create abstractions/documents when actual work requires them.
+- Reuse and revise existing code. For Beta donor code, process the current goal's rows in the scope migration ledger and record REUSED/REWRITTEN/REJECTED/DEFERRED before marking the goal working. Create abstractions/documents only when actual work requires them.
 - Do not make `.tmp/` content an application dependency or source of truth.
 
 ## Development database
@@ -41,6 +42,8 @@ The designated SOMA development database is disposable. Edit schema/migrations a
 
 Run relevant focused checks and exercise the changed workflow when possible. Record actual results and remaining work. Use the impact checker when available; otherwise search item IDs and code-path references and follow the same relationships.
 
-Update affected LLD items and the current goal. Keep IDs/paths stable. Use `working` only when the stated outcome has been exercised and required remaining work is none. Reopen a goal when another iteration requires it.
+Update affected LLD items and the current goal. Keep IDs/paths stable. Use `working` only when the stated outcome has been exercised, required remaining work is none, and all migration-ledger rows for that goal are closed. Reopen a goal when another iteration requires it.
+
+At a goal checkpoint, update exactly the goal file, relevant migration rows, and `docs/LLD/CONTINUE.md` unless behavior itself changed. Do not create another handover/status/progress file.
 
 Skip formal certification, release-readiness claims, exhaustive unrelated rereading/testing, and duplicate progress ledgers during development. Keep each README to a precise purpose of at most 40 words, plus necessary navigation links.
