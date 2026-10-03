@@ -50,6 +50,11 @@
       "covers": ["SECURITY.BROWSER_SESSION"]
     },
     {
+      "id": "CHK00.READ.SNAPSHOT",
+      "anchor": "chk-read-snapshot",
+      "covers": ["PERSISTENCE.READ_SNAPSHOT"]
+    },
+    {
       "id": "CHK00.SNAPSHOT",
       "anchor": "chk-snapshot",
       "covers": ["PERSISTENCE.SNAPSHOT"]
@@ -127,7 +132,7 @@
     {
       "id": "CHK00.MIGRATION.REBUILD",
       "anchor": "chk-migration-rebuild",
-      "covers": ["MIGRATION.MANIFEST", "DEV.DB_RESET"]
+      "covers": ["MIGRATION.MANIFEST", "DEV.DB_RESET", "PERSISTENCE.SCHEMA_VERIFY", "MIGRATION.STATUS"]
     },
     {
       "id": "CHK00.REPLAY.EXACT",
@@ -157,12 +162,12 @@
     {
       "id": "CHK00.UI.REFLOW",
       "anchor": "chk-ui-reflow",
-      "covers": ["UI.RESPONSIVE", "UI.WORKING_COPY"]
+      "covers": ["UI.RESPONSIVE", "UI.WORKING_COPY", "WORKING_COPY.STORE"]
     },
     {
       "id": "CHK00.UI.HOLD",
       "anchor": "chk-ui-hold",
-      "covers": ["UI.CONFIRMATION"]
+      "covers": ["UI.CONFIRMATION", "SECURITY.DELIBERATE_PROOF"]
     },
     {
       "id": "CHK00.DOC.IMPACT",
@@ -207,6 +212,11 @@ Use injected UTC, monotonic, and UUID providers to deterministically exercise a 
 ## CHK00.SESSION.CSRF
 
 Using a test authentication provider, issue a browser session and verify exact Host, current-run binding, idle/absolute deadlines, host-only HttpOnly SameSite cookie behavior, and mutation CSRF + exact Origin checks. Reject wrong run, expired session, missing/null/cross-origin Origin, wrong CSRF, proxy/forwarded substitution, and invalid Fetch Metadata before application dispatch. Confirm browser never receives run-control secret.
+
+<a id="chk-read-snapshot"></a>
+## CHK00.READ.SNAPSHOT
+
+Within one projection, read several related facts while a concurrent writer commits between individual SELECT opportunities. Verify every participating read observes the same snapshot generation and one captured as-of reference. Inject BEGIN/read/commit setup failures and verify the read connection/transaction is always cleaned up and no mixed-generation projection is returned.
 
 <a id="chk-snapshot"></a>
 ## CHK00.SNAPSHOT
@@ -304,7 +314,7 @@ Execute one application operation with multiple persistence participants, inject
 <a id="chk-migration-rebuild"></a>
 ## CHK00.MIGRATION.REBUILD
 
-Build a fresh disposable database from the manifest, verify declared owner order/dependencies/hashes, then reset the exact configured development instance and rebuild it again. A tampered SQL hash or unresolved dependency blocks application.
+Build a fresh disposable database from the manifest, verify declared owner order/dependencies/hashes plus committed schema tables/indexes/triggers, columns, foreign keys, effective FK indexes, ledger agreement, quick/FK checks, and append-only probes; then reset the exact configured development instance and rebuild it again. A tampered SQL hash, unresolved dependency, extra/missing authoritative schema object, ledger mismatch, or FK-index gap blocks readiness. Query migration status through both verified live and safely locked offline paths and verify it remains strictly observational.
 
 <a id="chk-replay-exact"></a>
 ## CHK00.REPLAY.EXACT
@@ -339,7 +349,7 @@ Populate synthetic workbench state with filters, active/selected record, scroll 
 <a id="chk-ui-hold"></a>
 ## CHK00.UI.HOLD
 
-Exercise a synthetic registered deliberate action. Verify continuous 3000 ms monotonic hold dispatches once; release, route/target change, stale dependency, or scroll-classified movement resets and dispatches zero commands.
+Exercise a synthetic registered deliberate action. Verify continuous 3000 ms client monotonic hold plus the session/run/target-bound server challenge cannot complete before the server's 3000 ms minimum, returns at most one short-lived single-use proof, and dispatches once. Release, route/target/revision/preview change, stale dependency, visibility invalidation, challenge expiry, or scroll-classified movement resets/abandons and dispatches zero commands. Reuse/wrong-binding proof fails closed and never substitutes for owner eligibility/freshness checks.
 
 <a id="chk-doc-impact"></a>
 ## CHK00.DOC.IMPACT
