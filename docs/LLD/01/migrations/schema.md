@@ -7,7 +7,7 @@
     {
       "id": "M01.001",
       "anchor": "m01-001",
-      "depends_on": ["CUSTOMER.ORGANIZATION", "CUSTOMER.ACCOUNT_CODE", "PROFILE.LOCAL_USER", "MIGRATION.MANIFEST"],
+      "depends_on": ["CUSTOMER.ORGANIZATION", "CUSTOMER.ACCOUNT_CODE", "PROFILE.LOCAL_USER", "MIGRATION.MANIFEST", "M00.002"],
       "code_paths": ["src/core/soma/db/migrations/01/001_customer_profile.sql"]
     },
     {
@@ -51,9 +51,8 @@ Singleton row describing the supported matching profile and conservative Custome
 - `singleton_guard INTEGER PRIMARY KEY CHECK(singleton_guard=1)`
 - `matching_profile_id TEXT NOT NULL`
 - `customer_reference_generation INTEGER NOT NULL DEFAULT 0 CHECK(customer_reference_generation>=0)`
-- `created_at_utc INTEGER NOT NULL`
 
-Initial row declares `UNICODE_MATCH_V1`. Ordinary runtime never changes `matching_profile_id`; a new profile requires a forward migration/reindex.
+Initial row declares `UNICODE_MATCH_V1` with generation 0. This technical singleton carries no wall-clock chronology column; migration SQL must not invent domain chronology through SQLite `now`/`strftime`. Ordinary runtime never changes `matching_profile_id`; a new profile requires a forward migration/reindex.
 
 Protected triggers increment `customer_reference_generation` for accepted Customer Organization insert/update and Customer Account Code insert/active->superseded changes. This intentionally over-invalidates conflict-review snapshots rather than accepting against changed reference state.
 
