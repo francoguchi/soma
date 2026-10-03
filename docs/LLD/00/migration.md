@@ -40,7 +40,7 @@ The pinned Beta donor inventory contains 132 design files: LLD-01 Foundation Run
 - [x] Selection/open, scroll ownership, autocomplete, deliberate hold, responsive composition and safe Undo -> shared Foundation interaction items.
 - [x] Working-copy contracts/schema/commands/queries/migration -> `WORKING_COPY.STORE`, `UI.WORKING_COPY`, `M00.005`.
 - [x] Shell, routing, dialog focus, semantic tokens and error/loading states -> current user-plane Foundation.
-- [x] Appearance behavior is split: `UI.APPEARANCE` + Core Dark default are current; persistent System/Light/Dark/skin settings remain for a later settings owner.
+- [x] Appearance semantics stay Foundation-owned: `UI.APPEARANCE` defines Core Dark default plus `core_dark | system | light`. Once the typed ordinary-setting store exists, Foundation may register/persist that preference through the generic store without transferring semantic ownership. Beta terminal green/amber/violet skins are deferred and are not part of the current contract.
 - [x] Beta domain-surface definitions are deferred to their owning future scopes; Foundation provides only the reusable shell/interactions.
 - [x] Visual fixture/golden-baseline governance is deferred until the UI stabilizes. Focused component/browser assertions are enough during rapid implementation.
 - [x] Beta LLD-10 acceptance/traceability suites are selective regression donors only; do not recreate the Beta certification packet.
@@ -88,6 +88,16 @@ When closing a donor row, replace **PENDING** with `REUSED`, `REWRITTEN`, `REJEC
 - [ ] **R00.06-B — PENDING:** inspect/restructure `src/web/interactions/{selection-open.ts,scroll-owner.ts,autocomplete.tsx,deliberate-hold.ts,safe-undo.ts,HoldButton.tsx}`, `layout/responsive.ts`, `working-copy/client.ts`, and shared components such as `BoundedCollection.tsx`, `SelectableCollection.tsx`, `Modal.tsx`, `UndoOpportunity.tsx`, and `WorkbenchShell.tsx`.
 - [ ] **R00.06-C — PENDING:** selectively migrate `tests/test_ui_working_copies.py`, `src/web/tests/interactions.test.mjs`, and only the browser-workbench assertions that exercise shared interactions.
 - [x] **R00.06-D — DEFERRED:** Beta visual fixture manifests/pixel baselines are not required for rapid Foundation implementation. Revisit visual-regression governance after the shared shell is stable.
+
+## Cross-scope reconciliation
+
+Scope-01 design review exposed three accepted Foundation clarifications:
+
+- narrowed `DEV.DB_RESET`, `STATIC.ASSETS`, and `CONTRACT.SOURCE` impact `code_paths` so scope 00 does not falsely claim future domain code;
+- allowed an optional composition-provided same-UoW descriptive-profile participant during Local Administrator first-run setup without moving credential/session ownership out of Foundation;
+- confirmed appearance semantics remain Foundation-owned while later generic settings persistence is only storage.
+
+These changes are design corrections, not new scope-01 ownership.
 
 ## Completion rule
 
