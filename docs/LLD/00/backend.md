@@ -10,6 +10,18 @@
       "code_paths": ["src/core/soma/runtime/", "src/core/soma/foundation/persistence/"]
     },
     {
+      "id": "RUNTIME.TRUSTED_CONTROL",
+      "anchor": "runtime-trusted-control",
+      "depends_on": ["RUNTIME.INSTANCE"],
+      "code_paths": ["src/core/soma/runtime/control.py", "src/core/soma/runtime/trust.py"]
+    },
+    {
+      "id": "DEV.SOURCE_LAUNCHERS",
+      "anchor": "dev-source-launchers",
+      "depends_on": ["RUNTIME.TRUSTED_CONTROL", "PERSISTENCE.CONNECTION", "DIAGNOSTICS.OPERATOR_LOGS"],
+      "code_paths": ["soma_setup.bat", "soma_run.bat", "soma_run_console.bat", "soma_stop.bat", "tools/source_launcher.py"]
+    },
+    {
       "id": "TIME.UTC",
       "anchor": "time-utc",
       "code_paths": ["src/core/soma/foundation/time/"]
@@ -67,6 +79,12 @@
       "code_paths": ["src/core/soma/foundation/diagnostics/"]
     },
     {
+      "id": "DIAGNOSTICS.OPERATOR_LOGS",
+      "anchor": "diagnostics-operator-logs",
+      "depends_on": ["DIAGNOSTICS.SAFE", "RUNTIME.INSTANCE"],
+      "code_paths": ["src/core/soma/foundation/diagnostics/runtime_logs.py"]
+    },
+    {
       "id": "CONTRACT.SOURCE",
       "anchor": "contract-source",
       "code_paths": ["docs/LLD/00/contracts/", "src/core/soma/"]
@@ -93,6 +111,7 @@
 
 **Rules:**
 - One running authoritative instance owns its configured database at a time.
+- The initial Windows canonical instance root is the LocalAppData known folder plus `SOMA/instance-v1`; source checkout location never becomes the data root.
 - Runtime identity and database paths are configuration-derived, never inferred from the current working directory.
 - Startup must prove ownership before migrations or authoritative reads/writes.
 - Ordinary startup never destroys or resets data.
@@ -102,6 +121,58 @@
 **Side effects:** Runtime registration/cleanup only; no business mutation.
 
 Reuse provenance: Beta LLD-01 runtime host and canonical data-instance ownership.
+
+<a id="runtime-trusted-control"></a>
+## RUNTIME.TRUSTED_CONTROL
+
+**Trigger/input:** A local launcher, tray action, or operator-control request needs to discover, open, inspect, or stop the running SOMA host.
+
+**Result:** Establish a fresh cryptographic/process-identity proof for exactly one current local run before treating it as controllable.
+
+**Rules:**
+- The host binds only to literal loopback `127.0.0.1` on an OS-selected port during development.
+- Each run has a fresh UUID `run_id` and independent random 32-byte run-control secret.
+- The run-control secret is CurrentUser-DPAPI protected in an owner-only runtime file; it never appears in the registry JSON, URL, browser state, audit, or diagnostics.
+- The atomically published runtime registry contains exactly: registry version, canonical origin, PID, Windows process creation identity, `run_id`, protocol version, `data_instance_id`, relative protected-secret locator, and UTC publication time.
+- A controller validates canonical path/ACL shape, literal loopback origin, live PID, exact process birth identity, expected SOMA/source interpreter image, protected secret, and an authenticated direct no-proxy/no-redirect `GET /api/v1/runtime/health`.
+- Health identity must exactly match registry run/data/PID/birth/protocol values before the instance may be opened or controlled.
+- `POST /api/v1/runtime/shutdown` requires the same fresh run-control proof and exact run identity.
+- Browser session/CSRF credentials and run-control credentials are independent and never substitute for each other.
+- Loopback reachability alone is never authentication.
+
+**Failure:** Malformed, stale, foreign, PID-reused, redirected, proxy-routed, unauthenticated, or identity-mismatched runtime state fails closed. Unknown artifacts are preserved for inspection rather than blindly deleted or used as kill authority.
+
+**Side effects:** Publication/cleanup of exact-owned runtime-control artifacts and authenticated host-control requests; no domain mutation.
+
+Reuse provenance: Beta LLD-12 `RuntimeRegistryV2` and `TrustedLocalInstanceV1`.
+
+<a id="dev-source-launchers"></a>
+## DEV.SOURCE_LAUNCHERS
+
+**Trigger/input:** Developer/operator invokes one of the repository-root Windows source buttons.
+
+**Result:** Provide four stable, human-friendly development entry points backed by one launcher implementation:
+
+| Entry point | Required behavior |
+|---|---|
+| `soma_setup.bat` | Create/reuse the repository-local development environment, install/verify declared development dependencies and native prerequisites, and validate the source checkout. It does not fabricate runtime state, start SOMA, reset the database, or silently substitute insecure dependencies. |
+| `soma_run.bat` | Reuse and open an already verified READY instance, or start SOMA detached, capture an owner-only run log, wait up to 30 seconds for authenticated READY, then open only the verified origin. |
+| `soma_run_console.bat` | Start the real SOMA host in the foreground, mirror sanitized runtime logging to the terminal, print the verified READY origin, and perform graceful owned shutdown on Ctrl+C. If a verified instance already runs, report/open that instance instead of creating a second host. |
+| `soma_stop.bat` | Freshly verify the current run, request graceful authenticated shutdown, and wait up to 10 seconds. No valid running instance is an idempotent success. Timeout reports failure and does not kill by process name, stale PID, or port alone. |
+
+**Rules:**
+- The BAT files are intentionally thin adapters. Runtime/setup/trust logic lives in `tools/source_launcher.py` and shared core providers; do not duplicate security logic across scripts.
+- Runtime actions never install or update dependencies. Environment mutation belongs only to explicit setup.
+- Source launchers operate against the canonical development instance, not a database under the checkout.
+- Concurrent run attempts converge on the single instance lock; the losing launcher waits for/verifies the winning host rather than creating a second authoritative instance.
+- Setup is rerunnable and preserves unrelated checkout/user data.
+- Source launchers are development controls, not the future production installer contract; production shortcuts may later call the same trusted control capabilities.
+
+**Failure:** Missing/unsupported environment, unsafe checkout/runtime path, failed native dependency verification, startup crash, READY timeout, or trust failure produces a nonzero exit and an actionable diagnostic/log location. No fake success or plaintext fallback is allowed.
+
+**Side effects:** Setup may create/update the repository-local environment. Run/console/stop operate the local runtime through RUNTIME.TRUSTED_CONTROL.
+
+Reuse provenance: Beta implementation `fbe3821ac0b52802ba8265f979590e75c3ac1209` source launchers and `tools/source_launcher.py`, revised into the new scope-00 architecture.
 
 <a id="time-utc"></a>
 ## TIME.UTC
@@ -300,6 +371,28 @@ Reuse provenance: Beta LLD-01 durable-job coordinator and pre-LLD-08 closure inv
 **Side effects:** diagnostic output only.
 
 Reuse provenance: Beta LLD-12 diagnostic sanitizer boundary.
+
+<a id="diagnostics-operator-logs"></a>
+## DIAGNOSTICS.OPERATOR_LOGS
+
+**Trigger/input:** SOMA starts, runs, fails, or the operator requests current diagnostic logs.
+
+**Result:** Maintain a predictable per-run sanitized log stream that is available from console mode and the system tray without searching the checkout or exposing secrets.
+
+**Rules:**
+- Runtime logs live under the canonical instance `diagnostics/` directory, never under the source checkout.
+- Every run log is bound to its `run_id`; startup and runtime events share the same sanitized logging pipeline.
+- Console mode mirrors the same sanitized events to stdout/stderr; detached mode writes them to the owned run log.
+- The current log path is discoverable through trusted runtime state, not guessed from newest filesystem timestamp alone.
+- Retention is bounded to at most 20 runtime log files, each at most 10 MB. Rotation/deletion touches only closed diagnostics-owned runtime log files; the current log, support bundles, and operator-exported artifacts are never removed by this policy.
+- Log timestamps use canonical UTC facts; presentation tools may additionally show operator-local time.
+- Secrets prohibited by DIAGNOSTICS.SAFE remain prohibited even when console verbosity is enabled.
+
+**Failure:** Log creation/rotation/access failure is visible to the launcher/tray and falls back to the safest available sanitized sink. Diagnostic failure does not change an otherwise valid domain result.
+
+**Side effects:** Creation, rotation, and bounded cleanup of owned runtime log files.
+
+Reuse provenance: Beta source-launcher owner-only startup logging plus LLD-12 diagnostic sanitization, with bounded retention added for the new application.
 
 <a id="contract-source"></a>
 ## CONTRACT.SOURCE
