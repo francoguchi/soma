@@ -783,6 +783,31 @@ Reuse provenance: Beta LLD-01 chronology rules plus LLD-09 chronology refinement
 
 Reuse provenance: Beta LLD-12 live-data key and DPAPI boundaries.
 
+<a id="auth-local-admin"></a>
+## AUTH.LOCAL_ADMIN
+
+**Trigger/input:** First-run credential setup, password login, logout, or browser bootstrap asks whether the singleton Local Administrator is configured/authenticated.
+
+**Result:** Provide one password-authenticated local actor for the current SOMA installation and issue/destroy SECURITY.BROWSER_SESSION state after successful authentication.
+
+**Rules:**
+- SOMA has one Local Administrator credential record in the current single-user product phase. Login requires no username.
+- Initial database state contains zero credential rows and reports `setup_required`; normal domain/application routes remain gated until first-run setup completes, while trusted runtime/diagnostic/setup routes remain available as explicitly allowed.
+- First-run setup requires password + confirmation. Validate at least 12 Unicode scalar values and at most 1024 UTF-8 bytes, with no trimming, Unicode normalization, case conversion, or hidden mutation. Confirmation requires exact UTF-8 byte equality.
+- Setup creates one stable technical `actor_id` and Argon2id PHC verifier using PLATFORM.BASELINE's accepted profile inside one TX.UOW. The raw password/confirmation never enters audit, diagnostics, correlation context, repr/debug text, browser storage, command replay payloads, or logs.
+- Login accepts password only, applies the current in-memory failure-delay gate before expensive hashing, verifies through the pinned Argon2 provider, and on success clears the failure counter and issues a current-run browser session.
+- After 5 consecutive failures, per-run login delay follows 1, 2, 4, then 8 seconds and remains capped at 8 seconds. Delay uses TIME.MONOTONIC, occurs outside database transactions, and creates no durable account lockout.
+- Public credential failure is uniform `AUTH_INVALID_CREDENTIALS`; malformed/unsupported persisted verifier shape is recorded only as bounded security diagnostic evidence and never reveals verifier details to the browser.
+- Logout invalidates the presented browser session and returns to `login_required`; it does not alter the password verifier.
+- Password authentication never derives/wraps the live DEK, run-control secret, session/CSRF token, or future backup recovery material.
+- Password change/reset/recovery UI and profile/display-name semantics are not owned by this minimal foundation contract and may be added by a later scope without changing the login/session boundary.
+
+**Failure:** A second setup attempt, invalid setup password/confirmation, invalid credentials, unsupported verifier, persistence failure, or session-issuance failure returns a stable safe error and never creates a partial credential/session state.
+
+**Side effects:** First-run setup creates the singleton credential row; successful login/logout mutates only in-memory session state plus bounded authentication-throttle state.
+
+Reuse provenance: Beta `PasswordAuthenticationV1`, narrowed to minimal setup/login/logout foundation ownership.
+
 <a id="security-deliberate-proof"></a>
 ## SECURITY.DELIBERATE_PROOF
 
