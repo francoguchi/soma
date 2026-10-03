@@ -45,6 +45,11 @@
       "covers": ["TIME.MONOTONIC", "TEST.SEAMS"]
     },
     {
+      "id": "CHK00.AUTH.LOCAL_ADMIN",
+      "anchor": "chk-auth-local-admin",
+      "covers": ["AUTH.LOCAL_ADMIN", "SECURITY.BROWSER_SESSION", "UI.AUTH_GATE", "M00.006"]
+    },
+    {
       "id": "CHK00.SESSION.CSRF",
       "anchor": "chk-session-csrf",
       "covers": ["SECURITY.BROWSER_SESSION"]
@@ -108,6 +113,11 @@
       "id": "CHK00.UI.DIAGNOSTICS",
       "anchor": "chk-ui-diagnostics",
       "covers": ["UI.DIAGNOSTICS_STATE", "RUNTIME.HEALTH", "DIAGNOSTICS.OPERATOR_LOGS", "DIAGNOSTICS.SAFE"]
+    },
+    {
+      "id": "CHK00.UI.APPEARANCE",
+      "anchor": "chk-ui-appearance",
+      "covers": ["UI.APPEARANCE", "UI.BRAND", "UI.TOKENS"]
     },
     {
       "id": "CHK00.UI.ACCESSIBILITY",
@@ -208,6 +218,13 @@ Issue one request that succeeds and one that fails inside a nested application/a
 
 Use injected UTC, monotonic, and UUID providers to deterministically exercise a timeout/retry/session scenario. Change wall-clock UTC during elapsed timing and verify timeout semantics do not change. Verify production/source composition cannot enable test providers through ordinary runtime configuration.
 
+<a id="chk-auth-local-admin"></a>
+## CHK00.AUTH.LOCAL_ADMIN
+
+On a freshly migrated unseeded credential table, bootstrap shows `setup_required` and ordinary workspaces remain gated. Reject passwords shorter than 12 Unicode scalars, larger than 1024 UTF-8 bytes, mismatched confirmation, or any setup attempt after the singleton exists. Verify exact password bytes are hashed with the accepted Argon2id profile, only the PHC verifier is persisted, one stable actor UUID is created, and no raw password/confirmation reaches logs, diagnostics, audit, replay, browser storage, or errors.
+
+Then verify password-only login: correct password issues a current-run session, wrong password returns the same public `AUTH_INVALID_CREDENTIALS` response, the per-run delay begins after five consecutive failures with 1/2/4/8-second monotonic steps and no durable lockout, successful login clears the failure counter, and logout invalidates the presented session. A new process run requires a fresh browser session but reuses the persisted credential. Password/profile management remains absent.
+
 <a id="chk-session-csrf"></a>
 ## CHK00.SESSION.CSRF
 
@@ -273,6 +290,11 @@ Register a synthetic reversible owner action with exact preview/fingerprint and 
 
 Open the System/Diagnostics surface on a healthy and partially failing host. Verify build/run/schema/capability/job/executor/connection/transaction/log/recent-safe-error state is visible, local time is readable, and canonical evidence remains inspectable where appropriate. Provider failure produces partial/unavailable panels without mutating jobs/migrations/domain state or exposing secrets/raw bodies.
 
+<a id="chk-ui-appearance"></a>
+## CHK00.UI.APPEARANCE
+
+Load a first-run and authenticated shell with no stored appearance preference and verify SOMA Core Dark is selected deterministically. Verify shared components consume semantic tokens rather than raw theme colors and retain readable brand, focus, selection, warning, destructive, disabled, and unavailable states. Inject an invalid future appearance preference and verify deterministic fallback to Core Dark without feature-specific CSS branching.
+
 <a id="chk-ui-accessibility"></a>
 ## CHK00.UI.ACCESSIBILITY
 
@@ -288,6 +310,8 @@ Start a real local host, verify its registry/DPAPI run secret/process birth/orig
 ## CHK00.LAUNCHERS.LIFECYCLE
 
 From a clean supported Windows source checkout, run `soma_setup.bat`, then `soma_run_console.bat`; verify foreground sanitized logging, READY origin, tray presence, and Ctrl+C graceful shutdown. Then execute `soma_run.bat` twice, `soma_stop.bat` twice, and a fresh run/stop cycle. The second run reuses the verified host, the second stop is idempotent, each new run receives a new run identity, no runtime action installs dependencies, and all detached startup/runtime logs are available under the canonical diagnostics root.
+
+Exercise `soma_reset_dev.bat`: verify it prints the exact LocalAppData development instance, does nothing when confirmation is absent/wrong, refuses a non-development target, gracefully stops a verified live host only after literal `RESET` confirmation, rebuilds migrations + DEV.SEED, leaves SOMA stopped, and never deletes the checkout or an unrelated/packaged instance.
 
 Inject startup failure and READY timeout: launcher returns nonzero with an actionable current log path and never opens an unverified origin. Inject a graceful-stop timeout: no process-name/PID-only termination occurs.
 
