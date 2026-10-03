@@ -255,3 +255,22 @@ Rows exist only for explicit writes. Defaults remain code-defined and absent unt
 
 A settings UPDATE may change only registered contract/value/revision/updated UTC/command fields after owner validation. Setting keys are immutable; changing semantic identity means a new registered key plus an explicit owner migration, not an UPDATE of `setting_key`.
 
+
+## Required protection and generation triggers
+
+The current schema verifier treats the following trigger identities/behaviors as authoritative once scope 01 is implemented:
+
+- `reference_metadata_delete_forbidden` — singleton metadata cannot be deleted during ordinary runtime.
+- `local_user_profile_update_guard` / `local_user_profile_delete_forbidden` — preserve profile identity/singleton/opening chronology and forbid ordinary deletion.
+- `reference_customer_organizations_update_guard` / `reference_customer_organizations_delete_forbidden` — preserve Customer immutable ID/opening chronology and forbid ordinary deletion.
+- `customer_identifier_history_update_guard` / `customer_identifier_history_delete_forbidden` — permit only active->superseded closure while preserving identifier history.
+- `reference_contacts_update_guard` / `reference_contacts_delete_forbidden` — preserve Contact immutable ID/opening chronology and forbid ordinary deletion.
+- `contact_channels_update_guard` / `contact_channels_delete_forbidden` — preserve channel identity/owner/kind/opening chronology, reject updates after archive, and forbid deletion.
+- `contact_affiliation_history_update_guard` / `contact_affiliation_history_delete_forbidden` — permit only current->historical closure and preserve relationship history.
+- `reference_dispatch_locations_update_guard` / `reference_dispatch_locations_delete_forbidden` — preserve location identity/address mode/opening chronology, prevent address ownership crossing, and forbid ordinary deletion.
+- `reference_lifecycle_events_update_forbidden` / `reference_lifecycle_events_delete_forbidden` — lifecycle occurrence evidence is append-only.
+- `customer_reference_generation_after_customer_insert`, `customer_reference_generation_after_customer_update`, `customer_reference_generation_after_identifier_insert`, `customer_reference_generation_after_identifier_update` — conservatively advance reviewed Customer-reference freshness generation inside the same transaction.
+- `setting_key_update_guard` — `setting_key` cannot be renamed in place; owner upgrades preserve the registered semantic key.
+
+Trigger messages are stable internal integrity identities and are mapped through `REF.ERRORS`; raw SQLite text never crosses transport.
+
