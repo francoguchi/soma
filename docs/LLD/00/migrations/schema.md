@@ -31,13 +31,13 @@
     {
       "id": "M00.005",
       "anchor": "m00-005",
-      "depends_on": ["WORKING_COPY.STORE", "UI.WORKING_COPY", "M00.004"],
+      "depends_on": ["WORKING_COPY.STORE", "UI.WORKING_COPY", "M00.006"],
       "code_paths": ["src/core/soma/db/migrations/00/005_working_copies.sql"]
     },
     {
       "id": "M00.006",
       "anchor": "m00-006",
-      "depends_on": ["AUTH.LOCAL_ADMIN", "M00.005"],
+      "depends_on": ["AUTH.LOCAL_ADMIN", "M00.004"],
       "code_paths": ["src/core/soma/db/migrations/00/006_local_admin_auth.sql"]
     }
   ],
@@ -47,7 +47,7 @@
 
 # Foundation schema
 
-These are the current development migration allocations. Because the development database is disposable, the SQL may be revised before release; IDs remain owner-scoped and the manifest is the only execution-order authority.
+These are the current development migration allocations. Because the development database is disposable, the SQL may be revised before release; IDs remain owner-scoped and the manifest is the only execution-order authority. The planned implementation order is M00.001 -> M00.002 -> M00.003 -> M00.004 -> M00.006 -> M00.005; numeric identity does not imply execution order.
 
 <a id="m00-001"></a>
 ## M00.001 — Bootstrap and migration ledger
