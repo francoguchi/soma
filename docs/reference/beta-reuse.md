@@ -34,7 +34,13 @@ High-value Beta UI references:
 High-value Beta security/foundation references:
 
 - `spec/lld/foundation-runtime/`
+- `spec/lld/foundation-runtime/algorithms/runtime-host.json`
+- `spec/lld/foundation-runtime/algorithms/connection-unit-of-work.json`
+- `spec/lld/foundation-runtime/algorithms/audit-writer.json`
+- `spec/lld/foundation-runtime/algorithms/job-coordinator.json`
+- `spec/lld/foundation-runtime/errors.json`
 - `spec/lld/security-packaging/technology.json`
+- `spec/lld/security-packaging/algorithms/session-csrf.json`
 - `spec/lld/security-packaging/types/runtime-control.json`
 - `spec/lld/security-packaging/algorithms/trusted-instance.json`
 - `spec/lld/security-packaging/algorithms/package-lifecycle.json`
@@ -52,3 +58,5 @@ High-value Beta source-launcher implementation reference:
 The Beta launcher slice proved setup, foreground console, detached start/reuse, authenticated READY opening, graceful stop, trusted process identity, and owner-only startup logging. Its tray remained packaging/design work there; new SOMA intentionally moves the tray into scope 00 so every live-test host has the same native control surface.
 
 Implementation reuse rule: copy no slice merely because it exists. Verify its current LLD owner, dependencies, and behavior first; then transplant/revise it into the new capability/layer structure and preserve useful regression cases.
+
+See `beta-foundation-migration.md` for the exact old-to-new scope-00 ownership map.
