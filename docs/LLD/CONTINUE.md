@@ -18,6 +18,7 @@ This is the single current-state entry point for humans and agents. Do not appen
 | Overall migration map | `docs/LLD/MIGRATION.md` |
 | Mode | parallel design N+1 / implementation N |
 | Implementation blockers | none known in this design branch |
+| Implementation note | accepted Scope-00 reconciliation is now on `main`; local `feat/00-foundation` should reconcile the three changed Scope-00 docs without overwriting Codex progress |
 | Design blockers | PASS-1..PASS-4 complete; awaiting owner approval of scope 01 before implementation goals are created |
 | Certification | deferred until whole-application implementation and live testing |
 
