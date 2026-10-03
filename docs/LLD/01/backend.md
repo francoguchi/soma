@@ -113,6 +113,12 @@
       "code_paths": ["src/core/soma/modules/reference/application/"]
     },
     {
+      "id": "REF.AUDIT",
+      "anchor": "ref-audit",
+      "depends_on": ["AUDIT.APPEND_ONLY"],
+      "code_paths": ["src/core/soma/modules/reference/audit.py"]
+    },
+    {
       "id": "REF.QUERY",
       "anchor": "ref-query",
       "depends_on": ["QUERY.PAGE", "PERSISTENCE.READ_SNAPSHOT"],
@@ -334,6 +340,28 @@ After identity/lifecycle/revision/security preconditions pass, commands compare 
 NO_CHANGE does not increment revision, create/supersede relationship/identifier state, append lifecycle evidence, or fabricate application audit history. Exact replay of that command returns the original NO_CHANGE result even if later unrelated changes occur.
 
 Create operations, lifecycle precondition failures, channel archive, and reviewed ownership reassignment are not NO_CHANGE merely because the resulting visible text could appear similar.
+
+<a id="ref-audit"></a>
+## REF.AUDIT
+
+Scope 01 registers typed audit actions on Foundation `AUDIT.APPEND_ONLY`; it does not create a competing audit store.
+
+Action families cover Customer create/descriptive update/Account Code set-reviewed-share-reassign, Contact create/descriptive/channel/affiliation changes, Dispatch create/descriptive changes, reference archive/reactivate, setting writes, and Local User Profile create/display-name update.
+
+Audit payloads carry only bounded immutable IDs, revisions, closed change classifications/reason categories, review fingerprints and bounded result references required to explain the accepted mutation.
+
+Privacy exclusions are explicit:
+
+- no Customer/Contact/Dispatch descriptive names;
+- no raw Customer Account Code unless a future accepted authority specifically requires a bounded representation;
+- no email/channel value;
+- no physical address text;
+- no setting value;
+- no Local User Profile display-name text;
+- no credentials/verifiers/session/token/key material;
+- no unrestricted import/source row or unbounded claimant/blocker detail.
+
+Accepted `NO_CHANGE` writes no scope-01 application audit event because no authoritative domain fact changed; the Foundation command receipt remains technical idempotency evidence.
 
 <a id="ref-query"></a>
 ## REF.QUERY
