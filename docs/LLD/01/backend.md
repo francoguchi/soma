@@ -1,0 +1,263 @@
+<!-- soma-meta
+{
+  "version": 1,
+  "id": "LLD-01-BACKEND",
+  "scope": "01",
+  "items": [
+    {
+      "id": "REF.IDENTITY",
+      "anchor": "ref-identity",
+      "depends_on": ["IDENTITY.UUID"],
+      "code_paths": ["src/core/soma/modules/reference/domain/"]
+    },
+    {
+      "id": "REF.UNICODE_MATCH",
+      "anchor": "ref-unicode-match",
+      "depends_on": ["SERIALIZATION.STRICT_JSON"],
+      "code_paths": ["src/core/soma/modules/reference/domain/matching.py", "src/core/soma/modules/reference/assets/"]
+    },
+    {
+      "id": "PROFILE.LOCAL_USER",
+      "anchor": "profile-local-user",
+      "depends_on": ["AUTH.LOCAL_ADMIN", "TX.UOW", "COMMAND.REPLAY", "AUDIT.APPEND_ONLY"],
+      "code_paths": ["src/core/soma/modules/reference/application/profile.py", "src/core/soma/modules/reference/adapters/"]
+    },
+    {
+      "id": "CUSTOMER.ORGANIZATION",
+      "anchor": "customer-organization",
+      "depends_on": ["REF.IDENTITY", "REF.UNICODE_MATCH", "TX.UOW", "COMMAND.REPLAY", "AUDIT.APPEND_ONLY"],
+      "code_paths": ["src/core/soma/modules/reference/domain/customer.py", "src/core/soma/modules/reference/application/customer.py"]
+    },
+    {
+      "id": "CUSTOMER.ACCOUNT_CODE",
+      "anchor": "customer-account-code",
+      "depends_on": ["CUSTOMER.ORGANIZATION", "REF.UNICODE_MATCH", "PERSISTENCE.READ_SNAPSHOT"],
+      "code_paths": ["src/core/soma/modules/reference/domain/account_code.py", "src/core/soma/modules/reference/application/customer.py"]
+    },
+    {
+      "id": "CONTACT.MASTER",
+      "anchor": "contact-master",
+      "depends_on": ["REF.IDENTITY", "REF.UNICODE_MATCH", "TX.UOW", "COMMAND.REPLAY", "AUDIT.APPEND_ONLY"],
+      "code_paths": ["src/core/soma/modules/reference/domain/contact.py", "src/core/soma/modules/reference/application/contact.py"]
+    },
+    {
+      "id": "CONTACT.CHANNEL",
+      "anchor": "contact-channel",
+      "depends_on": ["CONTACT.MASTER", "REF.UNICODE_MATCH"],
+      "code_paths": ["src/core/soma/modules/reference/domain/channels.py", "src/core/soma/modules/reference/application/contact.py"]
+    },
+    {
+      "id": "CONTACT.AFFILIATION",
+      "anchor": "contact-affiliation",
+      "depends_on": ["CONTACT.MASTER", "CUSTOMER.ORGANIZATION"],
+      "code_paths": ["src/core/soma/modules/reference/domain/contact.py", "src/core/soma/modules/reference/application/contact.py"]
+    },
+    {
+      "id": "DISPATCH.LOCATION",
+      "anchor": "dispatch-location",
+      "depends_on": ["REF.IDENTITY", "REF.UNICODE_MATCH"],
+      "code_paths": ["src/core/soma/modules/reference/domain/dispatch.py", "src/core/soma/modules/reference/application/dispatch.py"]
+    },
+    {
+      "id": "REF.MATCHING",
+      "anchor": "ref-matching",
+      "depends_on": ["REF.UNICODE_MATCH", "CUSTOMER.ACCOUNT_CODE", "CONTACT.CHANNEL", "CONTACT.AFFILIATION", "QUERY.PAGE"],
+      "code_paths": ["src/core/soma/modules/reference/queries/matching.py"]
+    },
+    {
+      "id": "REF.DEPENDENCY_GUARD",
+      "anchor": "ref-dependency-guard",
+      "depends_on": ["TX.UOW", "QUERY.PAGE"],
+      "code_paths": ["src/core/soma/modules/reference/domain/dependencies.py", "src/core/soma/modules/reference/composition.py"]
+    },
+    {
+      "id": "REF.LIFECYCLE",
+      "anchor": "ref-lifecycle",
+      "depends_on": ["REF.DEPENDENCY_GUARD", "TX.UOW", "COMMAND.REPLAY", "AUDIT.APPEND_ONLY"],
+      "code_paths": ["src/core/soma/modules/reference/application/lifecycle.py"]
+    },
+    {
+      "id": "SETTING.REGISTRY",
+      "anchor": "setting-registry",
+      "depends_on": ["SERIALIZATION.STRICT_JSON"],
+      "code_paths": ["src/core/soma/modules/reference/domain/settings.py"]
+    },
+    {
+      "id": "SETTING.VALUE",
+      "anchor": "setting-value",
+      "depends_on": ["SETTING.REGISTRY", "TX.UOW", "COMMAND.REPLAY", "AUDIT.APPEND_ONLY"],
+      "code_paths": ["src/core/soma/modules/reference/application/settings.py", "src/core/soma/modules/reference/adapters/"]
+    },
+    {
+      "id": "REF.NO_CHANGE",
+      "anchor": "ref-no-change",
+      "depends_on": ["COMMAND.REPLAY"],
+      "code_paths": ["src/core/soma/modules/reference/application/"]
+    },
+    {
+      "id": "REF.QUERY",
+      "anchor": "ref-query",
+      "depends_on": ["QUERY.PAGE", "PERSISTENCE.READ_SNAPSHOT"],
+      "code_paths": ["src/core/soma/modules/reference/queries/"]
+    }
+  ],
+  "tags": ["identity", "reference", "settings"]
+}
+-->
+
+# Identity / Reference backend
+
+<a id="ref-identity"></a>
+## REF.IDENTITY
+
+Scope 01 owns durable reusable reference identities for Customer Organization, Contact, Dispatch Location, Local User Profile metadata, relationship/history rows, and reference events. IDs are immutable lowercase canonical UUIDv4 values allocated through Foundation `IDENTITY.UUID`; descriptive/business values never become relational identity.
+
+Equal names, addresses, emails, account codes, or normalized keys never authorize implicit merge/reuse. Cross-domain consumers store/reference immutable IDs and preserve their own at-use snapshots when history requires them.
+
+<a id="ref-unicode-match"></a>
+## REF.UNICODE_MATCH
+
+Reference matching uses one versioned deterministic normalization profile. Initial profile is `UNICODE_MATCH_V1`: Unicode 17.0.0 NFKC + repository-versioned full CaseFolding and White_Space data, with `unicodedata2==17.0.1` providing the pinned normalization database.
+
+Normalization rejects non-strings, enforces pre/post UTF-8 bounds, collapses governed whitespace runs to one ASCII space, applies full case-folding, preserves diacritics and punctuation, and rejects empty output. Built-in Python Unicode tables are not authority when they differ across supported runtimes.
+
+Persisted match-key columns are interpreted only when the stored matching-profile ID is supported. A profile change requires an explicit forward migration/reindex; it is never an in-place reinterpretation.
+
+<a id="profile-local-user"></a>
+## PROFILE.LOCAL_USER
+
+Scope 01 owns the singleton Local User Profile's descriptive identity metadata only: immutable `local_user_profile_id`, editable nonblank `display_name`, revision, and chronology.
+
+Foundation `AUTH.LOCAL_ADMIN` owns password setup/login/logout and browser-session authority. First-run authentication coordinates creation of the profile in the same outer UnitOfWork, defaulting `display_name` server-side to **Local Administrator** when no explicit accepted name exists.
+
+Updating `display_name` revalidates the exact metadata revision, changes no credential/session/DEK/security authority, and records only bounded identifiers/revisions/changed-field audit evidence—not raw prior/new display-name text.
+
+There is no username/login-name field.
+
+<a id="customer-organization"></a>
+## CUSTOMER.ORGANIZATION
+
+Customer Organization is an immutable reference identity with bounded descriptive name, governed name match key, lifecycle `active|archived`, revision, and chronology.
+
+Create is explicit even when an equal normalized name already exists. Descriptive updates preserve identity and lifecycle, use revision preconditions, and produce lifecycle/audit evidence only when accepted state actually changes.
+
+Customer references are history-bearing and do not expose ordinary hard delete.
+
+<a id="customer-account-code"></a>
+## CUSTOMER.ACCOUNT_CODE
+
+Customer Account Code is external matching evidence, never `customer_org_id`. One Customer has at most one active code claim; prior claims are superseded, not overwritten/deleted.
+
+The same normalized code may have more than one active Customer claimant only through explicit reviewed acceptance. Ordinary set/create detects another claimant and returns conflict-review state rather than stealing, merging, or silently sharing.
+
+Conflict preview binds the reviewed action to current matching-profile ID, conservative Customer-reference generation, normalized code key, target/source revisions/current claims, proposed action, and exact claimant count. Commit recomputes that bounded snapshot inside the existing UnitOfWork and constant-time compares its SHA-256. Changed context returns stale-review failure before receipt/mutation.
+
+Reviewed actions are:
+- confirm a shared claim while preserving future matching ambiguity;
+- reassign one source claim to a different Customer without touching unrelated third-party claimants.
+
+Claim history preserves creation/supersession command provenance.
+
+<a id="contact-master"></a>
+## CONTACT.MASTER
+
+Contact is one immutable identity with bounded descriptive name/match key, lifecycle, revision, and chronology. Zero channels and zero Customer affiliation are valid.
+
+Creating or editing a Contact never silently reuses another Contact because names/emails compare equal. Archived Contacts remain historically queryable but are excluded from new-work selectors until explicit reactivation.
+
+<a id="contact-channel"></a>
+## CONTACT.CHANNEL
+
+Contact channels are reusable communication/matching attributes, not Contact identity and never authentication identity. Initial supported kind is `email`.
+
+Storage validation trims only governed leading/trailing whitespace, rejects empty/NUL/CR/LF/C0/C1 controls, parses the complete value as exactly one address via Python `email.headerregistry.Address(addr_spec=value)`, performs no DNS/SMTP/deliverability lookup, persists accepted text, and derives a separate governed match key.
+
+Equal channel values are allowed and may remain ambiguous. Channel kind is immutable for one channel ID; changing kind requires archive + add. Archived channels remain history and are not eligible for matching/recipient use.
+
+Use validation is just-in-time. A specific selected channel must still belong to the active Contact, be active, and pass current syntax policy. Auto-select may return `USABLE|MISSING|ARCHIVED|INVALID|MULTIPLE_USABLE`; multiple usable values never choose a row-order winner unless the consuming workflow separately owns a deterministic selection rule.
+
+<a id="contact-affiliation"></a>
+## CONTACT.AFFILIATION
+
+A Contact may be unbound or have one current Customer Organization affiliation. Changing affiliation preserves the Contact identity, closes the prior current relationship with command/UTC provenance, and inserts the replacement current relationship in the same UnitOfWork.
+
+Historical affiliations are append-protected and never rewritten to current labels. A non-null new affiliation requires an active Customer Organization.
+
+Operational domains preserve their own organization-at-use context instead of depending on future affiliation changes.
+
+<a id="dispatch-location"></a>
+## DISPATCH.LOCATION
+
+Dispatch Location is a Customer-neutral reusable reference identity with name/match key, lifecycle, revision and one address mode:
+
+- `standalone`: scope 01 owns bounded multiline address text;
+- `site_derived`: address text is resolved from the future Infrastructure owner through an explicit provider.
+
+Scope 01 never stores Customer ownership/preference, Site ID shortcut, or logistics role on the Dispatch Location master.
+
+A standalone location is created through scope 01. A dedicated Site-derived location is an internal participant in the Infrastructure owner's existing outer UnitOfWork and never creates its own receipt/commit.
+
+<a id="ref-matching"></a>
+## REF.MATCHING
+
+Matching is deterministic read-only candidate evidence and returns exactly `UNRESOLVED|UNIQUE_CANDIDATE|AMBIGUOUS` plus bounded candidate IDs/count/continuation, normalized-key evidence, scope, and explanation code.
+
+Customer matching prefers exact Account Code evidence but never hides conflict: multiple code claimants remain ambiguous; supplied name evidence identifying another Customer makes the union ambiguous.
+
+Contact matching is scoped to one current Customer affiliation or explicit `UNBOUND`; name/email evidence is exact governed matching only. Equal email in different Customer scopes is not a global identity collision.
+
+`UNIQUE_CANDIDATE` is proposal evidence, not authorization to merge/link/mutate.
+
+<a id="ref-dependency-guard"></a>
+## REF.DEPENDENCY_GUARD
+
+Scope 01 owns a deterministic registry of cross-domain lifecycle validators. Each consuming/owning domain implements bounded indexed guards for the reference types it depends on.
+
+Authoritative archive/reactivation guards run inside the caller's existing UnitOfWork and return only eligibility/blocker/indeterminate facts without loading unbounded bodies or mutating. Indeterminate fails closed.
+
+Detailed blocker previews run in read snapshots outside the writer transaction and return exact count plus bounded deterministic pages. Scope 01 never queries another module's private tables directly.
+
+<a id="ref-lifecycle"></a>
+## REF.LIFECYCLE
+
+Customer Organization, Contact, and Dispatch Location use `active|archived` lifecycle with explicit archive/reactivate commands. Archive/reactivate revalidate base revision and every registered dependency guard inside one outer UnitOfWork.
+
+Archive never cascades deletion/unlinking to manufacture eligibility. Reactivation preserves prior archived history.
+
+Accepted create/archive/reactivate/descriptive-correction facts append reference lifecycle evidence linked to the command receipt and privacy-minimized Foundation audit evidence.
+
+<a id="setting-registry"></a>
+## SETTING.REGISTRY
+
+Settings use a closed code-defined registry. Each definition owns: stable key, semantic owner, contract name/version, default provider, strict validator, semantic equality, unknown-field policy, ordinary-nonsecret storage class, and field/depth/collection byte bounds.
+
+Scope 01 owns registry/store mechanics; each semantic owner owns the meaning and state-dependent validation of its settings. Unknown keys are rejected and do not create generic storage.
+
+Secret material is forbidden from this store and remains with its security owner.
+
+<a id="setting-value"></a>
+## SETTING.VALUE
+
+Reading an absent setting returns the registered default with source `DEFAULT` and performs zero persistence.
+
+Explicit writes validate through the registered contract, revalidate expected revision/absence and owner checks inside one UnitOfWork, then INSERT or explicit UPDATE with next revision and command/audit evidence. SQL REPLACE is forbidden.
+
+Persisted contract mismatch fails unless an explicit registered upgrader handles that exact origin/version. A registered upgrade parses/validates old bytes, produces/validates new bytes, and updates atomically.
+
+<a id="ref-no-change"></a>
+## REF.NO_CHANGE
+
+After identity/lifecycle/revision/security preconditions pass, commands compare the requested accepted state using exact stored semantics. If already current, commit only the Foundation command receipt with result type `NO_CHANGE`.
+
+NO_CHANGE does not increment revision, create/supersede relationship/identifier state, append lifecycle evidence, or fabricate application audit history. Exact replay of that command returns the original NO_CHANGE result even if later unrelated changes occur.
+
+Create operations, lifecycle precondition failures, channel archive, and reviewed ownership reassignment are not NO_CHANGE merely because the resulting visible text could appear similar.
+
+<a id="ref-query"></a>
+## REF.QUERY
+
+Reference collections use deterministic keyset pagination and Foundation `QUERY.PAGE`; scope 01 may choose a lower default (initial Beta donor default 50) while never exceeding Foundation's hard maximum 200.
+
+Primary query families include current detail, active lists, Account Code history/review, Contact channels/affiliation history/use validation, matching, lifecycle blocker preview, and setting lookup/list-by-owner.
+
+Large nested collections are dedicated bounded queries rather than unbounded detail expansion. Exact counts are on-demand except where ambiguity/review/eligibility semantics require them. Read-only queries never persist defaults or repair state.
