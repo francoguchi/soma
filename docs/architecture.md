@@ -98,6 +98,7 @@ soma/
           time/
           transactions/
           jobs/
+          working_copy/
           development/
         modules/
           tickets/
@@ -109,10 +110,13 @@ soma/
           inventory/
           communications/
         db/
+          schema_manifest.json
           migrations/
             manifest.json
             00/
               001_bootstrap.sql
+        transport/
+          security.py
         runtime/
           control.py
           health.py
