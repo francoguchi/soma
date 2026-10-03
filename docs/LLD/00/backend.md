@@ -79,7 +79,7 @@
     {
       "id": "RUNTIME.LIFECYCLE",
       "anchor": "runtime-lifecycle",
-      "depends_on": ["RUNTIME.INSTANCE", "TIME.MONOTONIC", "BUILD.IDENTITY"],
+      "depends_on": ["RUNTIME.INSTANCE", "TIME.MONOTONIC", "BUILD.IDENTITY", "PERSISTENCE.SCHEMA_VERIFY", "STATIC.ASSETS"],
       "code_paths": ["src/core/soma/runtime/host.py", "src/core/soma/runtime/lifecycle.py"]
     },
     {
@@ -113,10 +113,34 @@
       "code_paths": ["src/core/soma/foundation/security/browser_session.py", "src/core/soma/transport/security.py"]
     },
     {
+      "id": "SECURITY.DELIBERATE_PROOF",
+      "anchor": "security-deliberate-proof",
+      "depends_on": ["SECURITY.BROWSER_SESSION", "TIME.MONOTONIC", "IDENTITY.UUID", "TX.UOW"],
+      "code_paths": ["src/core/soma/foundation/security/deliberate_action.py"]
+    },
+    {
       "id": "PERSISTENCE.CONNECTION",
       "anchor": "persistence-connection",
       "depends_on": ["RUNTIME.INSTANCE", "SECURITY.LIVE_DATA_KEY"],
       "code_paths": ["src/core/soma/foundation/persistence/"]
+    },
+    {
+      "id": "PERSISTENCE.READ_SNAPSHOT",
+      "anchor": "persistence-read-snapshot",
+      "depends_on": ["PERSISTENCE.CONNECTION"],
+      "code_paths": ["src/core/soma/foundation/persistence/read_snapshot.py"]
+    },
+    {
+      "id": "PERSISTENCE.SCHEMA_VERIFY",
+      "anchor": "persistence-schema-verify",
+      "depends_on": ["PERSISTENCE.CONNECTION", "MIGRATION.MANIFEST"],
+      "code_paths": ["src/core/soma/foundation/persistence/schema_verify.py", "src/core/soma/db/schema_manifest.json"]
+    },
+    {
+      "id": "MIGRATION.STATUS",
+      "anchor": "migration-status",
+      "depends_on": ["MIGRATION.MANIFEST", "PERSISTENCE.SCHEMA_VERIFY", "RUNTIME.TRUSTED_CONTROL"],
+      "code_paths": ["src/core/soma/foundation/persistence/migration_status.py"]
     },
     {
       "id": "PERSISTENCE.SNAPSHOT",
@@ -194,6 +218,12 @@
       "anchor": "test-seams",
       "depends_on": ["TIME.UTC", "TIME.MONOTONIC", "IDENTITY.UUID", "FS.SAFE"],
       "code_paths": ["tests/core/foundation/", "src/core/soma/foundation/testing/"]
+    },
+    {
+      "id": "WORKING_COPY.STORE",
+      "anchor": "working-copy-store",
+      "depends_on": ["TX.UOW", "SERIALIZATION.STRICT_JSON", "TIME.UTC", "COMMAND.REPLAY"],
+      "code_paths": ["src/core/soma/foundation/working_copy/"]
     },
     {
       "id": "DIAGNOSTICS.SAFE",
@@ -744,6 +774,114 @@ Reuse provenance: Beta LLD-01 chronology rules plus LLD-09 chronology refinement
 
 Reuse provenance: Beta LLD-12 live-data key and DPAPI boundaries.
 
+<a id="security-deliberate-proof"></a>
+## SECURITY.DELIBERATE_PROOF
+
+**Trigger/input:** UI begins/completes an action registered for `deliberate_hold` or `impact_preview_plus_hold`, then the owning command consumes the resulting proof.
+
+**Result:** Provide server-timed, session/run/target-bound, single-use friction evidence without replacing domain authorization or freshness guards.
+
+**Rules:**
+- Challenge issuance requires a valid authenticated browser mutation context and a registered action code/target/base revision plus preview fingerprint when the tier requires one.
+- Challenge state is memory-only, bound to current run/session/action/target/revision/preview, and initially expires after 15 seconds.
+- Completion uses server TIME.MONOTONIC and requires elapsed >= 3000 ms and <= challenge expiry; client-reported elapsed time is never authority.
+- Successful completion returns one random 32-byte opaque proof token and stores only its SHA-256 plus exact bindings.
+- Proof initially expires after 30 seconds, is single-use, and is validated/consumed only inside the owning command's existing UnitOfWork at the owner-declared pre-mutation boundary.
+- Owning domain still performs all business/permission/dependency/freshness/preview guards. Proof means deliberate friction occurred, not that the action is authorized.
+- Failed owner transaction does not make a consumed proof reusable.
+
+**Failure:** wrong run/session/action/target/revision/preview, too-early/expired challenge, bad token, or reused proof fails closed before protected mutation.
+
+**Side effects:** bounded in-memory challenge/proof state and one proof-consumption marker during owner command execution.
+
+Reuse provenance: Beta `DeliberateActionProofV1`.
+
+<a id="persistence-read-snapshot"></a>
+## PERSISTENCE.READ_SNAPSHOT
+
+**Trigger/input:** A query/projection needs multiple reads to represent one coherent point of authoritative state.
+
+**Result:** Provide a short keyed verified read-only SQLite snapshot context shared by all participating owner reads for that projection.
+
+**Rules:**
+- Open a dedicated verified read connection, enable query-only mode, begin a read transaction, perform bounded reads, then commit/close.
+- Snapshot never includes operator think-time, network waits, external parsing, or unrelated work.
+- Connections never cross threads and are always cleaned up even if BEGIN/read/commit setup fails.
+- Cross-module projections call exported owner readers using the same snapshot mechanism/coordination contract; they never join another module's private tables.
+- One captured `as_of_utc` may accompany the snapshot for consistent derived ages/durations.
+
+**Failure:** Snapshot begin/read/cleanup failure returns a stable query failure and no partially mixed multi-generation result.
+
+**Side effects:** read transaction only.
+
+Reuse provenance: Beta LLD-01 consistent read snapshot and audit fix for BEGIN-failure cleanup.
+
+<a id="persistence-schema-verify"></a>
+## PERSISTENCE.SCHEMA_VERIFY
+
+**Trigger/input:** Migrations finish, an authoritative database opens for readiness, or explicit deep verification is requested.
+
+**Result:** Compare the actual encrypted database against a committed expected schema manifest and required integrity invariants before READY.
+
+**Rules:**
+- Expected truth is generated from accepted current migration/design lineage and committed with the application; it is never regenerated from the database being verified.
+- Verify authoritative tables/indexes/triggers, columns/types/null/default/PK shape, foreign keys/actions, index uniqueness/ordered key columns, and declared append-only triggers.
+- Unknown/missing/structurally different authoritative objects block readiness unless explicitly classified SQLite-owned/internal.
+- Verify every child foreign-key column sequence has an effective leading-prefix index unless an explicit measured accepted exception exists.
+- Ordinary readiness runs `foreign_key_check`, `quick_check`, exact migration-ledger/manifest reconciliation, and append-only-trigger probes inside rolled-back verification where needed.
+- Deep/restore verification may additionally require full `integrity_check`.
+- Verification is observational except controlled rolled-back probes.
+
+**Failure:** Drift, missing/extra authoritative object, FK/index gap, ledger mismatch, append-only failure, or integrity failure blocks READY with ERROR.CONTRACT identity.
+
+**Side effects:** read-only verification and rolled-back probes only.
+
+Reuse provenance: Beta LLD-01 schema verification contract.
+
+<a id="migration-status"></a>
+## MIGRATION.STATUS
+
+**Trigger/input:** Setup/diagnostics requests current migration/schema status either through a verified live host or through safe offline inspection.
+
+**Result:** Return a strictly observational migration classification without creating/repairing/migrating anything.
+
+**Rules:**
+- Prefer authenticated live-host status when a verified current runtime owns the instance.
+- Offline inspection must prove exclusive inspection safety using the canonical instance lock; if another process may own it, return a limited/locked status rather than opening directly.
+- Existing WAL/SHM sidecars without verified live ownership make immutable offline inspection unsafe.
+- Offline database open is read-only/immutable and never creates parent/database/lock/default/log files.
+- Status distinguishes at least: not initialized, current, pending, drift, ledger mismatch, unsupported future schema, invalid database/layout, integrity failure, verified live current/pending, locked/unverified, unsafe sidecar state, and inspection failure.
+- No status path invokes repair, migration, WAL checkpoint, defaults, or diagnostic emission merely by being queried.
+
+**Failure:** Inability to prove a safe truthful view is itself an explicit status, never guessed CURRENT.
+
+**Side effects:** none.
+
+Reuse provenance: Beta `GetMigrationStatus`.
+
+<a id="working-copy-store"></a>
+## WORKING_COPY.STORE
+
+**Trigger/input:** A registered edit surface checkpoints, fetches/restores, discards, or prunes recoverable UI working intent.
+
+**Result:** Persist bounded technical draft state separately from accepted domain truth while retaining exact owner contract, target, base revision, generation, chronology, and conflict identity.
+
+**Rules:**
+- Only immutable statically registered working-copy contracts may store draft payloads; each declares contract/version, target/scope keys, closed draft schema, and allowed dirty paths.
+- Checkpoint validates strict canonical JSON <=262144 UTF-8 bytes and exact expected generation; changed checkpoint increments generation, identical current content is NO_CHANGE.
+- New recoverable copies are capped at 256 nonexpired installation-wide; expiry is initially 7 days.
+- Main may checkpoint after 5 seconds idle but no more frequently than one successful checkpoint per 30 seconds for the same copy.
+- One checkpoint/discard uses one short existing Foundation UnitOfWork with command replay/audit metadata; it never invokes the owning domain mutation.
+- Restore reads the stored draft plus current owner revision/freshness context; restoration never accepts it.
+- Discard/prune deletes only technical working-copy state. Pruning is bounded to 100 rows per pass.
+- A stale base revision enters owner conflict review; last-write-wins over accepted owner truth is prohibited.
+
+**Failure:** Unknown contract, invalid/oversized draft, generation conflict, capacity, missing copy, or stale owner context returns explicit working-copy failure and preserves accepted truth.
+
+**Side effects:** `ui_working_copies` technical state plus required command/audit metadata only.
+
+Reuse provenance: Beta LLD-10 working-copy command/query mechanics.
+
 <a id="persistence-connection"></a>
 ## PERSISTENCE.CONNECTION
 
@@ -755,9 +893,12 @@ Reuse provenance: Beta LLD-12 live-data key and DPAPI boundaries.
 - SQLCipher is mandatory for authoritative production-format storage; development does not silently substitute plaintext SQLite.
 - Apply the raw live DEK before schema access.
 - Verify the expected SQLCipher/provider/cipher profile before migrations or authoritative reads.
-- Foreign keys are enabled on every authoritative connection.
+- Required connection setup includes `foreign_keys=ON`, `busy_timeout=5000`, `trusted_schema=OFF`, `temp_store=MEMORY`, `synchronous=FULL`, `secure_delete=FAST`, disabled extension loading, and verified WAL runtime mode; initial WAL autocheckpoint is 1000 pages.
+- Write UnitOfWork uses explicit `BEGIN IMMEDIATE`; bounded busy/snapshot conflicts map to retryable persistence-busy failure with no accepted partial write.
 - Connection lifetime is explicit; failed begin/open paths clean up resources.
-- Repositories receive connection/transaction context; they do not create independent commits.
+- Repositories receive connection/transaction context; they do not create independent commits or unmanaged connections.
+- SQL values are driver-bound parameters; one execute call contains one SQL statement and domain services never use `executescript`.
+- Connection/driver row objects do not escape repository boundaries or cross thread boundaries.
 
 **Failure:** Key/cipher/provider mismatch, integrity failure, unsupported profile, or database-open failure blocks authoritative access.
 
