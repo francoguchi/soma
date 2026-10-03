@@ -5,3 +5,4 @@ Define current behavior by permanent capability scope. Resume all design/impleme
 - [Continue from here](CONTINUE.md)
 - [Migration map](MIGRATION.md)
 - [00 — Foundation](00/README.md)
+- [01 — Identity / Reference](01/README.md)
