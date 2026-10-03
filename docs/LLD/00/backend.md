@@ -800,7 +800,7 @@ Reuse provenance: Beta LLD-12 live-data key and DPAPI boundaries.
 - SOMA has one Local Administrator credential record in the current single-user product phase. Login requires no username.
 - Initial database state contains zero credential rows and reports `setup_required`; normal domain/application routes remain gated until first-run setup completes, while trusted runtime/diagnostic/setup routes remain available as explicitly allowed.
 - First-run setup requires password + confirmation. Validate at least 12 Unicode scalar values and at most 1024 UTF-8 bytes, with no trimming, Unicode normalization, case conversion, or hidden mutation. Confirmation requires exact UTF-8 byte equality.
-- Setup creates one stable technical `actor_id` and Argon2id PHC verifier using PLATFORM.BASELINE's accepted profile inside one TX.UOW. The raw password/confirmation never enters audit, diagnostics, correlation context, repr/debug text, browser storage, command replay payloads, or logs.
+- Setup creates one stable technical `actor_id` and Argon2id PHC verifier using PLATFORM.BASELINE's accepted profile inside one TX.UOW. Composition may register a same-UoW descriptive-profile participant; when scope 01 is assembled, `PROFILE.AUTH_PARTICIPANT` receives the existing UoW/parent receipt/actor_id and must return without committing. The raw password/confirmation never enters audit, diagnostics, correlation context, repr/debug text, browser storage, command replay payloads, or logs.
 - Login accepts password only, applies the current in-memory failure-delay gate before expensive hashing, verifies through the pinned Argon2 provider, and on success clears the failure counter and issues a current-run browser session.
 - After 5 consecutive failures, per-run login delay follows 1, 2, 4, then 8 seconds and remains capped at 8 seconds. Delay uses TIME.MONOTONIC, occurs outside database transactions, and creates no durable account lockout.
 - Public credential failure is uniform `AUTH_INVALID_CREDENTIALS`; malformed/unsupported persisted verifier shape is recorded only as bounded security diagnostic evidence and never reveals verifier details to the browser.
@@ -810,7 +810,7 @@ Reuse provenance: Beta LLD-12 live-data key and DPAPI boundaries.
 
 **Failure:** A second setup attempt, invalid setup password/confirmation, invalid credentials, unsupported verifier, persistence failure, or session-issuance failure returns a stable safe error and never creates a partial credential/session state.
 
-**Side effects:** First-run setup creates the singleton credential row; successful login/logout mutates only in-memory session state plus bounded authentication-throttle state.
+**Side effects:** First-run setup creates the singleton credential row and any required registered same-UoW setup-participant metadata; successful login/logout mutates only in-memory session state plus bounded authentication-throttle state.
 
 Reuse provenance: Beta `PasswordAuthenticationV1`, narrowed to minimal setup/login/logout foundation ownership.
 
