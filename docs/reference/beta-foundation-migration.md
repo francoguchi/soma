@@ -1,6 +1,6 @@
 # Beta foundation migration map
 
-This file records provenance only. Current behavior is owned by `docs/LLD/00/`.
+This file records provenance only. Current behavior is owned by `docs/LLD/00/`; live migration/reuse status is tracked only in `docs/LLD/00/migration.md`.
 
 | Beta source | New scope-00 authority |
 |---|---|
