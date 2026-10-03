@@ -31,7 +31,7 @@
     {
       "id": "M00.005",
       "anchor": "m00-005",
-      "depends_on": ["UI.WORKING_COPY", "M00.004"],
+      "depends_on": ["WORKING_COPY.STORE", "UI.WORKING_COPY", "M00.004"],
       "code_paths": ["src/core/soma/db/migrations/00/005_working_copies.sql"]
     }
   ],
