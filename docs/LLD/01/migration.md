@@ -90,8 +90,8 @@ Scope 01 is **not approved** until all four passes are complete. Keep the result
 
 - [x] **PASS-1 — Foundation ownership/conflict audit:** prove scope 01 consumes scope 00 mechanisms instead of re-owning auth/session, appearance semantics, UUID generation, UoW/replay/audit, paging, working-copy/confirmation, runtime or shell behavior.
 - [x] **PASS-2 — Beta completeness/minimality audit:** account for all 40 LLD-02 design files and verify every retained behavior is needed by current SOMA; reject/defer obsolete Beta ownership rather than carrying it forward by inertia.
-- [ ] **PASS-3 — Internal coherence audit:** verify metadata graph, migrations/schema/FK indexes, cross-scope contracts, error/audit/privacy rules, bounds/pagination, transaction ordering and development checks agree with one another.
-- [ ] **PASS-4 — Adversarial implementation-readiness audit:** walk failure/race/stale/replay/ambiguity/large-data/cross-domain scenarios and verify the resulting implementation can be partitioned into clean goals without temporary architecture or hidden dependencies.
+- [x] **PASS-3 — Internal coherence audit:** verify metadata graph, migrations/schema/FK indexes, cross-scope contracts, error/audit/privacy rules, bounds/pagination, transaction ordering and development checks agree with one another.
+- [x] **PASS-4 — Adversarial implementation-readiness audit:** walk failure/race/stale/replay/ambiguity/large-data/cross-domain scenarios and verify the resulting implementation can be partitioned into clean goals without temporary architecture or hidden dependencies.
 
 ## Pre-approval audit evidence
 
@@ -132,6 +132,47 @@ Additional cleanup from the Beta packet:
 - Beta runtime/module layout and direct-service SQL are donor implementation shapes, not current architecture authority;
 - Beta migration-time SQLite `strftime('now')` initialization is not retained; current technical matching metadata has no invented wall-clock chronology;
 - Beta LLD-10 component ownership is not copied; scope 01 owns feature behavior while Foundation supplies shared interaction primitives.
+
+### PASS-3 — Internal coherence audit
+
+Completed after the PASS-1/PASS-2 fixes.
+
+- Metadata reconciliation across scope 00 + scope 01 produced **177 graph nodes**, **0 duplicate IDs**, **0 broken anchors**, **0 unresolved relationships**, **0 dependency cycles**, **0 scope-01 design items without a development check**, and **0 scope-00/scope-01 code-path ownership overlaps**.
+- Scope 01 currently has **41 owned design/migration/contract items** covered by **15 grouped development checks**.
+- `M01.001` now explicitly depends on Foundation `M00.006`; Local User Profile ID is FK-bound to `local_admin_credentials.actor_id`, enforcing the approved singleton identity without moving credential ownership.
+- All scope-01 tables are STRICT. The schema documents every FK child path and its effective leading-prefix PK/index coverage, including nullable command-history FKs.
+- **22 exact protection/generation trigger identities** are declared for immutable IDs, append-only/history rules, channel/address ownership, delete guards, setting-key immutability and Customer review-generation freshness.
+- The Beta migration-time SQLite wall clock was removed from `reference_metadata`; accepted chronology comes from Foundation `TIME.UTC`.
+- Query implementation placement was corrected to current architecture: application queries use dedicated read adapters rather than reviving Beta's top-level query/persistence ownership.
+- Domain errors now map only to Foundation's closed recoverability enum; no Beta-specific free-form recoverability values leak across the contract.
+- Settings have one current policy: unknown fields reject, unsupported versions require an explicit upgrader, and no generic quarantine/fallback store exists.
+- API/page bounds are coherent: scope-01 default 50 / max 200, with Foundation's hard maximum preserved.
+
+### PASS-4 — Adversarial implementation-readiness audit
+
+The current design was walked against the Beta risk evidence rather than assuming packet review implied implementation safety.
+
+Evidence set inspected:
+
+- **39** Beta acceptance scenarios (`T001..T039`, including Local User Profile);
+- **13** double-review regressions;
+- **38** failure-injection cases;
+- **13** performance/security structural cases;
+- **103 high-risk cases total**, grouped into the current 15 checks rather than copied one-for-one.
+
+Current checks retain the material failure families: duplicate identity evidence, Unicode drift/expansion, stale candidate/review/revision state, shared Account Code ambiguity, claimant scale, NO_CHANGE replay, email/header injection, multiple-channel ambiguity, append-only/history bypass, FK/index/schema drift, dependency races/100000 blockers, cross-domain rollback, malformed settings, static SQL/cursor safety, audit rollback/privacy and bounded query cost.
+
+Implementation donor audit at Beta implementation `fbe3821ac0b52802ba8265f979590e75c3ac1209` found all **21** named candidate source slices and **18** focused `tests/test_reference_*.py` files present. Expected disposition when implementation goals are created:
+
+- **strong reuse candidates:** Unicode matching asset/normalizer logic, field/email validators, Account Code review fingerprint algorithm, pure setting-definition concepts, accepted regression vectors/tests;
+- **reuse after restructuring:** Customer/Contact/Dispatch/lifecycle/profile/settings service logic and read-query SQL, moved behind current application/ports/adapters and Foundation providers;
+- **rewrite/reject as old architecture:** module-local cursor authority (use Foundation `QUERY.PAGE`), direct service-owned ConnectionFactory/UoW/AuditWriter construction, Beta route/session policy names, generic settings quarantine policy, stale 500-item transport limits, monolithic `0002_identity_reference.sql`, and migration-time SQLite wall clock.
+
+A clean implementation partition is possible without temporary ownership: matching/schema/profile foundation integration first, then Customer, Contact, Dispatch/lifecycle, Settings/providers, and finally Reference/Settings UI. **No `IMP-01-xx` files are created yet** because owner approval is deliberately required after this four-pass review.
+
+## Approval state
+
+**PASS-1 through PASS-4 are complete, but scope 01 remains UNAPPROVED pending owner sign-off.** Do not close the global LLD-02 migration entry or create implementation goals until that approval is given.
 
 ## Completion rule
 
