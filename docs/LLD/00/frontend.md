@@ -29,14 +29,20 @@
       "code_paths": ["src/main/app/auth/", "src/main/shared/api/"]
     },
     {
+      "id": "BRAND.ASSETS",
+      "anchor": "brand-assets",
+      "code_paths": ["src/main/assets/brand/"]
+    },
+    {
       "id": "UI.BRAND",
       "anchor": "ui-brand",
-      "code_paths": ["src/main/assets/brand/", "src/main/styles/"]
+      "depends_on": ["BRAND.ASSETS"],
+      "code_paths": ["src/main/styles/"]
     },
     {
       "id": "UI.APPEARANCE",
       "anchor": "ui-appearance",
-      "depends_on": ["UI.BRAND", "UI.APPEARANCE"],
+      "depends_on": ["UI.TOKENS"],
       "code_paths": ["src/main/styles/", "src/main/shared/appearance/"]
     },
     {
@@ -66,7 +72,7 @@
     {
       "id": "UI.SYSTEM_TRAY",
       "anchor": "ui-system-tray",
-      "depends_on": ["RUNTIME.TRUSTED_CONTROL", "DIAGNOSTICS.OPERATOR_LOGS", "UI.BRAND"],
+      "depends_on": ["RUNTIME.TRUSTED_CONTROL", "DIAGNOSTICS.OPERATOR_LOGS", "BRAND.ASSETS"],
       "code_paths": ["src/core/soma/runtime/tray.py", "src/main/assets/brand/"]
     },
     {
@@ -402,6 +408,23 @@ Reuse provenance: Beta LLD-10 safe-undo principle, moved into shared user-plane 
 **Failure:** Missing/invalid appearance preference falls back deterministically to `core-dark`.
 
 **Side effects:** presentation theme state only.
+
+<a id="brand-assets"></a>
+## BRAND.ASSETS
+
+**Trigger/input:** Runtime tray or Main needs a permanent SOMA-owned logo/icon asset.
+
+**Visible result:** Resolve only canonical repository-owned SOMA brand masters/derived runtime variants.
+
+**Rules:**
+- Accepted permanent SVG/PNG/ICO assets live under `src/main/assets/brand/`; `.tmp/` references never become runtime dependencies.
+- One canonical source asset may have deterministic derived sizes/formats for tray/favicon/application use.
+- Runtime never downloads, regenerates from screenshots, or substitutes third-party branding.
+- This item owns asset identity/files only. UI.BRAND owns how Main visually applies the brand.
+
+**Failure:** Missing required runtime icon falls back only where the consuming contract explicitly permits text/default shell presentation; it never loads an untracked/remote asset.
+
+**Side effects:** none.
 
 <a id="ui-brand"></a>
 ## UI.BRAND
