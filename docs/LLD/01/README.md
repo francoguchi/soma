@@ -5,4 +5,6 @@ Own reusable human/organization/location identities, reference lifecycle and mat
 - [Backend](backend.md)
 - [Frontend](frontend.md)
 - [Checks](checks.md)
+- [Contracts](contracts/README.md)
+- [Migrations](migrations/README.md)
 - [Migration ledger](migration.md)
