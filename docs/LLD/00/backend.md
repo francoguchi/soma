@@ -843,6 +843,7 @@ Reuse provenance: Beta migration manifest lessons; new owner-scoped identity rep
 
 Reuse provenance: Beta LLD-01 strict JSON and audit findings around incomplete container validation.
 
+<a id="command-replay"></a>
 ## COMMAND.REPLAY
 
 **Trigger/input:** Authoritative command carrying command identity and canonical request identity.
