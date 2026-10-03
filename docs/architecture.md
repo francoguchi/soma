@@ -254,6 +254,8 @@ A contract change updates its owner LLD item, provider implementation, generated
 
 `docs/LLD/CONTINUE.md` is the repository's single mutable continuation pointer. It contains current scope/branch/goal/blocker/next-action state only, never history. Any human or agent resuming work starts there instead of reconstructing progress from commits, old chats, or broad repository rereads.
 
+`docs/LLD/MIGRATION.md` is the one cross-scope Beta migration queue. It records which donor packets are still unmigrated or split across owners, but never duplicates per-goal implementation status. Read it when allocating or closing a scope, not on every focused coding increment.
+
 Each scope has a README plus `backend.md`, `frontend.md`, and `checks.md` as needed. A scope that migrates prior implementation/design also has one `migration.md` reuse ledger. That ledger tracks donor disposition and exact candidate sources; it is not behavioral authority and does not duplicate implementation results. `contracts/` holds schemas used for runtime validation or type generation. `migrations/` documents current schema construction.
 
 Scope `00` owns shared runtime, persistence, security mechanisms, time, interaction, API-contract, and tooling foundations.
@@ -274,7 +276,7 @@ Record what was actually run and its result. Note the commit when exercising a c
 
 For migrated scopes, a goal may become `working` only after every migration-ledger row assigned to that goal has an explicit terminal disposition: `REUSED`, `REWRITTEN`, `REJECTED`, `DEFERRED`, or an already-closed `NEW` decision. Reading donor code alone never closes a row.
 
-Migration rows use one machine-checkable Markdown form: `- [ ] **RNN.KK-X — PENDING:** ...` while open, and `- [x] **RNN.KK-X — STATUS:** ...` when closed, where `STATUS` is one of the five terminal dispositions and `NN.KK` matches implementation goal `IMP-NN-KK`. Row IDs are unique within the repository.
+Migration rows use one machine-checkable Markdown form: `- [ ] **RNN.KK-X — PENDING:** ...` while open, and `- [x] **RNN.KK-X — STATUS:** ...` when closed, where `STATUS` is one of `REUSED`, `REWRITTEN`, `REJECTED`, `DEFERRED`, or `NEW`, and `NN.KK` matches implementation goal `IMP-NN-KK`. `REUSED` means substantial donor code survives after adaptation; `REWRITTEN` preserves the behavior with new code; `REJECTED` intentionally drops donor behavior/code because current design supersedes it; `DEFERRED` names the later owner/goal; `NEW` declares no donor exists. Row IDs are unique within the repository.
 
 Goal statuses:
 
