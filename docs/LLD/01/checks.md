@@ -30,7 +30,7 @@ These are development checks for scope-01 behavior. They are not release certifi
 <a id="chk01-identity"></a>
 ## CHK01.IDENTITY
 
-Create distinct Customer/Contact/Dispatch identities with equal descriptive values and prove equality never collapses identity. Verify all new IDs are canonical UUIDv4 from Foundation. During first-run Local Administrator setup, create the singleton profile inside the same outer UnitOfWork, then update only display-name metadata without changing authentication/session authority.
+Create distinct Customer/Contact/Dispatch identities with equal descriptive values and prove equality never collapses identity. Verify all new IDs are canonical UUIDv4 from Foundation. During first-run Local Administrator setup, create the singleton profile inside the same outer UnitOfWork with `local_user_profile_id == actor_id`; a direct mismatched profile FK insert must fail. Then update only display-name metadata without changing authentication/session authority.
 
 <a id="chk01-bounds-api"></a>
 ## CHK01.BOUNDS.API
@@ -74,7 +74,7 @@ Register multiple synthetic dependency validators and archive/reactivate referen
 <a id="chk01-settings"></a>
 ## CHK01.SETTINGS
 
-Read absent registered settings and prove defaults create no row. Write/update one setting with exact revision, reject unknown/secret/mismatched contracts, exercise semantic equality NO_CHANGE, and verify explicit upgrader failure leaves prior bytes unchanged. Register settings from multiple semantic owners without transferring their business meaning to scope 01.
+Read absent registered settings and prove defaults create no row. Write/update one setting with exact revision, reject unknown/secret/mismatched contracts, exercise semantic equality NO_CHANGE, and verify explicit upgrader failure leaves prior bytes unchanged. Register settings from multiple semantic owners without transferring their business meaning to scope 01. In particular, register Foundation's appearance preference through the generic provider and verify scope 01 persists the typed value without owning/duplicating the `core_dark|system|light` semantic enum.
 
 <a id="chk01-no-change"></a>
 ## CHK01.NO_CHANGE
@@ -84,7 +84,7 @@ For descriptive, Account Code, Contact channel/affiliation and setting updates, 
 <a id="chk01-query"></a>
 ## CHK01.QUERY
 
-Exercise active lists, historical detail, Account Code history, Contact channels/affiliation history, lifecycle preview and setting queries over datasets larger than one page. Require stable keyset order, bounded nested collections, no N+1 query explosion, no side-effecting default materialization, and exact counts only where semantics require them.
+Exercise active lists, historical detail, Account Code history, Contact channels/affiliation history, lifecycle preview and setting queries over datasets larger than one page. Require stable keyset order, bounded nested collections, no N+1 query explosion, no side-effecting default materialization, and exact counts only where semantics require them. Resolve Customer scopes `all`, `specific`, and `unassigned` in one read snapshot; a missing specific Customer fails rather than silently broadening scope, and archived identity remains explicit rather than being rewritten.
 
 <a id="chk01-adversarial"></a>
 ## CHK01.ADVERSARIAL
@@ -97,7 +97,7 @@ Run the high-risk Beta regressions against current ownership rather than reprodu
 - source claim disappears or a third claimant exists during reassignment without corrupting unrelated claims;
 - stale Contact/channel/affiliation revisions never last-write-wins;
 - CR/LF/control email injection never persists or reaches recipient output;
-- direct SQL attempts to violate one-current-affiliation, history append-only, channel-kind=email, master-delete or lifecycle guards fail;
+- direct SQL attempts to violate immutable profile/master identities, one-current-affiliation, history append-only, channel-kind=email, master-delete or lifecycle guards fail;
 - 100000 dependency blockers change preview cost only, not archive writer-path materialization;
 - malformed/duplicate-key/nonfinite/oversized setting JSON and unsafe state-dependent validators fail before accepted mutation;
 - replay after lost NO_CHANGE response never turns into a later mutation;
