@@ -519,7 +519,7 @@ Reuse provenance: Beta `LocalHostLifecycle`.
 <a id="security-browser-session"></a>
 ## SECURITY.BROWSER_SESSION
 
-**Trigger/input:** A future authentication provider proves an operator and requests a browser session, or a browser query/mutation presents existing session context.
+**Trigger/input:** AUTH.LOCAL_ADMIN or a later accepted authentication provider proves an operator and requests a browser session, or a browser query/mutation presents existing session context.
 
 **Result:** Provide same-origin loopback browser-session and CSRF mechanics independent of run-control authentication.
 
@@ -530,9 +530,9 @@ Reuse provenance: Beta `LocalHostLifecycle`.
 - Query validation requires exact current Host, valid current-run session, and valid deadlines.
 - Mutation validation additionally requires exact current Origin, constant-time matching `X-SOMA-CSRF`, and same-origin/none Fetch Metadata when present.
 - CORS is disabled; forwarded/proxy headers do not influence trust.
-- Initial inherited bounds are 12-hour idle, 24-hour absolute lifetime, and maximum 4 sessions; a later owning security/auth scope may tighten them.
+- Initial inherited bounds are 12-hour idle, 24-hour absolute lifetime, and maximum 4 sessions; a later credential-management/security decision may tighten them.
 - Run end invalidates all sessions. Authentication/password changes may invalidate sessions through the provider contract.
-- This item does not define passwords, local profile semantics, or business authorization; it defines the transport/session substrate.
+- This item does not define password verification, local profile semantics, or business authorization; AUTH.LOCAL_ADMIN owns the minimal password setup/login/logout provider while this item owns the transport/session substrate.
 
 **Failure:** Missing/stale/wrong-run/cross-origin/session/CSRF context fails before application dispatch.
 
@@ -720,7 +720,7 @@ Reuse provenance: Beta LLD-12 `RuntimeRegistryV2` and `TrustedLocalInstanceV1`.
 
 **Trigger/input:** Developer/operator invokes one of the repository-root Windows source buttons.
 
-**Result:** Provide four stable, human-friendly development entry points backed by one launcher implementation:
+**Result:** Provide five stable, human-friendly development entry points backed by one launcher implementation:
 
 | Entry point | Required behavior |
 |---|---|
@@ -741,7 +741,7 @@ Reuse provenance: Beta LLD-12 `RuntimeRegistryV2` and `TrustedLocalInstanceV1`.
 
 **Failure:** Missing/unsupported environment, unsafe checkout/runtime path, failed native dependency verification, startup crash, READY timeout, or trust failure produces a nonzero exit and an actionable diagnostic/log location. No fake success or plaintext fallback is allowed.
 
-**Side effects:** Setup may create/update the repository-local environment. Run/console/stop operate the local runtime through RUNTIME.TRUSTED_CONTROL.
+**Side effects:** Setup may create/update the repository-local environment. Run/console/stop operate the local runtime through RUNTIME.TRUSTED_CONTROL. Reset may destroy and recreate only the explicitly confirmed canonical development database and seed state.
 
 Reuse provenance: Beta implementation `fbe3821ac0b52802ba8265f979590e75c3ac1209` source launchers and `tools/source_launcher.py`, revised into the new scope-00 architecture.
 
