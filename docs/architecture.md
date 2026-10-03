@@ -58,6 +58,7 @@ soma/
   soma_run.bat
   soma_run_console.bat
   soma_stop.bat
+  soma_reset_dev.bat
   docs/
     architecture.md
     LLD/
@@ -131,6 +132,7 @@ soma/
     main/
       package.json
       app/
+        auth/
         bootstrap/
         capabilities/
         routing/
@@ -141,6 +143,7 @@ soma/
         components/
         interactions/
         navigation/
+        appearance/
         time/
       features/
         system/
@@ -170,19 +173,21 @@ Local design references and scratch material may live under ignored `.tmp/`. Not
 
 ## Source runtime controls
 
-The repository-root `soma_setup.bat`, `soma_run.bat`, `soma_run_console.bat`, and `soma_stop.bat` are stable development/operator buttons. They remain thin adapters over `tools/source_launcher.py` and shared core runtime/security providers; BAT files never duplicate trust or lifecycle logic.
+The repository-root `soma_setup.bat`, `soma_run.bat`, `soma_run_console.bat`, `soma_stop.bat`, and `soma_reset_dev.bat` are stable development/operator buttons. They remain thin adapters over `tools/source_launcher.py` and shared core runtime/security providers; BAT files never duplicate trust or lifecycle logic.
 
 `soma_run` and `soma_run_console` start the same authoritative application composition. Detached and console modes differ only in operator presentation/logging and process attachment, not in domain/runtime behavior. Both expose the same system tray control surface when available.
 
 Source launchers are development infrastructure. They may later inform installer shortcuts, but packaging/release mechanics do not own the authoritative runtime lifecycle. Host control always passes through the same verified local-instance protocol, and system tray actions never become alternate kill/business authority.
 
+`soma_reset_dev.bat` is deliberately separate from ordinary run/stop controls. It resolves and displays the exact canonical development instance, requires literal typed `RESET`, refuses non-development targets, rebuilds migrations + development seed, and leaves SOMA stopped. A double-click alone is never destructive authorization.
+
 The source-development instance defaults beneath Windows LocalAppData at `SOMA/Development/instance-v1`. This intentionally separates disposable development data from a future packaged release instance.
 
 ## Foundation boundary
 
-Scope 00 owns mechanisms required before domain capabilities can safely exist: configuration/paths, build identity, UTC and monotonic clocks, technical IDs/correlation, errors, safe filesystem/temp, protected persistence/migrations/snapshots, transactions/replay/audit, jobs, trusted runtime/control, browser-session/CSRF substrate, static serving, API/query mechanics, diagnostics, capability discovery, testing seams, and shared user-plane interactions.
+Scope 00 owns mechanisms required before domain capabilities can safely exist: configuration/paths, build identity, UTC and monotonic clocks, technical IDs/correlation, errors, safe filesystem/temp, protected persistence/migrations/snapshots, transactions/replay/audit, jobs, trusted runtime/control, minimal singleton Local Administrator credential setup/login/logout, browser-session/CSRF substrate, static serving, API/query mechanics, diagnostics, capability discovery, testing seams, and shared user-plane interactions.
 
-Foundation never owns ticket, customer, Objective, Task, SLA, inventory, infrastructure, communication, import, or other business meaning. A generic mechanism may validate/transport an owner contract, but it may not infer owner lifecycle, eligibility, ranking, relationship, or audit semantics.
+Foundation never owns ticket, customer, Objective, Task, SLA, inventory, infrastructure, communication, import, or other business meaning. It also does not own Local Administrator profile/display-name/contact preferences or full credential-management/recovery UX beyond the minimum setup/login/logout authentication boundary. A generic mechanism may validate/transport an owner contract, but it may not infer owner lifecycle, eligibility, ranking, relationship, or audit semantics.
 
 A later module registers only the minimum data needed by a foundation registry (for example a job contract, audit payload contract, capability descriptor, route, seed contributor, or query DTO). Registration does not transfer business ownership to Foundation.
 
@@ -212,12 +217,12 @@ Shared foundation provides mechanisms. Domain-specific customer, ticket, SLA, in
 
 | Layer | Owns |
 |---|---|
-| App shell | Routing, startup/authentication presentation, navigation, workspace and pane composition. |
+| App shell | First-run/login gate, routing, startup presentation, capability-aware navigation, workspace and pane composition. |
 | Feature views | Tables, forms, record inspectors, and actions. |
 | Feature state | Selection, working copies, local validation, request identity, loading/error/conflict behavior, and API orchestration. |
 | Shared presentation/API | Reusable interactions, semantic styles, time formatting, typed requests, and generated/validated API bindings. |
 
-The system plane owns durable business rules and resulting facts. The user plane presents those facts and manages interaction state.
+The system plane owns durable business rules and resulting facts. The user plane presents those facts and manages interaction state. Until a later settings owner supplies an accepted preference, Main starts in SOMA Core Dark; semantic-token ownership prevents feature CSS from depending on that default.
 
 Mutation flow:
 
