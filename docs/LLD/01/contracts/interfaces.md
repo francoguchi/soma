@@ -29,6 +29,12 @@
       "code_paths": ["src/core/soma/modules/reference/ports/contact.py"]
     },
     {
+      "id": "CUSTOMER.SCOPE_PROVIDER",
+      "anchor": "customer-scope-provider",
+      "depends_on": ["CUSTOMER.ORGANIZATION", "REF.QUERY"],
+      "code_paths": ["src/core/soma/modules/reference/ports/customer_scope.py"]
+    },
+    {
       "id": "SETTING.PROVIDER",
       "anchor": "setting-provider",
       "depends_on": ["SETTING.REGISTRY", "SETTING.VALUE"],
@@ -102,6 +108,23 @@ Scope 01 provides read-only Contact communication lookup:
 
 It never sends mail, chooses among multiple usable channels without owning authority, or mutates Contact state.
 
+<a id="customer-scope-provider"></a>
+## CUSTOMER.SCOPE_PROVIDER
+
+Scope 01 provides one read-only Customer scope resolver for cross-domain projections such as Overview:
+
+`resolve_scope(snapshot, CustomerScopeV1) -> CustomerScopeResolutionV1`
+
+Accepted request variants are exactly:
+
+- `all`
+- `specific { customer_org_id }`
+- `unassigned`
+
+Resolution returns the same closed kind plus `customer_org_id|null` and bounded display name where applicable. A specific Customer must resolve by immutable identity under the supplied snapshot; missing/invalid identity fails rather than degrading to `all` or `unassigned`.
+
+The provider performs no mutation and grants no authorization to downstream projections. Each consuming domain applies the resolved scope to its own data and never joins scope-01 private tables.
+
 <a id="setting-provider"></a>
 ## SETTING.PROVIDER
 
@@ -113,6 +136,8 @@ Scope 01 provides the typed setting registry/store boundary:
 - `write(uow/application command, validated request) -> accepted setting result`
 
 Semantic owners register definitions at composition time. Registration requires a closed contract and ordinary-nonsecret storage classification. Runtime plugins/arbitrary keys are not accepted.
+
+The Beta-specific `ImportSettingsReader` is not retained as a scope-01 semantic interface. Future Import owns its directory-setting definitions and may expose an import-local typed facade over this generic provider; this avoids making scope 01 understand import workflow semantics. Foundation `UI.APPEARANCE` likewise owns appearance semantics and may register its ordinary preference here when the store is available.
 
 <a id="ref-dependency-provider"></a>
 ## REF.DEPENDENCY_PROVIDER
