@@ -37,7 +37,7 @@
     {
       "id": "CHK00.ERROR.TRACE",
       "anchor": "chk-error-trace",
-      "covers": ["ERROR.CONTRACT", "TRACE.CORRELATION", "IDENTITY.UUID", "SERIALIZATION.STRICT_JSON", "UI.ERROR_STATE"]
+      "covers": ["ERROR.CONTRACT", "TRACE.CORRELATION", "IDENTITY.UUID", "SERIALIZATION.STRICT_JSON"]
     },
     {
       "id": "CHK00.CLOCKS.SEAMS",
@@ -92,7 +92,7 @@
     {
       "id": "CHK00.UI.ROUTING",
       "anchor": "chk-ui-routing",
-      "covers": ["UI.ROUTING", "UI.SELECTION"]
+      "covers": ["UI.ROUTING"]
     },
     {
       "id": "CHK00.UI.AUTOCOMPLETE",
@@ -112,7 +112,7 @@
     {
       "id": "CHK00.UI.DIAGNOSTICS",
       "anchor": "chk-ui-diagnostics",
-      "covers": ["UI.DIAGNOSTICS_STATE", "RUNTIME.HEALTH", "DIAGNOSTICS.OPERATOR_LOGS", "DIAGNOSTICS.SAFE"]
+      "covers": ["UI.DIAGNOSTICS_STATE", "UI.ERROR_STATE", "RUNTIME.HEALTH", "DIAGNOSTICS.OPERATOR_LOGS", "DIAGNOSTICS.SAFE"]
     },
     {
       "id": "CHK00.UI.APPEARANCE",
@@ -162,7 +162,7 @@
     {
       "id": "CHK00.CONTRACT.SYNC",
       "anchor": "chk-contract-sync",
-      "covers": ["CONTRACT.SOURCE", "API.CLIENT"]
+      "covers": ["CONTRACT.SOURCE"]
     },
     {
       "id": "CHK00.UI.SELECTION",
