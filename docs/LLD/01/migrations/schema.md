@@ -42,100 +42,216 @@ The Foundation schema verifier must include these tables, indexes and protection
 <a id="m01-001"></a>
 ## M01.001 — Customer reference and Local User Profile
 
-Creates:
+Creates the matching-profile singleton, Local User Profile metadata, Customer masters and Account Code claim history.
 
 ### `reference_metadata`
 
-Singleton row describing the supported matching profile and conservative Customer-reference generation.
+```text
+singleton_guard               INTEGER PRIMARY KEY CHECK(singleton_guard = 1)
+matching_profile_id           TEXT NOT NULL CHECK(length(matching_profile_id) > 0)
+customer_reference_generation INTEGER NOT NULL DEFAULT 0 CHECK(customer_reference_generation >= 0)
+```
 
-- `singleton_guard INTEGER PRIMARY KEY CHECK(singleton_guard=1)`
-- `matching_profile_id TEXT NOT NULL`
-- `customer_reference_generation INTEGER NOT NULL DEFAULT 0 CHECK(customer_reference_generation>=0)`
-
-Initial row declares `UNICODE_MATCH_V1` with generation 0. This technical singleton carries no wall-clock chronology column; migration SQL must not invent domain chronology through SQLite `now`/`strftime`. Ordinary runtime never changes `matching_profile_id`; a new profile requires a forward migration/reindex.
-
-Protected triggers increment `customer_reference_generation` for accepted Customer Organization insert/update and Customer Account Code insert/active->superseded changes. This intentionally over-invalidates conflict-review snapshots rather than accepting against changed reference state.
+Migration inserts exactly `(1, 'UNICODE_MATCH_V1', 0)`. This technical singleton has no wall-clock chronology column; migration SQL must not invent domain chronology through SQLite `now`/`strftime`. Runtime does not change the profile ID. A future profile change requires a governed forward migration/reindex.
 
 ### `local_user_profiles`
 
-Singleton descriptive metadata only:
+```text
+local_user_profile_id TEXT PRIMARY KEY
+                      REFERENCES local_admin_credentials(actor_id)
+                      ON UPDATE RESTRICT ON DELETE RESTRICT
+singleton_guard       INTEGER NOT NULL UNIQUE CHECK(singleton_guard = 1)
+display_name          TEXT NOT NULL CHECK(length(display_name) > 0)
+revision              INTEGER NOT NULL DEFAULT 1 CHECK(revision > 0)
+created_at_utc        INTEGER NOT NULL CHECK(created_at_utc >= 0)
+updated_at_utc        INTEGER NOT NULL CHECK(updated_at_utc >= created_at_utc)
+```
 
-- `local_user_profile_id TEXT PRIMARY KEY REFERENCES local_admin_credentials(actor_id) ON UPDATE RESTRICT ON DELETE RESTRICT`
-- `singleton_guard INTEGER NOT NULL UNIQUE CHECK(singleton_guard=1)`
-- `display_name TEXT NOT NULL`
-- `revision INTEGER NOT NULL DEFAULT 1`
-- `created_at_utc INTEGER NOT NULL`
-- `updated_at_utc INTEGER NOT NULL`
+No password, verifier, username/login-name, session, auto-login or encryption material exists here. The FK enforces the approved singleton-model equality with Foundation Local Administrator `actor_id`; scope 01 still does not own credential state.
 
-No password, verifier, username/login-name, session, auto-login or encryption material exists here. The foreign key enforces the approved singleton-model identity equality with Foundation Local Administrator `actor_id`; scope 01 still does not own credential state.
+A protection trigger rejects changes to `local_user_profile_id`, `singleton_guard` or `created_at_utc`; accepted profile updates may change only `display_name`, `revision`, and `updated_at_utc` through the owner command.
 
 ### `customer_organizations`
 
-- immutable `customer_org_id`
-- bounded `name` + governed `name_match_key`
-- `lifecycle_state active|archived`
-- positive revision
-- created/updated UTC
+```text
+customer_org_id   TEXT PRIMARY KEY
+name              TEXT NOT NULL CHECK(length(name) > 0)
+name_match_key    TEXT NOT NULL CHECK(length(name_match_key) > 0)
+lifecycle_state   TEXT NOT NULL CHECK(lifecycle_state IN ('active','archived'))
+revision          INTEGER NOT NULL DEFAULT 1 CHECK(revision > 0)
+created_at_utc    INTEGER NOT NULL CHECK(created_at_utc >= 0)
+updated_at_utc    INTEGER NOT NULL CHECK(updated_at_utc >= created_at_utc)
+```
 
-Name/match key is not unique. Ordinary DELETE is rejected.
+Name/match key is not unique. A protection trigger rejects changes to immutable `customer_org_id`/`created_at_utc`; ordinary DELETE is rejected.
 
 ### `customer_org_identifiers`
 
-History-preserving external identifier claims. Initial supported `identifier_type` is `customer_account_code`.
+```text
+customer_org_identifier_id TEXT PRIMARY KEY
+customer_org_id            TEXT NOT NULL REFERENCES customer_organizations(customer_org_id)
+                           ON UPDATE RESTRICT ON DELETE RESTRICT
+identifier_type            TEXT NOT NULL CHECK(identifier_type = 'customer_account_code')
+value_text                 TEXT NOT NULL CHECK(length(value_text) > 0)
+match_key                  TEXT NOT NULL CHECK(length(match_key) > 0)
+lifecycle_state            TEXT NOT NULL CHECK(lifecycle_state IN ('active','superseded'))
+created_at_utc             INTEGER NOT NULL CHECK(created_at_utc >= 0)
+superseded_at_utc          INTEGER NULL
+created_command_id         TEXT NOT NULL REFERENCES command_receipts(command_id)
+                           ON UPDATE RESTRICT ON DELETE RESTRICT
+superseded_command_id      TEXT NULL REFERENCES command_receipts(command_id)
+                           ON UPDATE RESTRICT ON DELETE RESTRICT
+CHECK(
+  (lifecycle_state='active' AND superseded_at_utc IS NULL AND superseded_command_id IS NULL)
+  OR
+  (lifecycle_state='superseded' AND superseded_at_utc IS NOT NULL AND superseded_command_id IS NOT NULL)
+)
+```
 
-Rows store immutable identifier/customer/type/value/match-key/opening provenance plus `active|superseded`, supersession UTC/command when terminal. One Customer may have at most one active Account Code claim, but one normalized code may have multiple active Customers after reviewed shared-claim acceptance.
+Required indexes:
 
-Required indexes include active Customer-name matching, one-active-code-per-Customer, active code claimant lookup, history order and all command-FK leading-prefix coverage. UPDATE is restricted to the single active->superseded transition; DELETE is rejected.
+- `idx_customer_org_active_name_match(lifecycle_state,name_match_key,customer_org_id)`;
+- partial unique `uq_customer_org_active_identifier_type(customer_org_id,identifier_type) WHERE lifecycle_state='active'`;
+- `idx_customer_active_identifier_value(identifier_type,match_key,customer_org_id) WHERE lifecycle_state='active'`;
+- `idx_customer_identifier_history(customer_org_id,identifier_type,created_at_utc,customer_org_identifier_id)`;
+- `idx_customer_identifier_created_command(created_command_id)`;
+- `idx_customer_identifier_superseded_command(superseded_command_id) WHERE superseded_command_id IS NOT NULL`.
+
+Identifier UPDATE is restricted to the one `active -> superseded` transition setting supersession UTC/command while preserving identity/owner/type/value/key/opening provenance; superseded rows reject further UPDATE and every DELETE is rejected.
+
+Protected generation triggers increment `reference_metadata.customer_reference_generation` after Customer INSERT/accepted UPDATE and Account Code INSERT/accepted UPDATE. Trigger failure rolls back the owning UnitOfWork.
 
 <a id="m01-002"></a>
 ## M01.002 — Contacts
 
-Creates:
-
 ### `contacts`
 
-Immutable `contact_id`, bounded name/match key, active/archive lifecycle, revision and chronology. Equal names are allowed; ordinary DELETE is rejected.
+```text
+contact_id       TEXT PRIMARY KEY
+name             TEXT NOT NULL CHECK(length(name) > 0)
+name_match_key   TEXT NOT NULL CHECK(length(name_match_key) > 0)
+lifecycle_state  TEXT NOT NULL CHECK(lifecycle_state IN ('active','archived'))
+revision         INTEGER NOT NULL DEFAULT 1 CHECK(revision > 0)
+created_at_utc   INTEGER NOT NULL CHECK(created_at_utc >= 0)
+updated_at_utc   INTEGER NOT NULL CHECK(updated_at_utc >= created_at_utc)
+```
+
+Equal names are allowed. A protection trigger preserves immutable `contact_id`/`created_at_utc`; ordinary DELETE is rejected.
 
 ### `contact_channels`
 
-Initial channel kind is only `email`. Rows carry immutable channel/contact/kind identity, accepted text, governed match key, active/archive lifecycle, revision and chronology. Equal values are allowed. Ordinary DELETE is rejected.
+```text
+contact_channel_id TEXT PRIMARY KEY
+contact_id         TEXT NOT NULL REFERENCES contacts(contact_id)
+                   ON UPDATE RESTRICT ON DELETE RESTRICT
+channel_kind       TEXT NOT NULL CHECK(channel_kind = 'email')
+value_text         TEXT NOT NULL CHECK(length(value_text) > 0)
+match_key          TEXT NOT NULL CHECK(length(match_key) > 0)
+lifecycle_state    TEXT NOT NULL CHECK(lifecycle_state IN ('active','archived'))
+revision           INTEGER NOT NULL DEFAULT 1 CHECK(revision > 0)
+created_at_utc     INTEGER NOT NULL CHECK(created_at_utc >= 0)
+updated_at_utc     INTEGER NOT NULL CHECK(updated_at_utc >= created_at_utc)
+```
+
+A protection trigger preserves channel ID/contact/kind/created UTC, rejects any UPDATE once archived, and permits only active value/key/revision correction or the governed `active -> archived` transition. DELETE is rejected.
 
 ### `contact_affiliations`
 
-Append-protected affiliation history: immutable relationship ID, Contact, Customer, current/historical state, opening UTC/command, optional closing UTC/command. A partial unique index permits at most one current affiliation per Contact. UPDATE is restricted to current->historical closure; DELETE is rejected.
+```text
+contact_affiliation_id TEXT PRIMARY KEY
+contact_id             TEXT NOT NULL REFERENCES contacts(contact_id)
+                       ON UPDATE RESTRICT ON DELETE RESTRICT
+customer_org_id        TEXT NOT NULL REFERENCES customer_organizations(customer_org_id)
+                       ON UPDATE RESTRICT ON DELETE RESTRICT
+is_current             INTEGER NOT NULL CHECK(is_current IN (0,1))
+opened_at_utc          INTEGER NOT NULL CHECK(opened_at_utc >= 0)
+closed_at_utc          INTEGER NULL CHECK(closed_at_utc IS NULL OR closed_at_utc >= opened_at_utc)
+opened_command_id      TEXT NOT NULL REFERENCES command_receipts(command_id)
+                       ON UPDATE RESTRICT ON DELETE RESTRICT
+closed_command_id      TEXT NULL REFERENCES command_receipts(command_id)
+                       ON UPDATE RESTRICT ON DELETE RESTRICT
+CHECK(
+  (is_current=1 AND closed_at_utc IS NULL AND closed_command_id IS NULL)
+  OR
+  (is_current=0 AND closed_at_utc IS NOT NULL AND closed_command_id IS NOT NULL)
+)
+```
 
-Indexes cover active Contact matching, channel lookup/matching, current Customer affiliation, affiliation history and command-FK child paths.
+Required indexes:
+
+- `idx_contacts_active_name_match(lifecycle_state,name_match_key,contact_id)`;
+- `idx_contact_channels_contact(contact_id,lifecycle_state,channel_kind,created_at_utc,contact_channel_id)`;
+- `idx_contact_channels_match(channel_kind,lifecycle_state,match_key,contact_id)`;
+- partial unique `uq_contact_current_affiliation(contact_id) WHERE is_current=1`;
+- `idx_contact_affiliation_customer_current(customer_org_id,is_current,contact_id)`;
+- `idx_contact_affiliation_history(contact_id,opened_at_utc,contact_affiliation_id)`;
+- `idx_contact_affiliation_opened_command(opened_command_id)`;
+- `idx_contact_affiliation_closed_command(closed_command_id) WHERE closed_command_id IS NOT NULL`.
+
+Affiliation UPDATE is restricted to the single current->historical closure that preserves immutable relationship/opening fields and sets closing UTC/command. Historical rows reject further UPDATE and every DELETE is rejected.
 
 <a id="m01-003"></a>
 ## M01.003 — Dispatch Locations and lifecycle evidence
 
-Creates:
-
 ### `dispatch_locations`
 
-Immutable `dispatch_location_id`, name/match key, `address_mode standalone|site_derived`, standalone address only when applicable, active/archive lifecycle, revision and chronology.
+```text
+dispatch_location_id    TEXT PRIMARY KEY
+name                    TEXT NOT NULL CHECK(length(name) > 0)
+name_match_key          TEXT NOT NULL CHECK(length(name_match_key) > 0)
+address_mode            TEXT NOT NULL CHECK(address_mode IN ('standalone','site_derived'))
+standalone_address_text TEXT NULL
+lifecycle_state         TEXT NOT NULL CHECK(lifecycle_state IN ('active','archived'))
+revision                INTEGER NOT NULL DEFAULT 1 CHECK(revision > 0)
+created_at_utc          INTEGER NOT NULL CHECK(created_at_utc >= 0)
+updated_at_utc          INTEGER NOT NULL CHECK(updated_at_utc >= created_at_utc)
+CHECK(
+  (address_mode='standalone' AND standalone_address_text IS NOT NULL AND length(standalone_address_text) > 0)
+  OR
+  (address_mode='site_derived' AND standalone_address_text IS NULL)
+)
+```
 
-There is no Customer ownership/preference, Site ID shortcut or logistics-role column. Site relationship is owned by Infrastructure. Ordinary DELETE is rejected.
+There is no Customer ownership/preference, Site-ID shortcut or logistics-role column. A protection trigger preserves immutable location ID/address mode/created UTC; a `site_derived` row can never receive standalone address text through an update. Ordinary DELETE is rejected.
 
 ### `reference_lifecycle_events`
 
-Append-only occurrence evidence for Customer Organization, Contact and Dispatch Location.
+```text
+reference_lifecycle_event_id TEXT PRIMARY KEY
+target_type                  TEXT NOT NULL CHECK(target_type IN ('customer_organization','contact','dispatch_location'))
+target_id                    TEXT NOT NULL
+event_type                   TEXT NOT NULL CHECK(event_type IN ('created','archived','reactivated','descriptive_corrected'))
+occurred_at_utc              INTEGER NOT NULL CHECK(occurred_at_utc >= 0)
+command_id                   TEXT NOT NULL REFERENCES command_receipts(command_id)
+                             ON UPDATE RESTRICT ON DELETE RESTRICT
+reason_category              TEXT NULL
+```
 
-Stores immutable event ID, target type/ID, event type `created|archived|reactivated|descriptive_corrected`, occurrence UTC, command receipt and optional bounded reason category. UPDATE/DELETE is rejected.
+The polymorphic target is immutable evidence identity, not a destructive FK. UPDATE/DELETE is rejected.
 
-Indexes cover active Dispatch matching, target event history and command-FK child path.
+Required indexes:
+
+- `idx_dispatch_active_name_match(lifecycle_state,name_match_key,dispatch_location_id)`;
+- `idx_reference_lifecycle_target(target_type,target_id,occurred_at_utc,reference_lifecycle_event_id)`;
+- `idx_reference_lifecycle_command(command_id)`.
 
 <a id="m01-004"></a>
 ## M01.004 — Typed setting values
 
 Creates `setting_values` for explicit writes only:
 
-- `setting_key TEXT PRIMARY KEY`
-- `contract_name TEXT NOT NULL`
-- `contract_version INTEGER NOT NULL CHECK(contract_version>0)`
-- `value_json TEXT NOT NULL CHECK(json_valid(value_json))`
-- `revision INTEGER NOT NULL DEFAULT 1 CHECK(revision>0)`
-- `updated_at_utc INTEGER NOT NULL`
-- `command_id TEXT NOT NULL REFERENCES command_receipts(command_id)`
+```text
+setting_key      TEXT PRIMARY KEY
+contract_name    TEXT NOT NULL
+contract_version INTEGER NOT NULL CHECK(contract_version > 0)
+value_json       TEXT NOT NULL CHECK(json_valid(value_json))
+revision         INTEGER NOT NULL DEFAULT 1 CHECK(revision > 0)
+updated_at_utc   INTEGER NOT NULL CHECK(updated_at_utc >= 0)
+command_id       TEXT NOT NULL REFERENCES command_receipts(command_id)
+                 ON UPDATE RESTRICT ON DELETE RESTRICT
+```
 
-Rows exist only for explicit writes. Defaults stay code-defined and absent until changed. Unknown/secret-classified settings cannot use this store. SQL REPLACE is forbidden; upgrades are explicit validated UPDATE operations. A leading-prefix index covers `command_id`.
+Rows exist only for explicit writes. Defaults remain code-defined and absent until changed. Unknown/secret-classified settings cannot use this store. SQL `REPLACE` is forbidden; upgrades are explicit validated UPDATE operations. `idx_setting_values_command(command_id)` provides required FK child coverage.
+
+A settings UPDATE may change only registered contract/value/revision/updated UTC/command fields after owner validation. Setting keys are immutable; changing semantic identity means a new registered key plus an explicit owner migration, not an UPDATE of `setting_key`.
+
