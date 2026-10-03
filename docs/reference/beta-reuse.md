@@ -40,6 +40,7 @@ High-value Beta security/foundation references:
 - `spec/lld/foundation-runtime/algorithms/job-coordinator.json`
 - `spec/lld/foundation-runtime/errors.json`
 - `spec/lld/security-packaging/technology.json`
+- `spec/lld/security-packaging/algorithms/password-auth.json`
 - `spec/lld/security-packaging/algorithms/session-csrf.json`
 - `spec/lld/security-packaging/types/runtime-control.json`
 - `spec/lld/security-packaging/algorithms/trusted-instance.json`
