@@ -15,6 +15,8 @@ This is the single current-state entry point for humans and agents. Do not appen
 
 ## Resume
 
+The intended handoff can be as small as: **“Read `docs/LLD/CONTINUE.md` and continue.”** A coding agent may use the same instruction; `AGENTS.md` supplies the standing implementation rules.
+
 1. Read the active goal file.
 2. Read only the LLD items referenced by that goal and the matching active-goal rows in the migration ledger.
 3. Reuse/restructure donor code only where the current LLD still wants the same behavior.
