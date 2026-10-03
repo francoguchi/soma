@@ -252,7 +252,9 @@ A contract change updates its owner LLD item, provider implementation, generated
 
 ## Documentation roles
 
-Each scope has a README plus `backend.md`, `frontend.md`, and `checks.md` as needed. `contracts/` holds schemas used for runtime validation or type generation. `migrations/` documents current schema construction.
+`docs/LLD/CONTINUE.md` is the repository's single mutable continuation pointer. It contains current scope/branch/goal/blocker/next-action state only, never history. Any human or agent resuming work starts there instead of reconstructing progress from commits, old chats, or broad repository rereads.
+
+Each scope has a README plus `backend.md`, `frontend.md`, and `checks.md` as needed. A scope that migrates prior implementation/design also has one `migration.md` reuse ledger. That ledger tracks donor disposition and exact candidate sources; it is not behavioral authority and does not duplicate implementation results. `contracts/` holds schemas used for runtime validation or type generation. `migrations/` documents current schema construction.
 
 Scope `00` owns shared runtime, persistence, security mechanisms, time, interaction, API-contract, and tooling foundations.
 
@@ -269,6 +271,8 @@ A goal file contains only:
 - Remaining: concrete unfinished behavior or blocker; use `none` when working.
 
 Record what was actually run and its result. Note the commit when exercising a committed build, or `working tree` for uncommitted code. Additional prose is used only for a material decision or defect.
+
+For migrated scopes, a goal may become `working` only after every migration-ledger row assigned to that goal has an explicit terminal disposition: `REUSED`, `REWRITTEN`, `REJECTED`, `DEFERRED`, or an already-closed `NEW` decision. Reading donor code alone never closes a row.
 
 Goal statuses:
 
@@ -408,6 +412,18 @@ During development:
 - Do not add dummy migrations to mirror LLD numbers.
 
 No upgrade-compatibility work or historical migration preservation is required for the disposable development database. A future release baseline is a later whole-application task.
+
+## Continuation and checkpoint protocol
+
+The minimum resume command is conceptually: **read `docs/LLD/CONTINUE.md` and continue**. That file points to the active goal and scope migration ledger. The goal then points to exact LLD behavior IDs/checks. This is the intended replacement for handover prompts and duplicate status reports.
+
+At the end of a normal goal iteration:
+1. write actual focused Run results and Remaining state into the active goal;
+2. close donor rows processed for that goal in the scope migration ledger;
+3. set the goal status and move `docs/LLD/CONTINUE.md` to the next goal;
+4. update owning LLD behavior only if implementation/live use changed the design.
+
+Do not create timestamped handovers, roadmap snapshots, certification ledgers, or parallel TODO files. Git history preserves history; implementation goals preserve execution evidence; the migration ledger preserves donor disposition; CONTINUE preserves only the present pointer.
 
 ## Fast iteration policy
 
