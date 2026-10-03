@@ -19,6 +19,26 @@ Beta LLD-02 contains 40 design files. The migration is organized by behavior own
 - [x] **D01-I — REWRITTEN:** semantic NO_CHANGE, revisions/history, privacy-minimized audit, bounded keyset queries and stable errors are translated onto current Foundation replay/audit/query/error contracts.
 - [x] **D01-J — REWRITTEN:** reference/profile/settings UI behavior is now scope 01 while selection/scroll/dialog/working-copy/confirmation components remain Foundation-owned; Beta domain component ownership is not copied.
 
+## Beta packet coverage audit
+
+All 40 Beta LLD-02 design files are accounted for by the current behavior clusters; this is a completeness guard, not a copy checklist.
+
+| Donor group | Files | Current destination |
+|---|---:|---|
+| packet/technology/bounds/interfaces/errors/routes | 8 | scope README, backend contracts/bounds/error/route semantics |
+| algorithms | 6 | matching, Account Code review, lifecycle/dependency, channel, NO_CHANGE backend items |
+| commands | 4 | backend application behavior |
+| queries | 1 | `REF.QUERY` and provider contracts |
+| schema | 5 | `migrations/schema.md` + backend invariants |
+| types | 2 | current contracts/backend/frontend DTO semantics |
+| audit | 1 | privacy-minimized scope audit rules on Foundation audit mechanism |
+| migration allocation | 1 | `M01.001..M01.004` current schema allocation |
+| implementation map | 1 | implementation donor section below |
+| transitions | 1 | `REF.LIFECYCLE`, Account Code/channel/affiliation state rules |
+| UI handoff | 1 | `frontend.md` using Foundation interaction primitives |
+| acceptance/failure/traceability suites | 9 | `checks.md` + future focused implementation donor rows |
+| **Total** | **40** | **complete source-packet accounting** |
+
 ## Beta design donors
 
 Primary packet: `spec/lld/identity-reference/`.
@@ -55,6 +75,21 @@ Do not migrate domain workspace React components from other Beta packets into sc
 - Infrastructure owns Site persistence and Site↔Dispatch Location relationship/address source; scope 01 consumes an explicit provider.
 - Inventory and later owner domains provide bounded dependency validators; scope 01 must not query their private tables.
 - Ticket/import/logistics domains consume reference identities but do not redefine them.
+
+## Open owner decisions
+
+These are the remaining product choices before scope-01 implementation goals are frozen. Current documents preserve the Beta behavior as the temporary baseline until the owner answers.
+
+- **Q01-1 — Customer Account Code shared claims:** keep Beta's ability for multiple Customer Organizations to hold the same active Account Code after an explicit reviewed shared-claim decision, with future matching remaining AMBIGUOUS?
+  - Recommended: **yes**. It preserves contradictory real-world source evidence without silently stealing/merging identities.
+- **Q01-2 — Contact channel kinds:** keep the first scope-01 implementation email-only, or add phone/mobile channels now?
+  - Recommended: **email-only for this increment**. The channel contract is deliberately versionable; phone can be added when an actual consuming workflow needs it.
+- **Q01-3 — Appearance preference:** once scope 01 persists ordinary settings, expose only `core_dark | system | light`, or also revive Beta's optional terminal-green/amber/violet skins?
+  - Recommended: **Core Dark/System/Light only** and defer decorative skins until the main UX is stable.
+- **Q01-4 — Local User Profile identity:** keep one profile whose `local_user_profile_id` is the same stable UUID as Foundation Local Administrator `actor_id`, default display name `Local Administrator`, editable display name, no username?
+  - Recommended: **yes**. It avoids a redundant person-to-actor mapping in the current single-user product.
+- **Q01-5 — UI naming:** keep backend/domain name `CustomerOrganization` while presenting it to the operator simply as **Customer**?
+  - Recommended: **yes**. The backend retains precise identity semantics while the UI stays natural.
 
 ## Completion rule
 
