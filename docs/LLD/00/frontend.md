@@ -23,9 +23,21 @@
       "code_paths": ["src/main/app/bootstrap/", "src/main/shared/build/"]
     },
     {
+      "id": "UI.AUTH_GATE",
+      "anchor": "ui-auth-gate",
+      "depends_on": ["AUTH.LOCAL_ADMIN", "SECURITY.BROWSER_SESSION", "UI.BOOTSTRAP"],
+      "code_paths": ["src/main/app/auth/", "src/main/shared/api/"]
+    },
+    {
       "id": "UI.BRAND",
       "anchor": "ui-brand",
       "code_paths": ["src/main/assets/brand/", "src/main/styles/"]
+    },
+    {
+      "id": "UI.APPEARANCE",
+      "anchor": "ui-appearance",
+      "depends_on": ["UI.BRAND", "UI.APPEARANCE"],
+      "code_paths": ["src/main/styles/", "src/main/shared/appearance/"]
     },
     {
       "id": "UI.TOKENS",
@@ -36,7 +48,7 @@
     {
       "id": "UI.SHELL",
       "anchor": "ui-shell",
-      "depends_on": ["UI.TOKENS", "API.CLIENT", "UI.BOOTSTRAP"],
+      "depends_on": ["UI.TOKENS", "API.CLIENT", "UI.BOOTSTRAP", "UI.AUTH_GATE"],
       "code_paths": ["src/main/app/", "src/main/shared/components/"]
     },
     {
@@ -220,7 +232,8 @@ Reuse provenance: Beta LLD-10 presentation lessons and LLD-09 chronology refinem
 **Visible result:** Navigation/actions truthfully reflect what this assembled build can perform.
 
 **Rules:**
-- `available` capability surfaces may be entered; `unavailable` surfaces remain explicitly unavailable rather than invoking stubs/500s.
+- Declared future workspaces remain visible in primary navigation while unavailable; they render disabled/unavailable state rather than disappearing or invoking stubs/500s.
+- `available` capability surfaces may be entered; `unavailable` surfaces stay visibly disabled with concise “Not available in this build” meaning.
 - `development` may be shown with a concise non-authoritative development indicator.
 - Capability state controls exposure/availability only; it is never business authorization or a replacement for owner action blockers.
 - A route/bookmark to an unavailable feature remains understandable and provides safe navigation back.
