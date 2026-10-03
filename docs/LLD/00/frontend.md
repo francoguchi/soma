@@ -34,6 +34,12 @@
       "code_paths": ["src/main/app/", "src/main/shared/components/"]
     },
     {
+      "id": "UI.SYSTEM_TRAY",
+      "anchor": "ui-system-tray",
+      "depends_on": ["RUNTIME.TRUSTED_CONTROL", "DIAGNOSTICS.OPERATOR_LOGS", "UI.BRAND"],
+      "code_paths": ["src/core/soma/runtime/tray.py", "src/main/assets/brand/"]
+    },
+    {
       "id": "UI.SELECTION",
       "anchor": "ui-selection",
       "depends_on": ["UI.SHELL"],
@@ -170,6 +176,37 @@ Reuse provenance: Beta LLD-10 presentation lessons and LLD-09 chronology refinem
 **Failure:** Missing feature route shows explicit unavailable/not-found state and preserves safe navigation back to the prior context.
 
 **Side effects:** navigation/presentation state only.
+
+<a id="ui-system-tray"></a>
+## UI.SYSTEM_TRAY
+
+**Trigger/input:** A Windows SOMA host starts through either detached or console development launch.
+
+**Visible result:** Exactly one SOMA system-tray icon represents the current verified host and exposes tidy local runtime controls.
+
+**Rules:**
+- Use the approved SOMA application/tray icon from canonical brand assets and native Win32 `Shell_NotifyIconW` with a hidden message window; no separate tray framework is required.
+- Tooltip/status reflects at least `Starting`, `Ready`, `Stopping`, and `Failed` when the host can still present that state.
+- The context menu contains, in this order:
+  1. a disabled status line (`SOMA — <state>`);
+  2. `Open SOMA`;
+  3. `Open Current Log`;
+  4. `Open Logs Folder`;
+  5. separator;
+  6. `Stop SOMA`.
+- `Open SOMA` performs a fresh RUNTIME.TRUSTED_CONTROL verification before opening the browser origin.
+- `Open Current Log` opens the exact current run log recorded by DIAGNOSTICS.OPERATOR_LOGS; `Open Logs Folder` opens the canonical diagnostics directory.
+- `Stop SOMA` invokes the same authenticated graceful shutdown path as `soma_stop.bat`; tray UI is never independent kill authority.
+- Console and detached modes use the same tray behavior. Ctrl+C in console mode and tray Stop both converge on the same graceful host shutdown.
+- There is no separate `Exit Tray` action while the host is running: the icon represents host lifecycle and disappears after exact-owned runtime cleanup.
+- Only one icon is shown for the authoritative run; launcher races do not create duplicate tray owners.
+- Tray failure does not make the host untrusted or unavailable; launcher/console controls remain usable and the failure is logged safely.
+
+**Failure:** If native tray creation fails, SOMA continues with console/BAT runtime controls and records a sanitized warning. A tray action that cannot freshly verify the current run is disabled/fails closed and performs no control action.
+
+**Side effects:** Native shell notification icon/menu state and verified runtime-control requests only.
+
+Reuse provenance: Beta LLD-12 package lifecycle/technology design (`Shell_NotifyIconW`) promoted into scope 00 because live-test runtime control is foundational in the new SOMA.
 
 <a id="ui-selection"></a>
 ## UI.SELECTION
