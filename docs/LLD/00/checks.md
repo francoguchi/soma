@@ -62,12 +62,12 @@
     {
       "id": "CHK00.AUDIT.APPEND",
       "anchor": "chk-audit-append",
-      "covers": ["AUDIT.APPEND_ONLY", "TX.UOW"]
+      "covers": ["AUDIT.APPEND_ONLY", "TX.UOW", "M00.003"]
     },
     {
       "id": "CHK00.JOB.EXECUTION",
       "anchor": "chk-job-execution",
-      "covers": ["JOBS.EXECUTION", "JOBS.COORDINATOR", "RUNTIME.SHUTDOWN"]
+      "covers": ["JOBS.EXECUTION", "JOBS.COORDINATOR", "RUNTIME.SHUTDOWN", "M00.004"]
     },
     {
       "id": "CHK00.SEED.RESET",
@@ -132,12 +132,12 @@
     {
       "id": "CHK00.MIGRATION.REBUILD",
       "anchor": "chk-migration-rebuild",
-      "covers": ["MIGRATION.MANIFEST", "DEV.DB_RESET", "PERSISTENCE.SCHEMA_VERIFY", "MIGRATION.STATUS"]
+      "covers": ["MIGRATION.MANIFEST", "DEV.DB_RESET", "PERSISTENCE.SCHEMA_VERIFY", "MIGRATION.STATUS", "M00.001"]
     },
     {
       "id": "CHK00.REPLAY.EXACT",
       "anchor": "chk-replay-exact",
-      "covers": ["COMMAND.REPLAY"]
+      "covers": ["COMMAND.REPLAY", "M00.002"]
     },
     {
       "id": "CHK00.JOB.RECOVERY",
@@ -162,7 +162,7 @@
     {
       "id": "CHK00.UI.REFLOW",
       "anchor": "chk-ui-reflow",
-      "covers": ["UI.RESPONSIVE", "UI.WORKING_COPY", "WORKING_COPY.STORE"]
+      "covers": ["UI.RESPONSIVE", "UI.WORKING_COPY", "WORKING_COPY.STORE", "M00.005"]
     },
     {
       "id": "CHK00.UI.HOLD",
