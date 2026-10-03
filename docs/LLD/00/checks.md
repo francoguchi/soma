@@ -5,6 +5,21 @@
   "scope": "00",
   "items": [
     {
+      "id": "CHK00.RUNTIME.TRUST",
+      "anchor": "chk-runtime-trust",
+      "covers": ["RUNTIME.TRUSTED_CONTROL"]
+    },
+    {
+      "id": "CHK00.LAUNCHERS.LIFECYCLE",
+      "anchor": "chk-launchers-lifecycle",
+      "covers": ["DEV.SOURCE_LAUNCHERS", "RUNTIME.TRUSTED_CONTROL", "DIAGNOSTICS.OPERATOR_LOGS"]
+    },
+    {
+      "id": "CHK00.TRAY.CONTROL",
+      "anchor": "chk-tray-control",
+      "covers": ["UI.SYSTEM_TRAY", "RUNTIME.TRUSTED_CONTROL", "DIAGNOSTICS.OPERATOR_LOGS"]
+    },
+    {
       "id": "CHK00.TIME.ROUNDTRIP",
       "anchor": "chk-time-roundtrip",
       "covers": ["TIME.UTC", "TIME.DISPLAY"]
@@ -72,6 +87,23 @@
 # Foundation checks
 
 These are development checks, not release certification. Each scenario becomes executable when its covered behavior is implemented.
+
+<a id="chk-runtime-trust"></a>
+## CHK00.RUNTIME.TRUST
+
+Start a real local host, verify its registry/DPAPI run secret/process birth/origin/health identity, and control it successfully. Then independently test malformed registry shape, alternate/non-literal loopback host, wrong run secret, wrong run/data/protocol identity, stale PID, PID birth reuse, unexpected process image, redirect/proxy behavior, and replaced runtime artifacts. Every adversarial case fails closed without opening or stopping the wrong process.
+
+<a id="chk-launchers-lifecycle"></a>
+## CHK00.LAUNCHERS.LIFECYCLE
+
+From a clean supported Windows source checkout, run `soma_setup.bat`, then `soma_run_console.bat`; verify foreground sanitized logging, READY origin, tray presence, and Ctrl+C graceful shutdown. Then execute `soma_run.bat` twice, `soma_stop.bat` twice, and a fresh run/stop cycle. The second run reuses the verified host, the second stop is idempotent, each new run receives a new run identity, no runtime action installs dependencies, and all detached startup/runtime logs are available under the canonical diagnostics root.
+
+Inject startup failure and READY timeout: launcher returns nonzero with an actionable current log path and never opens an unverified origin. Inject a graceful-stop timeout: no process-name/PID-only termination occurs.
+
+<a id="chk-tray-control"></a>
+## CHK00.TRAY.CONTROL
+
+Run SOMA in both detached and console modes. Verify exactly one branded tray icon, state tooltip/menu, Open SOMA, Open Current Log, Open Logs Folder, and Stop SOMA. Each control that affects the host freshly verifies the same run identity. Tray Stop and console Ctrl+C converge on graceful shutdown. Simulate tray initialization failure and verify the host remains controllable through BAT/console paths with a sanitized warning.
 
 <a id="chk-time-roundtrip"></a>
 ## CHK00.TIME.ROUNDTRIP
