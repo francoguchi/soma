@@ -102,11 +102,11 @@ Candidate/review output is evidence only. Consumers rerun their own authoritativ
 
 Scope 01 provides read-only Contact communication lookup:
 
-- `match_email_candidates(snapshot, normalized_address, customer_scope) -> bounded candidates`
+- `match_email_candidates(snapshot, raw_address) -> ordered bounded candidate Contact identities/revisions`
 - `validate_contact(snapshot, contact_id, revision) -> ACTIVE|ARCHIVED|MISSING`
 - `validate_channel_for_use(snapshot, contact_id, channel_or_auto, purpose) -> ChannelUseValidation`
 
-It never sends mail, chooses among multiple usable channels without owning authority, or mutates Contact state.
+The provider validates/bounds and normalizes `raw_address` under the current scope-01 email/matching profile itself; consumers never manufacture a supposedly-normalized key. It never sends mail, chooses among multiple candidates/usable channels without owning authority, or mutates Contact state.
 
 <a id="customer-scope-provider"></a>
 ## CUSTOMER.SCOPE_PROVIDER
