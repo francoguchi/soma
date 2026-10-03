@@ -309,7 +309,7 @@ Reuse provenance: Beta LLD-01/10/12 technology baselines.
 **Result:** Supply a non-secret immutable identity for the running application/build.
 
 **Rules:**
-- Expose application version, runtime protocol version, contract/schema generation identifiers, and source commit/build identity when available.
+- Initial application version is `0.1.0.dev0`; initial runtime protocol version is integer `1`; initial shared contract format generation is integer `1`. Expose these plus migration/schema generation identifiers and source commit/build identity when available.
 - A dirty/source build is identified honestly; it is never presented as a release-certified build.
 - Build identity is consistent across runtime health, diagnostics, main bootstrap, and logs for one run.
 - Missing optional source-control metadata does not prevent development startup; required protocol/schema identity does.
@@ -359,9 +359,14 @@ Reuse provenance: Beta LLD-01/10/12 technology baselines.
 
 **Result:** Produce one stable safe error envelope.
 
-**Required shape:** `code`, bounded operator-safe `summary`, `recoverability`, optional `safe_next_action`, and `correlation_id`; field-level validation details may be added only by their closed contract.
+**Required JSON shape:** `code`, operator-safe `summary`, `recoverability`, `safe_next_action` (string or null), `correlation_id`, and optional `fields`.
 
 **Rules:**
+- `code` matches `[A-Z][A-Z0-9_.-]{1,95}`; `summary` is nonempty and at most 512 Unicode scalar values.
+- `recoverability` is exactly one of `correct_input`, `retry`, `refresh`, `reauthenticate`, `restart`, or `none`.
+- `safe_next_action` is null or at most 512 operator-safe Unicode scalar values.
+- `correlation_id` is the canonical lowercase UUIDv4 from TRACE.CORRELATION.
+- Optional `fields` is an array of at most 64 closed objects with `path`, `code`, and `summary`; field paths are contract field paths, not SQL/filesystem paths.
 - Stable machine code is the API contract; HTTP status is transport mapping only.
 - Raw SQL/Starlette/Uvicorn/OS/Python exception text, file paths, secrets, tokens, and unbounded provider text never cross the application boundary.
 - Foundation defines common categories such as validation, unauthenticated, forbidden, not-found, stale/conflict, persistence, migration, readiness, busy/retry, integrity, and internal error.
@@ -1109,10 +1114,15 @@ Reuse provenance: Beta source-launcher owner-only startup logging plus LLD-12 di
 **Result:** One machine-readable authoritative contract definition drives or validates both core transport types and main consumer bindings.
 
 **Rules:**
-- Python and TypeScript do not independently invent equivalent DTOs.
+- Runtime JSON contracts are authored as JSON Schema Draft 2020-12 files under the owning `docs/LLD/NN/contracts/` directory. Each file ends `.schema.json`, declares the Draft 2020-12 `$schema`, and uses a stable `$id` of `urn:soma:<scope>:<contract-name>:v<integer>`.
+- Contract objects are closed: required fields are explicit and `additionalProperties: false`; nullability is explicit; no implicit trimming/coercion/default insertion is allowed at transport boundaries.
+- Bounds required for safe execution are in the schema. Serialized UTC whole seconds use names ending `_utc_s`; millisecond durations use `_ms`; byte counts use `_bytes`. Monotonic values are not serialized as chronology.
+- Remote `$ref` is forbidden. Relative local references within the same scope contract directory are allowed. Avoid ambiguous overlapping `oneOf`/`anyOf`, `patternProperties`, executable/custom code, and implementation-specific schema extensions in the shared contract subset.
+- Python transport validates boundary JSON with a pinned Draft 2020-12 validator against these schemas and immediately maps validated values into application inputs/results. It does not maintain a second hand-authored equivalent transport DTO model.
+- TypeScript API bindings are generated from the same schemas into `src/main/shared/api/generated/`; generated files are outputs and are never edited manually.
+- Scope 00 uses a deterministic offline-capable contract tool under `tools/contracts.py` for schema validation and TypeScript generation/checking. The initial implementation may use pinned `jsonschema` for Python validation and pinned `json-schema-to-typescript` as the development generator; exact versions live in project/package metadata and lockfiles.
 - Provider owns field names, enum values, null meaning, units, identity, bounds, and version.
-- Generated artifacts are outputs, not second authorities.
-- Contract generation/validation is deterministic and runnable without network access.
+- Contract generation/checking must run without network access after dependencies are installed.
 - A behavior-changing contract edit updates the owning LLD item and affected implementation goal in the same iteration.
 
 **Failure:** divergence between authority and generated/validated binding fails a focused check.
