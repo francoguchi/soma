@@ -76,20 +76,22 @@ Do not migrate domain workspace React components from other Beta packets into sc
 - Inventory and later owner domains provide bounded dependency validators; scope 01 must not query their private tables.
 - Ticket/import/logistics domains consume reference identities but do not redefine them.
 
-## Open owner decisions
+## Owner decisions — resolved
 
-These are the remaining product choices before scope-01 implementation goals are frozen. Current documents preserve the Beta behavior as the temporary baseline until the owner answers.
+- **Q01-1 — Customer Account Code shared claims: YES.** Multiple Customers may retain one active Account Code only after explicit reviewed acceptance; matching remains `AMBIGUOUS` while multiple eligible claimants survive.
+- **Q01-2 — Contact channel kinds: EMAIL ONLY for the first scope-01 implementation.** Additional kinds require an explicit versioned policy/schema decision when a real consuming workflow needs them.
+- **Q01-3 — Appearance preference: Foundation-owned, not scope-01-owned.** `UI.APPEARANCE` in scope 00 owns SOMA Core Dark as default and the accepted future modes `core_dark | system | light`. Scope 01 supplies only the generic ordinary-nonsecret typed setting store. Beta terminal-green/amber/violet skins are intentionally deferred and are not migrated into scope 01.
+- **Q01-4 — Local User Profile identity: YES.** `local_user_profile_id == AUTH.LOCAL_ADMIN actor_id` in the current singleton model; default display name is `Local Administrator`, editable descriptively, with no username/login-name authority.
+- **Q01-5 — Operator wording: YES.** Domain/backend remains `CustomerOrganization`; ordinary UI labels it **Customer**.
 
-- **Q01-1 — Customer Account Code shared claims:** keep Beta's ability for multiple Customer Organizations to hold the same active Account Code after an explicit reviewed shared-claim decision, with future matching remaining AMBIGUOUS?
-  - Recommended: **yes**. It preserves contradictory real-world source evidence without silently stealing/merging identities.
-- **Q01-2 — Contact channel kinds:** keep the first scope-01 implementation email-only, or add phone/mobile channels now?
-  - Recommended: **email-only for this increment**. The channel contract is deliberately versionable; phone can be added when an actual consuming workflow needs it.
-- **Q01-3 — Appearance preference:** once scope 01 persists ordinary settings, expose only `core_dark | system | light`, or also revive Beta's optional terminal-green/amber/violet skins?
-  - Recommended: **Core Dark/System/Light only** and defer decorative skins until the main UX is stable.
-- **Q01-4 — Local User Profile identity:** keep one profile whose `local_user_profile_id` is the same stable UUID as Foundation Local Administrator `actor_id`, default display name `Local Administrator`, editable display name, no username?
-  - Recommended: **yes**. It avoids a redundant person-to-actor mapping in the current single-user product.
-- **Q01-5 — UI naming:** keep backend/domain name `CustomerOrganization` while presenting it to the operator simply as **Customer**?
-  - Recommended: **yes**. The backend retains precise identity semantics while the UI stays natural.
+## Pre-approval audit gates
+
+Scope 01 is **not approved** until all four passes are complete. Keep the results here rather than creating another status document.
+
+- [ ] **PASS-1 — Foundation ownership/conflict audit:** prove scope 01 consumes scope 00 mechanisms instead of re-owning auth/session, appearance semantics, UUID generation, UoW/replay/audit, paging, working-copy/confirmation, runtime or shell behavior.
+- [ ] **PASS-2 — Beta completeness/minimality audit:** account for all 40 LLD-02 design files and verify every retained behavior is needed by current SOMA; reject/defer obsolete Beta ownership rather than carrying it forward by inertia.
+- [ ] **PASS-3 — Internal coherence audit:** verify metadata graph, migrations/schema/FK indexes, cross-scope contracts, error/audit/privacy rules, bounds/pagination, transaction ordering and development checks agree with one another.
+- [ ] **PASS-4 — Adversarial implementation-readiness audit:** walk failure/race/stale/replay/ambiguity/large-data/cross-domain scenarios and verify the resulting implementation can be partitioned into clean goals without temporary architecture or hidden dependencies.
 
 ## Completion rule
 
