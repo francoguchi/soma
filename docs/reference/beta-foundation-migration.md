@@ -17,6 +17,7 @@ This file records provenance only. Current behavior is owned by `docs/LLD/00/`.
 | LLD-12 RuntimeRegistryV2/TrustedLocalInstance | `RUNTIME.TRUSTED_CONTROL` |
 | Beta launcher implementation `fbe3821...` | `DEV.SOURCE_LAUNCHERS`, `DIAGNOSTICS.OPERATOR_LOGS` |
 | LLD-12 Shell_NotifyIconW design | `UI.SYSTEM_TRAY` |
+| LLD-12 PasswordAuthenticationV1 | `AUTH.LOCAL_ADMIN`, `UI.AUTH_GATE`, `M00.006` |
 | LLD-12 BrowserSessionAndCsrfV1 | `SECURITY.BROWSER_SESSION` |
 | LLD-12 DeliberateActionProofV1 | `SECURITY.DELIBERATE_PROOF` |
 | LLD-12 diagnostic sanitization | `DIAGNOSTICS.SAFE`, `UI.DIAGNOSTICS_STATE` |
@@ -33,4 +34,4 @@ This file records provenance only. Current behavior is owned by `docs/LLD/00/`.
 
 New scope-00 mechanisms not copied as Beta packet ownership include `CONFIG.RUNTIME`, `BUILD.IDENTITY`, `FS.SAFE`, `FS.TEMP`, `DEV.SEED`, `CAPABILITY.REGISTRY`, and `TEST.SEAMS`. They formalize repeated needs exposed during Alpha/Beta development.
 
-Excluded from scope 00 even when Beta LLD-12 grouped them nearby: local-profile/password product semantics, portable-backup envelope/recovery UX, release installer/signing, and domain authorization. Their later owner scopes consume the foundation mechanisms instead.
+Excluded from scope 00 even when Beta LLD-12 grouped them nearby: Local Administrator profile/display-name/contact settings, password change/reset/recovery product UX beyond minimal setup/login/logout, portable-backup envelope/recovery UX, release installer/signing, and domain authorization. Their later owner scopes consume the foundation mechanisms instead.
