@@ -17,7 +17,8 @@ This is the single current-state entry point for humans and agents. Do not appen
 | Design migration ledger | `docs/LLD/01/migration.md` |
 | Overall migration map | `docs/LLD/MIGRATION.md` |
 | Mode | parallel design N+1 / implementation N |
-| Blockers | none |
+| Implementation note | accepted Scope-00 documentation reconciliation is now on `main`; preserve any local Codex edits while reconciling `docs/LLD/00/{backend,frontend,migration}.md` into `feat/00-foundation` before closing `IMP-00-01` |
+| Design blocker | PASS-1..PASS-4 complete on `design/01-identity-reference`; awaiting owner approval before `IMP-01-xx` goals are created |
 | Certification | deferred until whole-application implementation and live testing |
 
 ## Resume
@@ -37,7 +38,7 @@ The intended handoff can be as small as:
 4. Implement, run the goal's focused checks plus directly affected tests, and fix failures.
 5. Update the goal's Run/Remaining/status, close its migration rows, then advance this file to the next implementation goal.
 
-Current next action: continue `IMP-00-01` on `feat/00-foundation`.
+Current next action: reconcile the accepted Scope-00 documentation corrections from `main` into the local `feat/00-foundation` worktree without overwriting implementation progress, then continue `IMP-00-01`.
 
 ### Design lane
 
@@ -47,7 +48,7 @@ Current next action: continue `IMP-00-01` on `feat/00-foundation`.
 4. Record every donor behavior/code slice as reused, rewritten, rejected, deferred, or new.
 5. Update the design scope backend/frontend/checks/contracts/migrations and create implementation goals only after ownership and behavior are clear.
 
-Current next action: reconcile Beta LLD-02 into scope `01 — Identity / Reference` on `design/01-identity-reference`.
+Current next action: review the completed PASS-1..PASS-4 evidence on `design/01-identity-reference`. If approved, freeze Scope 01 and partition its implementation goals; until then it remains explicitly unapproved.
 
 ## Do not
 
