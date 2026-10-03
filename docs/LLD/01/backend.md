@@ -17,6 +17,24 @@
       "code_paths": ["src/core/soma/modules/reference/domain/matching.py", "src/core/soma/modules/reference/assets/"]
     },
     {
+      "id": "REF.BOUNDS",
+      "anchor": "ref-bounds",
+      "depends_on": ["QUERY.PAGE"],
+      "code_paths": ["src/core/soma/modules/reference/domain/validation.py", "src/core/soma/modules/reference/transport/"]
+    },
+    {
+      "id": "REF.COMMAND_ORDER",
+      "anchor": "ref-command-order",
+      "depends_on": ["TX.UOW", "COMMAND.REPLAY", "AUDIT.APPEND_ONLY"],
+      "code_paths": ["src/core/soma/modules/reference/application/"]
+    },
+    {
+      "id": "REF.ERRORS",
+      "anchor": "ref-errors",
+      "depends_on": ["ERROR.CONTRACT"],
+      "code_paths": ["src/core/soma/modules/reference/transport/errors.py"]
+    },
+    {
       "id": "PROFILE.LOCAL_USER",
       "anchor": "profile-local-user",
       "depends_on": ["AUTH.LOCAL_ADMIN", "TX.UOW", "COMMAND.REPLAY", "AUDIT.APPEND_ONLY"],
@@ -122,6 +140,70 @@ Reference matching uses one versioned deterministic normalization profile. Initi
 Normalization rejects non-strings, enforces pre/post UTF-8 bounds, collapses governed whitespace runs to one ASCII space, applies full case-folding, preserves diacritics and punctuation, and rejects empty output. Built-in Python Unicode tables are not authority when they differ across supported runtimes.
 
 Persisted match-key columns are interpreted only when the stored matching-profile ID is supported. A profile change requires an explicit forward migration/reindex; it is never an in-place reinterpretation.
+
+<a id="ref-bounds"></a>
+## REF.BOUNDS
+
+Scope 01 owns semantic bounds for its reference fields; Foundation owns absolute parser/transport safety ceilings. Values are rejected, never truncated.
+
+Initial accepted field bounds:
+
+| Field | Accepted bound |
+|---|---|
+| Local User Profile `display_name` | 1..512 UTF-8 bytes, one line, reject NUL/CR/LF |
+| Customer name | 1..1024 UTF-8 bytes, one line, reject NUL/CR/LF |
+| Customer Account Code | 1..512 UTF-8 bytes, one line, reject NUL/CR/LF |
+| Contact name | 1..1024 UTF-8 bytes, one line, reject NUL/CR/LF |
+| Email channel | 1..2048 UTF-8 bytes before governed trim; one line; reject NUL/CR/LF/C0/C1 controls |
+| Dispatch Location name | 1..1024 UTF-8 bytes, one line, reject NUL/CR/LF |
+| Standalone Dispatch address | 1..8192 UTF-8 bytes, maximum 32 lines, reject NUL; normalize accepted CRLF/CR to LF before validation/persistence |
+| Governed normalized match key | 1..2048 UTF-8 bytes, one line, reject NUL/CR/LF |
+| Lifecycle `reason_category` | maximum 128 UTF-8 bytes, one closed category/code rather than free narrative |
+| `review_context_id` | 1..256 UTF-8 bytes, one line, opaque provenance only |
+
+The Beta packet's stale `local_user_profiles.username` bound is interpreted only as the intended 512-byte descriptive display-name limit; no username/login field is migrated.
+
+Scope-01 collection default is 50 items with hard maximum 200. This is intentionally stricter than Foundation's shared default while respecting Foundation's maximum. Candidate/history/channel/blocker pages never use the stale Beta transport annotation of 500.
+
+Each SettingDefinition declares its own UTF-8/depth/collection bounds under Foundation strict-JSON absolute safety ceilings.
+
+<a id="ref-command-order"></a>
+## REF.COMMAND_ORDER
+
+Every ordinary accepted scope-01 command follows one ordering:
+
+1. exact replay/idempotency lookup;
+2. pure bounded preflight outside the writer transaction (field bounds, Unicode normalization, email syntax, state-independent setting validation);
+3. open one Foundation outer UnitOfWork;
+4. load/revalidate current identity, lifecycle, revision, uniqueness, dependency and review-freshness state;
+5. detect semantic `NO_CHANGE` where the command permits it;
+6. allocate new immutable IDs needed by the accepted change;
+7. insert the Foundation command receipt;
+8. perform owner domain/history/lifecycle writes;
+9. append required typed privacy-minimized audit/result evidence;
+10. commit once.
+
+No DNS/network/external I/O, operator wait, unbounded claimant/blocker enumeration, or other long work occurs while the write transaction is held. Cross-scope participants receive the existing UoW/parent receipt and never commit or create competing receipts.
+
+Any failure after opening the UnitOfWork rolls back the receipt and every attempted scope-01 write.
+
+<a id="ref-errors"></a>
+## REF.ERRORS
+
+Scope 01 uses Foundation `ERROR.CONTRACT` and adds stable domain codes. HTTP status is transport mapping only; clients act on the machine code/recoverability.
+
+Current domain catalogue includes:
+
+- lifecycle/dependency: `REFERENCE_ARCHIVED`, `ARCHIVE_BLOCKED`, `REACTIVATION_BLOCKED`, `DEPENDENCY_VALIDATION_FAILED`;
+- Customer/reference conflict: `CUSTOMER_ORG_INACTIVE`, `ACCOUNT_CODE_CONFLICT_REVIEW`, `ACCOUNT_CODE_SOURCE_NOT_OWNER`, `ACCOUNT_CODE_SHARED_CONTEXT_REQUIRED`, `REVIEW_CONTEXT_STALE`;
+- matching: `MATCH_PROFILE_UNSUPPORTED`, `MATCH_INPUT_INVALID`;
+- channels: `CHANNEL_INVALID`, `CHANNEL_NOT_USABLE`, `CHANNEL_SELECTION_REQUIRED`, `CHANNEL_NOT_OWNED`;
+- settings: `SETTING_UNKNOWN`, `SETTING_CONTRACT_MISMATCH`, `SETTING_SECRET_FORBIDDEN`;
+- profile/bounds: `SINGLETON_PROFILE_EXISTS`, `FIELD_BOUND_EXCEEDED`.
+
+Foundation supplies generic not-found, stale-revision, validation, replay/idempotency, persistence and internal categories. Candidate states `UNRESOLVED|UNIQUE_CANDIDATE|AMBIGUOUS`, channel prerequisite states, affiliation mismatch warnings and `NO_CHANGE` are not errors.
+
+Raw names, addresses, emails, setting values, SQL/provider exceptions or unrestricted source evidence never enter safe error summaries merely to explain a failure.
 
 <a id="profile-local-user"></a>
 ## PROFILE.LOCAL_USER
@@ -256,7 +338,7 @@ Create operations, lifecycle precondition failures, channel archive, and reviewe
 <a id="ref-query"></a>
 ## REF.QUERY
 
-Reference collections use deterministic keyset pagination and Foundation `QUERY.PAGE`; scope 01 may choose a lower default (initial Beta donor default 50) while never exceeding Foundation's hard maximum 200.
+Reference collections use deterministic keyset pagination and Foundation `QUERY.PAGE`; scope 01 uses default 50 and hard maximum 200. The conflicting Beta transport annotations of default 100 / maximum 500 are rejected as stale because they contradict both the Beta semantic bounds packet and the current Foundation hard maximum.
 
 Primary query families include current detail, active lists, Account Code history/review, Contact channels/affiliation history/use validation, matching, lifecycle blocker preview, and setting lookup/list-by-owner.
 
