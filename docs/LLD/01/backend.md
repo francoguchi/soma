@@ -13,7 +13,7 @@
     {
       "id": "REF.UNICODE_MATCH",
       "anchor": "ref-unicode-match",
-      "depends_on": ["SERIALIZATION.STRICT_JSON"],
+      "depends_on": ["PLATFORM.BASELINE"],
       "code_paths": ["src/core/soma/modules/reference/domain/matching.py", "src/core/soma/modules/reference/assets/"]
     },
     {
@@ -25,7 +25,7 @@
     {
       "id": "REF.COMMAND_ORDER",
       "anchor": "ref-command-order",
-      "depends_on": ["TX.UOW", "COMMAND.REPLAY", "AUDIT.APPEND_ONLY"],
+      "depends_on": ["TX.UOW", "COMMAND.REPLAY", "AUDIT.APPEND_ONLY", "TIME.UTC", "IDENTITY.UUID"],
       "code_paths": ["src/core/soma/modules/reference/application/"]
     },
     {
@@ -49,7 +49,7 @@
     {
       "id": "CUSTOMER.ACCOUNT_CODE",
       "anchor": "customer-account-code",
-      "depends_on": ["CUSTOMER.ORGANIZATION", "REF.UNICODE_MATCH", "PERSISTENCE.READ_SNAPSHOT"],
+      "depends_on": ["CUSTOMER.ORGANIZATION", "REF.UNICODE_MATCH", "PERSISTENCE.READ_SNAPSHOT", "SERIALIZATION.STRICT_JSON"],
       "code_paths": ["src/core/soma/modules/reference/domain/account_code.py", "src/core/soma/modules/reference/application/customer.py"]
     },
     {
@@ -176,7 +176,7 @@ Each SettingDefinition declares its own UTF-8/depth/collection bounds under Foun
 <a id="ref-command-order"></a>
 ## REF.COMMAND_ORDER
 
-Every ordinary accepted scope-01 command follows one ordering:
+Every ordinary accepted scope-01 command follows one ordering. Accepted chronology comes only from Foundation `TIME.UTC`; newly allocated owner/event identities come only from Foundation `IDENTITY.UUID`:
 
 1. exact replay/idempotency lookup;
 2. pure bounded preflight outside the writer transaction (field bounds, Unicode normalization, email syntax, state-independent setting validation);
