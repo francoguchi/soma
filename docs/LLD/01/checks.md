@@ -5,6 +5,8 @@
   "scope": "01",
   "items": [
     {"id":"CHK01.IDENTITY","anchor":"chk01-identity","covers":["REF.IDENTITY","PROFILE.LOCAL_USER","PROFILE.AUTH_PARTICIPANT","M01.001"]},
+    {"id":"CHK01.BOUNDS.API","anchor":"chk01-bounds-api","covers":["REF.BOUNDS","REF.ERRORS","REF.API"]},
+    {"id":"CHK01.COMMAND.ATOMICITY","anchor":"chk01-command-atomicity","covers":["REF.COMMAND_ORDER","REF.AUDIT"]},
     {"id":"CHK01.MATCH.PROFILE","anchor":"chk01-match-profile","covers":["REF.UNICODE_MATCH","REF.MATCHING","REF.MATCH_PROVIDER"]},
     {"id":"CHK01.CUSTOMER","anchor":"chk01-customer","covers":["CUSTOMER.ORGANIZATION","CUSTOMER.ACCOUNT_CODE"]},
     {"id":"CHK01.CONTACT","anchor":"chk01-contact","covers":["CONTACT.MASTER","CONTACT.CHANNEL","CONTACT.AFFILIATION","CONTACT.COMM_PROVIDER","M01.002"]},
@@ -12,7 +14,8 @@
     {"id":"CHK01.LIFECYCLE","anchor":"chk01-lifecycle","covers":["REF.LIFECYCLE","REF.DEPENDENCY_GUARD","REF.DEPENDENCY_PROVIDER"]},
     {"id":"CHK01.SETTINGS","anchor":"chk01-settings","covers":["SETTING.REGISTRY","SETTING.VALUE","SETTING.PROVIDER","M01.004"]},
     {"id":"CHK01.NO_CHANGE","anchor":"chk01-no-change","covers":["REF.NO_CHANGE"]},
-    {"id":"CHK01.QUERY","anchor":"chk01-query","covers":["REF.QUERY"]},
+    {"id":"CHK01.QUERY","anchor":"chk01-query","covers":["REF.QUERY","CUSTOMER.SCOPE_PROVIDER"]},
+    {"id":"CHK01.ADVERSARIAL","anchor":"chk01-adversarial","covers":[]},
     {"id":"CHK01.UI.REFERENCE","anchor":"chk01-ui-reference","covers":["UI.REF.WORKSPACE","UI.REF.CANDIDATES","UI.REF.ACCOUNT_CODE_REVIEW","UI.REF.CONTACT","UI.REF.DISPATCH","UI.REF.LIFECYCLE"]},
     {"id":"CHK01.UI.SETTINGS","anchor":"chk01-ui-settings","covers":["UI.PROFILE.METADATA","UI.SETTINGS.REGISTRY"]}
   ],
@@ -28,6 +31,20 @@ These are development checks for scope-01 behavior. They are not release certifi
 ## CHK01.IDENTITY
 
 Create distinct Customer/Contact/Dispatch identities with equal descriptive values and prove equality never collapses identity. Verify all new IDs are canonical UUIDv4 from Foundation. During first-run Local Administrator setup, create the singleton profile inside the same outer UnitOfWork, then update only display-name metadata without changing authentication/session authority.
+
+<a id="chk01-bounds-api"></a>
+## CHK01.BOUNDS.API
+
+Exercise every scope-01 semantic field at valid boundary, one-byte/line overflow, forbidden-control and malformed-input cases. Require rejection without truncation. Verify display-name 512, names 1024, Account Code 512, email 2048, standalone address 8192/32 lines, normalized key 2048, reason category 128 and review context 256 UTF-8-byte contracts.
+
+Exercise list/history/candidate/channel/blocker APIs with omitted/default, 50, 200 and >200 limits; >200 rejects/clamps according to the typed contract and no path accepts Beta's stale 500 maximum. Fuzz generic reference type, cursor, path and sort/filter inputs and prove they never become SQL identifiers/fragments. Confirm no ordinary DELETE route exists and internal profile/Site participants are not remotely callable. Every failure crosses only stable REF.ERRORS/Foundation ERROR.CONTRACT data.
+
+<a id="chk01-command-atomicity"></a>
+## CHK01.COMMAND.ATOMICITY
+
+Instrument representative Customer, Contact, lifecycle, setting and profile mutations. Prove bounded normalization/syntax checks happen before the writer transaction, state/revision/review/dependency facts are revalidated inside one outer UnitOfWork, one receipt precedes owner writes, required audit is appended in the same UnitOfWork, and exactly one commit occurs.
+
+Inject repository/constraint/audit failure after receipt insertion and require rollback of receipt plus every partial owner/history row. Cross-scope participants must use the caller UoW/parent receipt and never commit independently. Inspect audit payloads and verify names, emails, addresses, setting values, display name, credentials and unrestricted source bodies are absent.
 
 <a id="chk01-match-profile"></a>
 ## CHK01.MATCH.PROFILE
@@ -68,6 +85,26 @@ For descriptive, Account Code, Contact channel/affiliation and setting updates, 
 ## CHK01.QUERY
 
 Exercise active lists, historical detail, Account Code history, Contact channels/affiliation history, lifecycle preview and setting queries over datasets larger than one page. Require stable keyset order, bounded nested collections, no N+1 query explosion, no side-effecting default materialization, and exact counts only where semantics require them.
+
+<a id="chk01-adversarial"></a>
+## CHK01.ADVERSARIAL
+
+Run the high-risk Beta regressions against current ownership rather than reproducing old tests mechanically:
+
+- duplicate/equal names or email keys never merge identity;
+- unsupported matching profile and normalization expansion fail closed;
+- reviewed Account Code context stale/very-large claimant sets never stream bodies under the writer lock;
+- source claim disappears or a third claimant exists during reassignment without corrupting unrelated claims;
+- stale Contact/channel/affiliation revisions never last-write-wins;
+- CR/LF/control email injection never persists or reaches recipient output;
+- direct SQL attempts to violate one-current-affiliation, history append-only, channel-kind=email, master-delete or lifecycle guards fail;
+- 100000 dependency blockers change preview cost only, not archive writer-path materialization;
+- malformed/duplicate-key/nonfinite/oversized setting JSON and unsafe state-dependent validators fail before accepted mutation;
+- replay after lost NO_CHANGE response never turns into a later mutation;
+- injected SQL/cursor/reference-type payloads remain data and fail before repository identifier selection;
+- missing/partial future dependency providers return explicit unavailable/indeterminate state rather than optimistic eligibility.
+
+This pass also verifies query statement counts remain bounded independently of page row count and that exact matching/keyset navigation uses declared indexes on representative synthetic populations.
 
 <a id="chk01-ui-reference"></a>
 ## CHK01.UI.REFERENCE
