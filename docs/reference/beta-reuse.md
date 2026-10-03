@@ -11,6 +11,7 @@ Observed Beta implementation head during architecture review: `fbe3821ac0b52802b
 | Scope 00 backend | LLD-01 Foundation Runtime | canonical instance, SQLCipher connection boundary, one outer UnitOfWork, migrations, exact command replay, durable jobs, strict JSON |
 | Scope 00 frontend | LLD-10 shared UI | selection/open distinction, scroll ownership, responsive panes, working copies, confirmation tiers, semantic tokens |
 | Scope 00 security mechanisms | LLD-12 shared security | DPAPI-protected live DEK, SQLCipher verification, diagnostic sanitization, trust-boundary separation |
+| Scope 00 runtime control | LLD-12 + launcher implementation at `fbe3821ac0b52802ba8265f979590e75c3ac1209` | trusted runtime registry/control, source setup/run/console/stop adapters, owner-only startup logs; tray design is promoted from LLD-12 packaging into foundation |
 | Future identity/settings scope | LLD-02 | organizations, contacts, locations, local profile/settings |
 | Future tickets scope | LLD-03 | SR/RFC/device-reference identity, lifecycle and relationships |
 | Future import scope | LLD-04 | Advanced Search SR, Enhanced RFC, Service Provider WFM import/reconciliation |
@@ -34,6 +35,20 @@ High-value Beta security/foundation references:
 
 - `spec/lld/foundation-runtime/`
 - `spec/lld/security-packaging/technology.json`
-- `spec/lld/security-packaging/`
+- `spec/lld/security-packaging/types/runtime-control.json`
+- `spec/lld/security-packaging/algorithms/trusted-instance.json`
+- `spec/lld/security-packaging/algorithms/package-lifecycle.json`
+
+High-value Beta source-launcher implementation reference:
+
+- commit `fbe3821ac0b52802ba8265f979590e75c3ac1209` (`Launcher implemented`)
+- `soma_setup.bat`
+- `soma_run.bat`
+- `soma_run_console.bat`
+- `soma_stop.bat`
+- `tools/source_launcher.py`
+- `src/soma/security/runtime/source_control.py`
+
+The Beta launcher slice proved setup, foreground console, detached start/reuse, authenticated READY opening, graceful stop, trusted process identity, and owner-only startup logging. Its tray remained packaging/design work there; new SOMA intentionally moves the tray into scope 00 so every live-test host has the same native control surface.
 
 Implementation reuse rule: copy no slice merely because it exists. Verify its current LLD owner, dependencies, and behavior first; then transplant/revise it into the new capability/layer structure and preserve useful regression cases.
