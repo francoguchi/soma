@@ -88,10 +88,50 @@ Do not migrate domain workspace React components from other Beta packets into sc
 
 Scope 01 is **not approved** until all four passes are complete. Keep the results here rather than creating another status document.
 
-- [ ] **PASS-1 — Foundation ownership/conflict audit:** prove scope 01 consumes scope 00 mechanisms instead of re-owning auth/session, appearance semantics, UUID generation, UoW/replay/audit, paging, working-copy/confirmation, runtime or shell behavior.
-- [ ] **PASS-2 — Beta completeness/minimality audit:** account for all 40 LLD-02 design files and verify every retained behavior is needed by current SOMA; reject/defer obsolete Beta ownership rather than carrying it forward by inertia.
+- [x] **PASS-1 — Foundation ownership/conflict audit:** prove scope 01 consumes scope 00 mechanisms instead of re-owning auth/session, appearance semantics, UUID generation, UoW/replay/audit, paging, working-copy/confirmation, runtime or shell behavior.
+- [x] **PASS-2 — Beta completeness/minimality audit:** account for all 40 LLD-02 design files and verify every retained behavior is needed by current SOMA; reject/defer obsolete Beta ownership rather than carrying it forward by inertia.
 - [ ] **PASS-3 — Internal coherence audit:** verify metadata graph, migrations/schema/FK indexes, cross-scope contracts, error/audit/privacy rules, bounds/pagination, transaction ordering and development checks agree with one another.
 - [ ] **PASS-4 — Adversarial implementation-readiness audit:** walk failure/race/stale/replay/ambiguity/large-data/cross-domain scenarios and verify the resulting implementation can be partitioned into clean goals without temporary architecture or hidden dependencies.
+
+## Pre-approval audit evidence
+
+### PASS-1 — Foundation ownership/conflict audit
+
+Completed against the current design branch.
+
+- Scope-01 metadata resolves Foundation mechanisms through explicit dependencies; it does not create competing UUID, UoW, replay, audit, paging, auth/session, shell, working-copy, confirmation or appearance authorities.
+- `UI.APPEARANCE` remains scope 00 semantic authority. Scope 01 only offers a generic ordinary-nonsecret Setting provider.
+- Local User Profile is descriptive metadata only; `PROFILE.AUTH_PARTICIPANT` uses Foundation's existing setup UoW/receipt/actor identity and never commits or stores credential/session/key material.
+- Cross-scope code-path audit found no scope-00/scope-01 ownership overlap after narrowing three overly broad Foundation impact mappings (`DEV.DB_RESET`, `STATIC.ASSETS`, `CONTRACT.SOURCE`).
+- Scope 01 may depend on Foundation, but Foundation implementation remains runnable without scope-01 code; optional integration occurs through composition/ports rather than reverse imports.
+
+### PASS-2 — Beta completeness/minimality audit
+
+The Beta LLD-02 `_index.json` plus every one of its 39 declared packet files were parsed at the pinned design SHA; high-risk algorithms/schema/interfaces/routes/tests were also inspected directly.
+
+Cross-packet donor disposition:
+
+| Beta LLD-02 interface/behavior | Current disposition |
+|---|---|
+| `DomainIdFactory` | **REJECTED as scope-01 duplicate**; use Foundation `IDENTITY.UUID`. |
+| `DispatchLocationService` | **REWRITTEN** as scope-01 owner behavior + `DISPATCH.SITE_PARTICIPANT`. |
+| `SettingDefinitionRegistry` / `SettingStore` | **REWRITTEN** as generic `SETTING.PROVIDER`; semantic meaning stays with registering owner. |
+| `LocalUserProfileSecurityProvider` | **REWRITTEN** as `PROFILE.AUTH_PARTICIPANT`; auth semantics remain Foundation. |
+| `CustomerScopeProvider` | **RETAINED/REWRITTEN** as `CUSTOMER.SCOPE_PROVIDER` for later Overview/domain projections. |
+| `ContactCommunicationLookupProvider` | **RETAINED/REWRITTEN** as `CONTACT.COMM_PROVIDER`. |
+| `ImportSettingsReader` | **REJECTED as scope-01 semantic coupling**; future Import owns its setting definitions/facade over generic `SETTING.PROVIDER`. |
+| `ReferenceMatcher` / Account Code review service | **RETAINED/REWRITTEN** under `REF.MATCH_PROVIDER`. |
+| `SiteDispatchAddressProvider` | **RETAINED as consumed future interface** `DISPATCH.SITE_ADDRESS_PROVIDER`. |
+| concrete Inventory reference validator | **DEFERRED to owner**; scope 01 keeps only generic `REF.DEPENDENCY_PROVIDER`. |
+
+Additional cleanup from the Beta packet:
+
+- stale `local_user_profiles.username` bound is not migrated as a field; its intended 512-byte one-line limit is applied to descriptive `display_name`;
+- conflicting Beta transport `limit 1..500 default 100` annotations are rejected in favor of Beta's semantic page bound and current Foundation hard maximum: scope 01 default 50 / max 200;
+- Beta terminal color skins/appearance semantics are not scope-01 settings ownership; Foundation owns Core Dark/System/Light and decorative skins are deferred;
+- Beta runtime/module layout and direct-service SQL are donor implementation shapes, not current architecture authority;
+- Beta migration-time SQLite `strftime('now')` initialization is not retained; current technical matching metadata has no invented wall-clock chronology;
+- Beta LLD-10 component ownership is not copied; scope 01 owns feature behavior while Foundation supplies shared interaction primitives.
 
 ## Completion rule
 
