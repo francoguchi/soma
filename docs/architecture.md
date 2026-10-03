@@ -274,6 +274,8 @@ Record what was actually run and its result. Note the commit when exercising a c
 
 For migrated scopes, a goal may become `working` only after every migration-ledger row assigned to that goal has an explicit terminal disposition: `REUSED`, `REWRITTEN`, `REJECTED`, `DEFERRED`, or an already-closed `NEW` decision. Reading donor code alone never closes a row.
 
+Migration rows use one machine-checkable Markdown form: `- [ ] **RNN.KK-X — PENDING:** ...` while open, and `- [x] **RNN.KK-X — STATUS:** ...` when closed, where `STATUS` is one of the five terminal dispositions and `NN.KK` matches implementation goal `IMP-NN-KK`. Row IDs are unique within the repository.
+
 Goal statuses:
 
 - `queued`: selected work has not started.
