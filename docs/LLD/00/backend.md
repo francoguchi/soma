@@ -1142,6 +1142,8 @@ Reuse provenance: Beta source-launcher owner-only startup logging plus LLD-12 di
 - Use baseline/current graph union when relationships are removed.
 - Consider both old/new paths for moves.
 - Report unmapped changed code explicitly.
+- Validate `docs/LLD/CONTINUE.md` names an existing implementation goal and current scope migration ledger, and that the named branch matches the checked-out branch when branch context is available.
+- Validate migration-row syntax/uniqueness/status consistency. A goal in `working` state fails validation if any `RNN.KK-*` row remains `PENDING` or unchecked.
 - Sort output deterministically by stable ID.
 - The tool reports impact; it does not rewrite documents automatically.
 
