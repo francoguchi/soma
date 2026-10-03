@@ -17,8 +17,8 @@ This document defines the current repository layout, documentation model, coding
 - Start with a fresh SOMA development database. Carryover of Alpha/Beta records is outside the current implementation scope.
 - The current development database is disposable. Schema changes may rewrite, replace, or reorder development migrations, followed by database recreation.
 - Write code, exercise it, fix observed behavior, and repeat. Every design item and implementation goal may be revised.
-- Run checks relevant to changed behavior. Formal certification occurs after required application functionality is complete and has been tested in use.
-- A certificate, design freeze, or per-module formal review is never a prerequisite for continuing development.
+- Run only checks relevant to changed behavior. Formal whole-application certification occurs after required application functionality is complete and has been tested in use.
+- A certificate, design freeze, per-module formal review, full-suite run, coverage threshold, release build, PR, or CI result is never a prerequisite for continuing an ordinary development increment unless that increment explicitly targets it.
 
 Database recreation is an implementation action when schema changes require it. Resolve the configured SOMA development instance, stop its runtime, recreate its database and migration ledger from the current manifest, then apply the declared development seed. Reset only that resolved instance. Routine startup does not clear records. The reset entry point and seed are foundation responsibilities and are not assumed to exist before implementation.
 
@@ -408,6 +408,14 @@ During development:
 - Do not add dummy migrations to mirror LLD numbers.
 
 No upgrade-compatibility work or historical migration preservation is required for the disposable development database. A future release baseline is a later whole-application task.
+
+## Fast iteration policy
+
+Foundation implementation uses `feat/00-foundation` and executes `IMP-00-01` through `IMP-00-06` in dependency order. Future scopes use their own capability branch. A scope branch may contain many runnable increments; do not create one branch/PR per implementation goal unless requested.
+
+For each goal, the default evidence budget is the checks named in that goal plus directly affected focused unit/integration tests. Run broader tests only when shared changed code makes them directly relevant or a focused failure points outward. Do not perform release certification, packaging/signing, cross-platform matrices, exhaustive repository testing, coverage campaigns, or unrelated audits during ordinary implementation.
+
+A goal may move to `working` after its stated outcome is exercised successfully and required remaining work is none. This is a development checkpoint, not certification and not a promise that later iterations cannot revise it.
 
 ## Coding loop
 
