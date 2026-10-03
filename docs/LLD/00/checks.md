@@ -22,7 +22,7 @@
     {
       "id": "CHK00.RUNTIME.LIFECYCLE",
       "anchor": "chk-runtime-lifecycle",
-      "covers": ["RUNTIME.LIFECYCLE", "RUNTIME.HEALTH", "RUNTIME.SHUTDOWN"]
+      "covers": ["RUNTIME.INSTANCE", "RUNTIME.LIFECYCLE", "RUNTIME.HEALTH", "RUNTIME.SHUTDOWN"]
     },
     {
       "id": "CHK00.CONFIG.PATHS",
@@ -32,12 +32,12 @@
     {
       "id": "CHK00.BUILD.STATIC",
       "anchor": "chk-build-static",
-      "covers": ["PLATFORM.BASELINE", "BUILD.IDENTITY", "STATIC.ASSETS", "UI.BOOTSTRAP"]
+      "covers": ["PLATFORM.BASELINE", "BUILD.IDENTITY", "STATIC.ASSETS", "UI.BOOTSTRAP", "UI.BRAND"]
     },
     {
       "id": "CHK00.ERROR.TRACE",
       "anchor": "chk-error-trace",
-      "covers": ["ERROR.CONTRACT", "TRACE.CORRELATION", "IDENTITY.UUID"]
+      "covers": ["ERROR.CONTRACT", "TRACE.CORRELATION", "IDENTITY.UUID", "SERIALIZATION.STRICT_JSON", "UI.ERROR_STATE"]
     },
     {
       "id": "CHK00.CLOCKS.SEAMS",
@@ -102,12 +102,12 @@
     {
       "id": "CHK00.UI.DIAGNOSTICS",
       "anchor": "chk-ui-diagnostics",
-      "covers": ["UI.DIAGNOSTICS_STATE", "RUNTIME.HEALTH", "DIAGNOSTICS.OPERATOR_LOGS"]
+      "covers": ["UI.DIAGNOSTICS_STATE", "RUNTIME.HEALTH", "DIAGNOSTICS.OPERATOR_LOGS", "DIAGNOSTICS.SAFE"]
     },
     {
       "id": "CHK00.UI.ACCESSIBILITY",
       "anchor": "chk-ui-accessibility",
-      "covers": ["UI.ACCESSIBILITY", "UI.TOKENS", "UI.DIALOG_FOCUS", "UI.SELECTION"]
+      "covers": ["UI.ACCESSIBILITY", "UI.TOKENS", "UI.DIALOG_FOCUS", "UI.SELECTION", "UI.SHELL"]
     },
     {
       "id": "CHK00.TIME.ROUNDTRIP",
