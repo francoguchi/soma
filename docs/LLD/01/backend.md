@@ -80,7 +80,7 @@
       "id": "REF.MATCHING",
       "anchor": "ref-matching",
       "depends_on": ["REF.UNICODE_MATCH", "CUSTOMER.ACCOUNT_CODE", "CONTACT.CHANNEL", "CONTACT.AFFILIATION", "QUERY.PAGE"],
-      "code_paths": ["src/core/soma/modules/reference/queries/matching.py"]
+      "code_paths": ["src/core/soma/modules/reference/application/queries/matching.py", "src/core/soma/modules/reference/adapters/persistence/reference_reader.py"]
     },
     {
       "id": "REF.DEPENDENCY_GUARD",
@@ -122,7 +122,7 @@
       "id": "REF.QUERY",
       "anchor": "ref-query",
       "depends_on": ["QUERY.PAGE", "PERSISTENCE.READ_SNAPSHOT"],
-      "code_paths": ["src/core/soma/modules/reference/queries/"]
+      "code_paths": ["src/core/soma/modules/reference/application/queries/", "src/core/soma/modules/reference/adapters/persistence/reference_reader.py"]
     }
   ],
   "tags": ["identity", "reference", "settings"]
