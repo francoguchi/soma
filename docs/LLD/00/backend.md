@@ -506,6 +506,7 @@ Reuse provenance: Beta `LocalHostLifecycle`, corrected to separate process state
 - Capability state does not alter domain truth and is not business authorization.
 - Main uses this registry to avoid fake routes/actions while iterative implementation is incomplete.
 - CAPABILITY.REGISTRY is **not** a navigation registry. Capability IDs/module names never become top-level workspace labels automatically; UI.WORKSPACE_REGISTRY owns product navigation.
+- Foundation composition never fabricates speculative domain capabilities solely to populate future navigation. In particular it must not invent `finance`, `products`, `sla`, `workflows`, `customers`, or similar placeholders without an owning scope contract. A missing owner capability is simply absent/unavailable to the workspace registry.
 - IDs are stable capability names owned by their scope; Foundation owns registry mechanics only.
 
 **Failure:** Duplicate/conflicting registrations fail composition; unknown capability consumers treat it as unavailable.
