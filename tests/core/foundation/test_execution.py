@@ -64,6 +64,61 @@ def test_replay_precedes_owner_reads_and_returns_exact_historical_result(databas
             b.execute(command, kind, request, ("ProbeResultV1", 1), operation)
 
 
+def test_explicit_no_change_commits_exact_result_without_audit(database):
+    _, _, factory, _ = database
+    command = new_uuid4()
+    b = boundary(factory)
+
+    result = b.execute(
+        command,
+        "probe-no-change",
+        {"value": 1},
+        ("ProbeResultV1", 1),
+        lambda uow: ({"value": 1}, [], False),
+    )
+    assert result == {"value": 1}
+    assert count(factory, "command_receipts") == 1
+    assert count(factory, "command_receipt_results") == 1
+    assert count(factory, "audit_events") == 0
+
+    with UnitOfWork(factory) as uow:
+        uow.connection.execute("UPDATE instance_metadata SET created_at_utc=901")
+
+    replay = b.execute(
+        command,
+        "probe-no-change",
+        {"value": 1},
+        ("ProbeResultV1", 1),
+        lambda uow: pytest.fail("owner ran on NO_CHANGE replay"),
+    )
+    assert replay == {"value": 1}
+    assert count(factory, "audit_events") == 0
+
+
+@pytest.mark.parametrize(
+    "outcome",
+    [
+        ({"value": 1}, [], True),
+        ({"value": 1}, [None], False),
+        ({"value": 1}, [], "no-change"),
+    ],
+)
+def test_command_change_state_and_audit_evidence_are_consistent(database, outcome):
+    _, _, factory, _ = database
+    command = new_uuid4()
+    with pytest.raises(ValidationError):
+        boundary(factory).execute(
+            command,
+            "probe-outcome",
+            {},
+            ("ProbeResultV1", 1),
+            lambda uow: outcome,
+        )
+    assert count(factory, "command_receipts") == 0
+    assert count(factory, "command_receipt_results") == 0
+    assert count(factory, "audit_events") == 0
+
+
 @pytest.mark.parametrize(
     "damage",
     [
