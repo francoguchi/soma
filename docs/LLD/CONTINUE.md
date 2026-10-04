@@ -18,7 +18,7 @@ This is the single current-state entry point for humans and agents. Do not appen
 | Design migration ledger | `docs/LLD/02/migration.md` |
 | Overall migration map | `docs/LLD/MIGRATION.md` |
 | Mode | parallel design N+1 / implementation N |
-| Implementation note | Scope 00 merged through PR #1 at `429793fc`; Foundation is the accepted platform baseline. Scope 01 is approved and begins from the post-merge `main` baseline on `feat/01-identity-reference`. |
+| Implementation note | Scope 00 merged through PR #1 at `429793fc`; Foundation is the accepted platform baseline. Scope 01 pre-coding reconciliation is complete, and `feat/01-identity-reference` already pins `unicodedata2==17.0.1`. The coding pass should execute the R01.01 map rather than make new ownership decisions. |
 | Design blocker | none; Scope 02 design resumes from the merged Foundation baseline |
 | Certification | deferred until whole-application implementation and live testing |
 
