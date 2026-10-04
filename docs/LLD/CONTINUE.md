@@ -39,7 +39,7 @@ The intended handoff can be as small as:
 4. Implement, run the goal's focused checks plus directly affected tests, and fix failures.
 5. Update the goal's Run/Remaining/status, close its migration rows, then advance this file to the next implementation goal.
 
-Current checkpoint: Scope 00 is merged and working. Scope 01 design is approved; `IMP-01-01` is the active implementation goal. Begin from the named R01.01 donor rows only: preserve/restructure matching, validation, Account Code review, Customer/Profile behavior and focused regressions into the current domain/application/ports/adapters architecture. Do not begin Contacts, Dispatch, Settings, public Reference API routes or feature UI in this increment.
+Current checkpoint: Scope 00 is merged and working. Scope 01 design is approved; `IMP-01-01` is active and its pre-coding donor reconciliation is complete in `docs/LLD/01/migration.md`. The implementation pass must execute that map rather than rediscover ownership: add the pinned Unicode-17 runtime dependency, complete the already-accepted optional auth/profile same-UoW seam, support explicit NO_CHANGE without fake audit, use M01.001 for shared lifecycle evidence, keep SQL out of domain matching/review code, and migrate only the named R01.01 donor slices. Contacts, Dispatch, Settings, public Reference API routes and feature UI remain out of this increment.
 
 ### Design lane
 
