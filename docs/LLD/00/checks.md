@@ -356,7 +356,7 @@ Register a synthetic reversible owner action with exact preview/fingerprint and 
 <a id="chk-ui-diagnostics"></a>
 ## CHK00.UI.DIAGNOSTICS
 
-Open the System/Diagnostics surface on a healthy and partially failing host. Verify build/run/schema/capability/job/executor/connection/transaction/log/recent-safe-error state is visible, local time is readable, and canonical evidence remains inspectable where appropriate. Provider failure produces partial/unavailable panels without mutating jobs/migrations/domain state or exposing secrets/raw bodies.
+Open the System/Diagnostics surface on a healthy and partially failing host. Verify build/run/schema/capability/job/executor/connection/transaction/log state is visible, local time is readable, and canonical evidence remains inspectable where appropriate. Normal lifecycle transitions render as runtime/event evidence, while warnings/errors remain separately identifiable. Capability rows correspond to actually registered descriptors; absent future workspace owners do not appear as synthetic capability entries. Provider failure produces partial/unavailable panels without mutating jobs/migrations/domain state or exposing secrets/raw bodies.
 
 <a id="chk-ui-appearance"></a>
 ## CHK00.UI.APPEARANCE
