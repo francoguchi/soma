@@ -19,7 +19,7 @@ This is the single current-state entry point for humans and agents. Do not appen
 | Overall migration map | `docs/LLD/MIGRATION.md` |
 | Mode | Foundation convergence checkpoint; Scope 02 design is paused, not discarded |
 | Implementation note | local `feat/00-foundation` may contain completed/unpushed Foundation work; reconcile the accepted docs surgically and preserve local implementation before starting 00.07 |
-| Design blocker | none; convergence contract is accepted on `main`, awaiting `IMP-00-07` implementation/live review before Scope 02 resumes |
+| Design blocker | none; second live visual refinement is accepted on `main`, awaiting `IMP-00-07` implementation/live review before Scope 02 resumes |
 | Certification | deferred until whole-application implementation and live testing |
 
 ## Resume
@@ -39,7 +39,7 @@ The intended handoff can be as small as:
 4. Implement, run the goal's focused checks plus directly affected tests, and fix failures.
 5. Update the goal's Run/Remaining/status, close its migration rows, then advance this file to the next implementation goal.
 
-Current next action: reconcile current accepted Scope-00 documentation into the local `feat/00-foundation` worktree without overwriting completed work, then implement `IMP-00-07` as a convergence pass over the existing Foundation implementation.
+Current next action: reconcile the latest accepted Scope-00/`IMP-00-07` refinement into the local `feat/00-foundation` worktree without overwriting completed work, then finish the convergence pass: viewport-filling panes, active-pane focus language, compact controls/unavailable state, restrained current-locus accent, runtime-event vs warning separation, and the persistent operator status strip.
 
 ### Design lane
 
