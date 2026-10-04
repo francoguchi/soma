@@ -11,14 +11,15 @@ This is the single current-state entry point for humans and agents. Do not appen
 | Implementation goal | `IMP-00-01 — Foundation primitives and tooling` |
 | Implementation goal file | `docs/implementation/00/00.01.md` |
 | Implementation migration ledger | `docs/LLD/00/migration.md` |
-| Design scope | `01 — Identity / Reference` |
-| Design branch | `design/01-identity-reference` |
-| Design source | `SOMA Beta LLD-02 — Identity, Settings, Contacts, Organizations, Locations` |
-| Design migration ledger | `docs/LLD/01/migration.md` |
+| Queued next implementation | `01 — Identity / Reference` (`IMP-01-01..06`), after required Foundation checkpoints |
+| Design scope | `02 — Tickets Core` |
+| Design branch | `design/02-tickets-core` |
+| Design source | `SOMA Beta LLD-03 — Service Requests, RFCs, Device References, Ticket Relationships` |
+| Design migration ledger | `docs/LLD/02/migration.md` |
 | Overall migration map | `docs/LLD/MIGRATION.md` |
 | Mode | parallel design N+1 / implementation N |
 | Implementation note | accepted Scope-00 documentation reconciliation is now on `main`; preserve any local Codex edits while reconciling `docs/LLD/00/{backend,frontend,migration}.md` into `feat/00-foundation` before closing `IMP-00-01` |
-| Design blocker | PASS-1..PASS-4 complete on `design/01-identity-reference`; awaiting owner approval before `IMP-01-xx` goals are created |
+| Design blocker | none; scope 02 packet migration has started |
 | Certification | deferred until whole-application implementation and live testing |
 
 ## Resume
@@ -48,7 +49,7 @@ Current next action: reconcile the accepted Scope-00 documentation corrections f
 4. Record every donor behavior/code slice as reused, rewritten, rejected, deferred, or new.
 5. Update the design scope backend/frontend/checks/contracts/migrations and create implementation goals only after ownership and behavior are clear.
 
-Current next action: review the completed PASS-1..PASS-4 evidence on `design/01-identity-reference`. If approved, freeze Scope 01 and partition its implementation goals; until then it remains explicitly unapproved.
+Current next action: reconcile Beta LLD-03 into scope `02 — Tickets Core` on `design/02-tickets-core`, beginning with identity/relationship/source-authority boundaries before allocating implementation goals.
 
 ## Do not
 
