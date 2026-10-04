@@ -9,7 +9,7 @@ The pinned Beta LLD inventory contains 657 design files. Packet file counts belo
 ## Queue
 
 - [x] **LLD-01 Foundation Runtime — 36 files — mapped to scope 00.** Current design is closed in `00/{backend,frontend,checks,migrations}.md`; implementation donor decisions remain open in `00/migration.md`.
-- [ ] **LLD-02 Identity / Reference — 40 files — migrating into scope 01.** Permanent owner allocated as `01 — Identity / Reference`; active design branch is `design/01-identity-reference`, with detailed disposition tracked in `01/migration.md`.
+- [x] **LLD-02 Identity / Reference — 40 files — mapped to scope 01.** Four-pass design audit and owner approval completed 2026-10-03; all useful behavior is owned/rejected/deferred in `01/migration.md`. Implementation donor decisions remain open by `IMP-01-xx` goal.
 - [ ] **LLD-03 Tickets Core — 66 files — pending owner scope.** Expected capability: SR/RFC/device-reference identity, relationships, lifecycle, notes/evidence and workbenches.
 - [ ] **LLD-04 RFC / WFM Import — 57 files — pending owner scope.** Expected capability: source imports, staging, reconciliation, source-presence evidence and import-facing workflows.
 - [ ] **LLD-05 Objectives / Tasks — 68 files — pending owner scope.** Expected capability: Objectives, Tasks/WFM, grouping, execution, reviews/retries and owner workbenches.
