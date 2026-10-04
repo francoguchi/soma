@@ -55,7 +55,7 @@ Run the pinned Unicode normalization vector corpus across supported Python lines
 <a id="chk01-customer"></a>
 ## CHK01.CUSTOMER
 
-Create/update Customers, set/replace Account Code and preserve superseded history. Create a real conflicting code, verify ordinary assignment returns review-required with no mutation, then exercise shared-claim and reassignment using the exact reviewed snapshot. Change Customer reference state between preview/commit and require stale-review failure before receipt/mutation.
+Create/update Customers, set/replace Account Code and preserve superseded history. Verify accepted Customer creation/descriptive correction appends the required immutable lifecycle evidence from M01.001, while semantic NO_CHANGE appends neither lifecycle nor audit evidence. Create a real conflicting code, verify ordinary assignment returns review-required with no mutation, then exercise shared-claim and reassignment using the exact reviewed snapshot. Change Customer reference state between preview/commit and require stale-review failure before receipt/mutation.
 
 <a id="chk01-contact"></a>
 ## CHK01.CONTACT
