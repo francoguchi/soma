@@ -7,7 +7,7 @@
     {
       "id": "UI.REF.WORKSPACE",
       "anchor": "ui-ref-workspace",
-      "depends_on": ["UI.SHELL", "UI.COLLECTIONS", "REF.QUERY"],
+      "depends_on": ["UI.SHELL", "UI.WORKSPACE_REGISTRY", "UI.COLLECTIONS", "REF.QUERY"],
       "code_paths": ["src/main/features/reference/"]
     },
     {
@@ -62,7 +62,7 @@
 <a id="ui-ref-workspace"></a>
 ## UI.REF.WORKSPACE
 
-Provide dense Reference workspaces for **Customers** (domain `CustomerOrganization`), Contacts, and Dispatch Locations using Foundation shell/collection/selection/working-copy primitives. Lists are bounded and preserve filters, active/selected identity, scroll and open-workbench context.
+Provide dense Reference-data surfaces for **Customers** (domain `CustomerOrganization`), Contacts, and Dispatch Locations using Foundation shell/collection/selection/working-copy primitives. Their primary navigation entry is **Settings → Reference data** under Foundation `UI.WORKSPACE_REGISTRY`; scope 01 does not create a top-level Customers workspace. Contextual deep links from owning workflows may open the same surfaces directly. Lists are bounded and preserve filters, active/selected identity, scroll and open-workbench context.
 
 Active references are available for new work; archived references remain history-visible and visually ineligible until explicit reactivation.
 
