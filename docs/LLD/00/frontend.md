@@ -84,7 +84,7 @@
     {
       "id": "UI.SHELL",
       "anchor": "ui-shell",
-      "depends_on": ["UI.TOKENS", "UI.VISUAL_GRAMMAR", "UI.WORKSPACE_REGISTRY", "UI.TEXT_INTEGRITY", "UI.PANE_FOCUS", "UI.OPERATOR_STATUS_STRIP", "API.CLIENT", "UI.BOOTSTRAP", "UI.AUTH_GATE"],
+      "depends_on": ["UI.TOKENS", "UI.VISUAL_GRAMMAR", "UI.STYLE_LIBRARY", "UI.WORKSPACE_REGISTRY", "UI.TEXT_INTEGRITY", "UI.PANE_FOCUS", "UI.OPERATOR_STATUS_STRIP", "API.CLIENT", "UI.BOOTSTRAP", "UI.AUTH_GATE"],
       "code_paths": ["src/main/app/", "src/main/shared/components/"]
     },
     {
@@ -399,6 +399,7 @@ Reuse provenance: Beta LLD-10 safe-undo principle, moved into shared user-plane 
 - Failed diagnostic subpanels remain visibly partial rather than making the whole application unavailable.
 - Normal host lifecycle transitions are presented as compact runtime/event evidence, not as recent warning/error codes.
 - Capability diagnostics report registered descriptors only. Missing future workspace owners appear through the workspace unavailable state rather than synthetic diagnostic entries.
+- Compact metric groups such as Durable jobs use the shared balanced metric-grid primitive. Equal columns stay aligned and an odd final metric is centered/spans intentionally rather than being stranded at the left edge.
 
 **Failure:** Diagnostic provider failure shows unavailable/partial state and never changes authoritative readiness/domain results.
 
@@ -586,7 +587,8 @@ Reuse provenance: Beta LLD-10 safe-undo principle, moved into shared user-plane 
 - Pointer interaction inside a pane makes it active unless a modal/overlay owns focus.
 - Keyboard traversal into a pane makes it active without selecting/opening a record merely to advertise activity.
 - Pane-local shortcuts, arrows, page navigation and scroll commands target the active pane only; no hidden/background pane consumes them.
-- Active pane uses one restrained Electric-blue-derived edge/cursor/focus treatment plus non-color structure where accessibility requires it.
+- Active pane uses one restrained current-locus rail/header wash plus non-color structure where accessibility requires it. It does not show a persistent visible `ACTIVE` badge/word in ordinary desktop presentation.
+- Focusing the pane container itself must not produce a full-pane rectangular outline. Keyboard-visible pane focus is localized to the same rail/header/current-locus treatment; nested buttons/inputs/links keep their ordinary visible focus ring.
 - Active pane survives responsive recomposition when the same logical pane still exists. If it cannot survive, the owner chooses a deterministic adjacent/default pane and preserves record/filter/working-copy state.
 - Narrow mode exposes an explicit pane switcher/label so the operator always knows which logical pane is active.
 - Modal/dialog focus temporarily supersedes pane focus and restores the surviving invoker pane on close.
