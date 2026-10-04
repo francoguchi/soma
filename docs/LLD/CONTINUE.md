@@ -17,8 +17,8 @@ This is the single current-state entry point for humans and agents. Do not appen
 | Design source | live Foundation desktop/mobile review + accepted SOMA/init.Habits directional references |
 | Design migration ledger | `docs/LLD/00/migration.md` |
 | Overall migration map | `docs/LLD/MIGRATION.md` |
-| Mode | Foundation fourth-refinement checkpoint complete; next implementation queued |
-| Implementation note | `IMP-00-01..07` are working on `feat/00-foundation`; accepted design at `1a3bdd5` is reconciled, prior implementation/evidence is preserved, and the latest convergence remains uncommitted |
+| Mode | Foundation implementation checkpoint complete; scope merge is the only remaining branch-hygiene step before `IMP-01-01` |
+| Implementation note | `IMP-00-01..07` are working and committed on `feat/00-foundation`; latest Foundation convergence is pushed at the current branch head and ready for scope merge into `main` |
 | Design blocker | none; IMP-00-07 passed focused checks and required live review; Scope 02 may resume when selected |
 | Certification | deferred until whole-application implementation and live testing |
 
