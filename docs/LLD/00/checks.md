@@ -270,6 +270,9 @@ On a freshly migrated unseeded credential table, bootstrap shows `setup_required
 
 Then verify password-only login: correct password issues a current-run session, wrong password returns the same public `AUTH_INVALID_CREDENTIALS` response, the per-run delay begins after five consecutive failures with 1/2/4/8-second monotonic steps and no durable lockout, successful login clears the failure counter, and logout invalidates the presented session. A new process run requires a fresh browser session but reuses the persisted credential. Password/profile management remains absent.
 
+
+Compose a synthetic same-UoW profile participant and verify first-run setup calls it after the parent command receipt exists, with the same UoW, parent command ID and actor ID; participant failure rolls back credential + participant/audit state and no browser session survives. Foundation-only composition remains valid without the optional participant.
+
 <a id="chk-session-csrf"></a>
 ## CHK00.SESSION.CSRF
 
@@ -481,6 +484,9 @@ With no live host, safely inspect a locked development instance and distinguish 
 ## CHK00.REPLAY.EXACT
 
 Run a command once, capture its committed result, repeat the exact identity/request, and verify byte/semantic-equivalent replay without owner re-execution. Reuse the ID with different request identity and verify failure before owner preparation.
+
+
+Exercise an owner operation that explicitly returns NO_CHANGE after replay/precondition validation. Verify only receipt + immutable exact result commit; no domain/history row and no audit event is appended. Replay returns that exact NO_CHANGE even after unrelated later mutations. An APPLIED operation with missing required audit still fails and rolls back.
 
 <a id="chk-job-recovery"></a>
 ## CHK00.JOB.RECOVERY
