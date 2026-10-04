@@ -8,3 +8,4 @@ Track runnable implementation outcomes for shared SOMA foundations.
 - [00.04 — Trusted local runtime](00.04.md)
 - [00.05 — Runnable user-plane shell](00.05.md)
 - [00.06 — Shared interaction system](00.06.md)
+- [00.07 — Foundation shell and runtime convergence](00.07.md)
