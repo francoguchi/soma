@@ -33,6 +33,6 @@ export function ConsolePanes({panes}: {panes: readonly {id: string; title: strin
       {panes.map(pane => <button key={pane.id} aria-pressed={active === pane.id} aria-controls={`console-${pane.id}`} onClick={() => activate(pane.id)}>{pane.title}</button>)}
     </div>
     <p className="sr-only" role="status">Active pane: {panes.find(pane => pane.id === active)?.title}</p>
-    <div className="diagnostics-grid">{panes.map(pane => <section key={pane.id} id={`console-${pane.id}`} data-console-pane={pane.id} data-pane-id={pane.id} data-pane-active={pane.id === active} data-scroll-owner="y" className="panel" tabIndex={0} aria-labelledby={`console-title-${pane.id}`} hidden={!wide && pane.id !== active}><h2 id={`console-title-${pane.id}`}>{pane.title}<span className="active-pane-label" aria-hidden="true">{pane.id === active ? 'active' : ''}</span></h2>{pane.content}</section>)}</div>
+    <div className="diagnostics-grid">{panes.map(pane => <section key={pane.id} id={`console-${pane.id}`} data-console-pane={pane.id} data-pane-id={pane.id} data-pane-active={pane.id === active} data-scroll-owner="y" className="panel" tabIndex={0} aria-labelledby={`console-title-${pane.id}`} hidden={!wide && pane.id !== active}><h2 id={`console-title-${pane.id}`}>{pane.title}</h2>{pane.content}</section>)}</div>
   </div>;
 }

@@ -1,0 +1,19 @@
+/* Foundation forms styles. */
+.auth-surface{min-height:100dvh;display:grid;place-items:center;padding:24px}
+.auth-card{width:min(100%,440px);padding:32px;border:1px solid var(--border);background:var(--surface);border-radius:var(--radius)}
+.auth-card label{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.auth-card input{width:100%;background:var(--palette-slate);border:1px solid var(--border);border-radius:var(--radius);padding:10px;color:var(--text)}
+.auth-card button.primary{width:100%;margin:8px 0 20px}
+input,textarea,select{font:inherit;color:var(--text);background:var(--palette-slate);border:1px solid var(--border);border-radius:var(--radius);padding:8px;min-height:40px;max-width:100%}
+input[type=checkbox]{min-width:32px;min-height:32px;vertical-align:middle;accent-color:var(--accent)}
+fieldset{border:0;padding:0;margin:0;min-width:0}
+.autocomplete{position:relative;max-width:440px;margin:12px 0}
+.autocomplete>label{display:block;margin-bottom:6px}
+.autocomplete>input{width:100%}
+.autocomplete-popup{position:absolute;inset-inline:0;z-index:30;overflow:auto;list-style:none;margin:4px 0;padding:5px;background:var(--surface-raised);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 8px 24px #0008}
+.autocomplete-popup [role=option]{min-height:40px;padding:8px;cursor:pointer;overflow-wrap:anywhere}
+.autocomplete-popup [aria-selected=true]{background:var(--selection);outline:2px solid var(--focus);outline-offset:-2px}
+.autocomplete-popup [aria-disabled=true]{color:var(--disabled);cursor:not-allowed}
+.impact-preview li{overflow-wrap:anywhere}
+.autocomplete-popup ul{list-style:none;margin:0;padding:0}
+.autocomplete-popup>button{width:100%;margin-top:8px}

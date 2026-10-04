@@ -95,6 +95,16 @@
       "covers": ["UI.WORKSPACE_REGISTRY", "UI.CAPABILITY_STATE", "UI.ROUTING"]
     },
     {
+      "id": "CHK00.UI.STYLE_LIBRARY",
+      "anchor": "chk-ui-style-library",
+      "covers": ["UI.STYLE_LIBRARY"]
+    },
+    {
+      "id": "CHK00.UI.SCROLLBAR",
+      "anchor": "chk-ui-scrollbar",
+      "covers": ["UI.SCROLLBAR", "UI.SCROLL"]
+    },
+    {
       "id": "CHK00.UI.VISUAL_GRAMMAR",
       "anchor": "chk-ui-visual-grammar",
       "covers": ["UI.VISUAL_GRAMMAR", "UI.SHELL", "UI.RESPONSIVE", "UI.BRAND", "UI.TOKENS"]
@@ -338,6 +348,7 @@ Build a synthetic three-pane shell with a selectable list, evidence pane and act
 Verify exactly one logical pane owns pane-local keyboard/scroll commands at a time; active pane, DOM focus, row selection, opened record and hover remain distinguishable. Activating a pane must not create a record selection. Modal focus temporarily supersedes and then restores the surviving invoker pane. Crossing the responsive threshold preserves the logical active pane where possible and otherwise chooses a deterministic labelled fallback without losing filters/working copies.
 
 At least one non-color structural cue plus the restrained Electric-blue current-locus accent identifies the active pane under normal and forced-color/high-contrast presentation.
+A focus-visible pane has only a localized rail/header cue, never a rectangle around the full pane. No visible ACTIVE badge is required; a screen-reader status announces the active pane. An odd final Durable-jobs metric is centered or intentionally spans the row. The stable style entry imports the ordered Foundation layers, and all governed scroll owners use the shared semantic scrollbar tokens with usable forced-color/native fallback.
 
 <a id="chk-ui-status-strip"></a>
 ## CHK00.UI.STATUS_STRIP
@@ -484,3 +495,13 @@ Exercise a synthetic registered deliberate action. Verify continuous 3000 ms cli
 ## CHK00.DOC.IMPACT
 
 Validate metadata/index creation, modify one item and one mapped source path, and verify direct/indirect impact paths. Remove an edge and verify baseline/current union still reports the former dependent. Unmapped changed code is reported as a gap. Verify `docs/LLD/CONTINUE.md` resolves to an existing scope/goal/ledger, duplicate or malformed migration-row IDs fail validation, and a goal marked `working` fails while any matching `RNN.KK-*` row remains unchecked/PENDING.
+
+<a id="chk-ui-style-library"></a>
+## CHK00.UI.STYLE_LIBRARY
+
+Verify `soma.css` remains the stable entry and declares the ordered reset/tokens/base/primitives/components/utilities/features layers. Shared rules live in their owning library files, components use low-specificity classes/data attributes, and feature CSS has no global overrides. Confirm all seven semantic layer imports are present.
+
+<a id="chk-ui-scrollbar"></a>
+## CHK00.UI.SCROLLBAR
+
+Exercise shell navigation, a pane, a bounded list/table and a modal at wide, ~1040px and narrow widths. Verify the shared Core Dark thumb/track are visible and usable in both axes; hover increases neutral contrast. Confirm standards and Chromium/WebKit rules consume scrollbar tokens and forced colors return scrollbar styling to system colors. Scroll ownership and touch/keyboard behavior remain unchanged.

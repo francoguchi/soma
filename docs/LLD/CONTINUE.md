@@ -17,9 +17,9 @@ This is the single current-state entry point for humans and agents. Do not appen
 | Design source | live Foundation desktop/mobile review + accepted SOMA/init.Habits directional references |
 | Design migration ledger | `docs/LLD/00/migration.md` |
 | Overall migration map | `docs/LLD/MIGRATION.md` |
-| Mode | Foundation refinement checkpoint complete; next implementation queued |
-| Implementation note | `IMP-00-01..07` are working locally on `feat/00-foundation`; latest accepted refinement is reconciled, prior implementation/evidence preserved, and changes remain uncommitted |
-| Design blocker | none; IMP-00-07 refinement passed required live review; Scope 02 may resume when selected |
+| Mode | Foundation style-library convergence checkpoint in progress |
+| Implementation note | `IMP-00-01..07` are working locally on `feat/00-foundation`; latest accepted style-library refinement at `cab04ac` is being implemented; prior implementation/evidence preserved |
+| Design blocker | none; latest `UI.STYLE_LIBRARY` / `UI.SCROLLBAR` refinement awaits focused checks and live review before Scope 02 resumes |
 | Certification | deferred until whole-application implementation and live testing |
 
 ## Resume
@@ -39,7 +39,7 @@ The intended handoff can be as small as:
 4. Implement, run the goal's focused checks plus directly affected tests, and fix failures.
 5. Update the goal's Run/Remaining/status, close its migration rows, then advance this file to the next implementation goal.
 
-Current checkpoint: the accepted IMP-00-07 refinement is working after focused checks and reviewed compiled Chrome layouts at 1440/1040/1039/390px. Goal evidence and migration dispositions are current. The designated development instance is stopped with its database preserved. Next implementation is IMP-01-01 when selected; no future scope was started.
+Current next action: finish the accepted `UI.STYLE_LIBRARY` / `UI.SCROLLBAR` refinement in IMP-00-07, run focused style/focus/scrollbar checks and live-review wide desktop, ~1040px and narrow layouts. Keep Scope 02 paused until this checkpoint is working.
 
 ### Design lane
 
@@ -49,13 +49,13 @@ Current checkpoint: the accepted IMP-00-07 refinement is working after focused c
 4. Record every donor behavior/code slice as reused, rewritten, rejected, deferred, or new.
 5. Update the design scope backend/frontend/checks/contracts/migrations and create implementation goals only after ownership and behavior are clear.
 
-Current next action: the Foundation refinement prerequisite is satisfied. Resume `design/02-tickets-core` only when the user selects that lane; no Scope-02 changes were made during this pass.
+Current next action: keep `design/02-tickets-core` frozen until IMP-00-07 style-library implementation and live review are complete; resume only when selected.
 
 ## Do not
 
 Do not reconstruct project status by rereading Alpha/Beta or the whole repository. Do not copy Beta wholesale, preserve its old directory ownership, or treat compiled/static artifacts as authority.
 
-Do not merge implementation-in-progress from `feat/00-foundation` into design branches merely to inspect it. Foundation convergence updates the owning Scope-00 LLD first, then Codex reconciles those changes into its local implementation. The refined convergence checkpoint has been live-reviewed; subsequent design work remains a separately selected lane.
+Do not merge implementation-in-progress from `feat/00-foundation` into design branches merely to inspect it. Foundation convergence updates the owning Scope-00 LLD first, then Codex reconciles those changes into its local implementation. The latest style-library refinement requires implementation/live review before Scope 02 can resume.
 
 Do not create a branch/PR/certification packet per goal, run unrelated full suites, perform release packaging/signing, or block design on future implementation details. A `working` goal is a development checkpoint, not certification.
 

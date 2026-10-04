@@ -18,6 +18,8 @@ test('pane activation preserves composite widget focus and safely restores a rem
   fireEvent.click(screen.getByRole('option'));
   expect(choose).toHaveBeenCalledTimes(1);
   expect(screen.getByRole('region', {name: 'Evidence'}).dataset['paneActive']).toBe('true');
+  expect(screen.getByRole('status').textContent).toContain('Active pane: Evidence');
+  expect(document.querySelector('.active-pane-label')).toBeNull();
   rerender(<ConsolePanes panes={[panes[0]!]}/>);
   const work = screen.getByRole('region', {name: 'Work'});
   expect(work.dataset['paneActive']).toBe('true');

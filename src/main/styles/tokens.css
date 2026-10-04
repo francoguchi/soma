@@ -1,0 +1,3 @@
+/* Foundation tokens styles. */
+:root{color-scheme:dark;--palette-slate:#0f1115;--palette-blue:#5a33ff;--palette-mist:#eceef2;--palette-pure:#ffffff;--surface:#171b23;--surface-raised:#1d2330;--border:#30394b;--text:#e9eef8;--muted:#a8b4ca;--accent:#b7a2ff;--focus:#d0c2ff;--selection:#30254f;--warning:#ffdc88;--destructive:#ffadad;--disabled:#9ca6b8;--font-body:system-ui,-apple-system,'Segoe UI',sans-serif;--font-code:Consolas,monospace;--space:8px;--radius:2px;--soma-scrollbar-track:#11151c;--soma-scrollbar-thumb:#596579;--soma-scrollbar-thumb-hover:#8292aa;--soma-scrollbar-size:12px}
+:root{background:var(--palette-slate)}

@@ -1,0 +1,10 @@
+/* Foundation actions styles. */
+button,input{font:inherit}
+button{border:1px solid var(--border);background:var(--surface-raised);color:var(--text);border-radius:var(--radius);padding:8px 12px;cursor:pointer;min-height:40px}
+button:hover:not(:disabled){border-color:var(--accent)}
+button:disabled{color:var(--disabled);cursor:not-allowed;background:var(--surface)}
+button.primary{background:var(--palette-blue);color:#fff;border-color:var(--palette-blue)}
+.button-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+button{min-height:32px;padding:5px 10px}
+button{background:transparent;padding:4px 8px;min-height:30px}
+button:disabled{background:transparent}

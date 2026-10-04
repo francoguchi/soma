@@ -1,0 +1,12 @@
+/* Foundation status styles. */
+.status-strip{display:flex;flex-wrap:wrap;gap:20px;padding:12px 16px;border:1px solid var(--border);background:var(--surface);font:12px var(--font-code);margin-bottom:20px}
+.status-good{color:var(--accent);font-weight:700}
+.shell-status{grid-column:1/-1;display:flex;justify-content:space-between;gap:16px;border-top:1px solid var(--border);padding:4px 16px;color:var(--muted);font:11px var(--font-code)}
+.shell-header,.workspace-nav,.shell-status,.surface-header,.status-strip,.panel h2,.panel h3,dt,dd,.button-row,.pane-switcher{font-family:var(--font-code)}
+.status-strip{gap:8px 20px;padding:8px 10px;margin-bottom:0;border-bottom:0;font-size:11px}
+.shell-status{position:relative;align-items:center;flex-direction:row;gap:12px;padding:0 12px;min-height:28px;background:var(--surface);font:10px/1.4 var(--font-code)}
+.status-primary{display:flex;gap:12px;white-space:nowrap}
+.status-readiness{font-weight:700}
+.status-secondary{display:flex;gap:20px;min-width:0}
+.status-details{display:none}
+.shell-status[data-condition=degraded] .status-readiness{color:var(--warning)}
