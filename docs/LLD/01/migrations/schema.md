@@ -121,6 +121,29 @@ Identifier UPDATE is restricted to the one `active -> superseded` transition set
 
 Protected generation triggers increment `reference_metadata.customer_reference_generation` after Customer INSERT/accepted UPDATE and Account Code INSERT/accepted UPDATE. Trigger failure rolls back the owning UnitOfWork.
 
+
+### `reference_lifecycle_events`
+
+The shared reference lifecycle-evidence table is created in **M01.001**, because Customer create/descriptive-correction behavior in IMP-01-01 already requires durable lifecycle evidence. Later Contact and Dispatch/Lifecycle goals reuse this same table; they do not introduce it retroactively.
+
+```text
+reference_lifecycle_event_id TEXT PRIMARY KEY
+target_type                  TEXT NOT NULL CHECK(target_type IN ('customer_organization','contact','dispatch_location'))
+target_id                    TEXT NOT NULL
+event_type                   TEXT NOT NULL CHECK(event_type IN ('created','archived','reactivated','descriptive_corrected'))
+occurred_at_utc              INTEGER NOT NULL CHECK(occurred_at_utc >= 0)
+command_id                   TEXT NOT NULL REFERENCES command_receipts(command_id)
+                             ON UPDATE RESTRICT ON DELETE RESTRICT
+reason_category              TEXT NULL
+```
+
+The polymorphic target is immutable evidence identity, not a destructive FK. UPDATE/DELETE is rejected. Required indexes are:
+
+- `idx_reference_lifecycle_target(target_type,target_id,occurred_at_utc,reference_lifecycle_event_id)`;
+- `idx_reference_lifecycle_command(command_id)`.
+
+This table being available from M01.001 does **not** move archive/reactivate command ownership forward: `REF.LIFECYCLE` remains implemented by IMP-01-03. It only prevents Customer/Contact creation and descriptive-correction history from depending on a future migration.
+
 <a id="m01-002"></a>
 ## M01.002 — Contacts
 
@@ -191,7 +214,9 @@ Required indexes:
 Affiliation UPDATE is restricted to the single current->historical closure that preserves immutable relationship/opening fields and sets closing UTC/command. Historical rows reject further UPDATE and every DELETE is rejected.
 
 <a id="m01-003"></a>
-## M01.003 — Dispatch Locations and lifecycle evidence
+## M01.003 — Dispatch Locations
+
+M01.003 adds Dispatch Location storage. It consumes the shared `reference_lifecycle_events` table introduced by M01.001; archive/reactivate behavior is implemented here at the application layer without creating a second lifecycle-evidence store.
 
 ### `dispatch_locations`
 
@@ -214,26 +239,9 @@ CHECK(
 
 There is no Customer ownership/preference, Site-ID shortcut or logistics-role column. A protection trigger preserves immutable location ID/address mode/created UTC; a `site_derived` row can never receive standalone address text through an update. Ordinary DELETE is rejected.
 
-### `reference_lifecycle_events`
-
-```text
-reference_lifecycle_event_id TEXT PRIMARY KEY
-target_type                  TEXT NOT NULL CHECK(target_type IN ('customer_organization','contact','dispatch_location'))
-target_id                    TEXT NOT NULL
-event_type                   TEXT NOT NULL CHECK(event_type IN ('created','archived','reactivated','descriptive_corrected'))
-occurred_at_utc              INTEGER NOT NULL CHECK(occurred_at_utc >= 0)
-command_id                   TEXT NOT NULL REFERENCES command_receipts(command_id)
-                             ON UPDATE RESTRICT ON DELETE RESTRICT
-reason_category              TEXT NULL
-```
-
-The polymorphic target is immutable evidence identity, not a destructive FK. UPDATE/DELETE is rejected.
-
 Required indexes:
 
-- `idx_dispatch_active_name_match(lifecycle_state,name_match_key,dispatch_location_id)`;
-- `idx_reference_lifecycle_target(target_type,target_id,occurred_at_utc,reference_lifecycle_event_id)`;
-- `idx_reference_lifecycle_command(command_id)`.
+- `idx_dispatch_active_name_match(lifecycle_state,name_match_key,dispatch_location_id)`.
 
 <a id="m01-004"></a>
 ## M01.004 — Typed setting values
