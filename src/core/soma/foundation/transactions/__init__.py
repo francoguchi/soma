@@ -114,7 +114,7 @@ class CommandBoundary:
     def execute(
         self, command_id, command_type, request, result_contract, operation, *, correlation_id=None
     ):
-        """operation(uow) returns exact result and required owner audit inputs."""
+        """operation(uow) returns (result, events) or explicit (result, events, changed)."""
         require_uuid4(command_id)
         if not command_type or len(command_type.encode()) > 256:
             raise ValidationError("Invalid command type.")
@@ -158,13 +158,21 @@ class CommandBoundary:
                 "INSERT INTO command_receipts VALUES (?,?,?,?,?)",
                 (command_id, command_type, digest, correlation_id, self.clock()),
             )
-            result, events = operation(uow)
+            outcome = operation(uow)
+            if type(outcome) is not tuple or len(outcome) not in {2, 3}:
+                raise ValidationError("Command operation returned an invalid outcome.")
+            result, events = outcome[:2]
+            changed = True if len(outcome) == 2 else outcome[2]
+            if type(changed) is not bool:
+                raise ValidationError("Command change state must be explicit boolean.")
             raw = canonical(result)
             contract.validate(result)
             if canonical(result) != raw:
                 raise ValidationError("Contract validation changed the result.")
-            if not events:
-                raise ValidationError("Authoritative commands require owner audit evidence.")
+            if changed and not events:
+                raise ValidationError("Applied authoritative commands require owner audit evidence.")
+            if not changed and events:
+                raise ValidationError("NO_CHANGE commands cannot append owner audit evidence.")
             for event in events:
                 if event.command_id != command_id:
                     raise ValidationError("Audit command identity does not match.")
