@@ -7,7 +7,7 @@
     {
       "id": "UI.REF.WORKSPACE",
       "anchor": "ui-ref-workspace",
-      "depends_on": ["UI.SHELL", "UI.COLLECTIONS", "REF.QUERY"],
+      "depends_on": ["UI.SHELL", "UI.WORKSPACE_REGISTRY", "UI.COLLECTIONS", "REF.QUERY"],
       "code_paths": ["src/main/features/reference/"]
     },
     {
