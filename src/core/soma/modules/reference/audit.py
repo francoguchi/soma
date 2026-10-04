@@ -1,0 +1,227 @@
+from __future__ import annotations
+
+import string
+
+from soma.foundation.audit import AuditContract, AuditWriter
+from soma.foundation.errors import ValidationError
+from soma.foundation.identity import require_uuid4
+
+
+def _dict(value, keys):
+    if type(value) is not dict or set(value) != set(keys):
+        raise ValidationError("Invalid Reference audit payload.")
+    return value
+
+
+def _revision(value):
+    if type(value) is not int or value < 1:
+        raise ValidationError("Invalid Reference audit revision.")
+    return value
+
+
+def _optional_uuid(value):
+    if value is not None:
+        require_uuid4(value)
+
+
+def _reason(value):
+    if value is not None and (
+        type(value) is not str
+        or not value
+        or len(value.encode("utf-8", errors="strict")) > 128
+        or any(character in value for character in ("\x00", "\r", "\n"))
+    ):
+        raise ValidationError("Invalid Reference audit reason category.")
+
+
+def _hash(value):
+    if (
+        type(value) is not str
+        or len(value) != 64
+        or any(character not in string.hexdigits for character in value)
+    ):
+        raise ValidationError("Invalid Reference review fingerprint.")
+
+
+def _profile_created(value):
+    value = _dict(value, {"local_user_profile_id", "metadata_revision"})
+    require_uuid4(value["local_user_profile_id"])
+    if value["metadata_revision"] != 1:
+        raise ValidationError("Invalid Local User Profile creation revision.")
+
+
+def _profile_updated(value):
+    value = _dict(
+        value,
+        {"local_user_profile_id", "prior_revision", "new_revision", "changed_field"},
+    )
+    require_uuid4(value["local_user_profile_id"])
+    prior = _revision(value["prior_revision"])
+    if value["new_revision"] != prior + 1 or value["changed_field"] != "display_name":
+        raise ValidationError("Invalid Local User Profile update evidence.")
+
+
+def _customer_created(value):
+    value = _dict(
+        value,
+        {
+            "customer_org_id",
+            "new_revision",
+            "account_code_claim_created",
+            "reason_category",
+        },
+    )
+    require_uuid4(value["customer_org_id"])
+    if value["new_revision"] != 1 or type(value["account_code_claim_created"]) is not bool:
+        raise ValidationError("Invalid Customer creation evidence.")
+    _reason(value["reason_category"])
+
+
+def _customer_descriptive_updated(value):
+    value = _dict(
+        value,
+        {
+            "target_type",
+            "target_id",
+            "prior_revision",
+            "new_revision",
+            "changed_fields",
+            "lifecycle_event_id",
+        },
+    )
+    if value["target_type"] != "customer_organization":
+        raise ValidationError("Invalid Customer descriptive target.")
+    require_uuid4(value["target_id"])
+    require_uuid4(value["lifecycle_event_id"])
+    prior = _revision(value["prior_revision"])
+    if value["new_revision"] != prior + 1 or value["changed_fields"] != ["name"]:
+        raise ValidationError("Invalid Customer descriptive update evidence.")
+
+
+def _account_code_set(value):
+    value = _dict(
+        value,
+        {
+            "customer_org_id",
+            "customer_org_identifier_id",
+            "superseded_identifier_id",
+            "prior_revision",
+            "new_revision",
+            "change_kind",
+            "reason_category",
+        },
+    )
+    require_uuid4(value["customer_org_id"])
+    require_uuid4(value["customer_org_identifier_id"])
+    _optional_uuid(value["superseded_identifier_id"])
+    prior = _revision(value["prior_revision"])
+    if value["new_revision"] != prior + 1 or value["change_kind"] not in {"SET", "REPLACE"}:
+        raise ValidationError("Invalid Customer Account Code change evidence.")
+    if (value["change_kind"] == "SET") != (value["superseded_identifier_id"] is None):
+        raise ValidationError("Customer Account Code change classification is inconsistent.")
+    _reason(value["reason_category"])
+
+
+def _review_validator(expected_action):
+    def validate(value):
+        value = _dict(
+            value,
+            {
+                "proposed_action",
+                "review_snapshot_hash",
+                "review_context_id",
+                "from_customer_org_id",
+                "to_customer_org_id",
+                "changed_identifier_ids",
+                "changed_customer_org_ids",
+                "reason_category",
+            },
+        )
+        if value["proposed_action"] != expected_action:
+            raise ValidationError("Invalid Customer Account Code review action.")
+        _hash(value["review_snapshot_hash"])
+        if value["review_context_id"] is not None and (
+            type(value["review_context_id"]) is not str
+            or not value["review_context_id"]
+            or len(value["review_context_id"].encode("utf-8", errors="strict")) > 256
+        ):
+            raise ValidationError("Invalid Account Code review context identity.")
+        _optional_uuid(value["from_customer_org_id"])
+        require_uuid4(value["to_customer_org_id"])
+        for key in ("changed_identifier_ids", "changed_customer_org_ids"):
+            items = value[key]
+            if type(items) is not list or not items or len(items) > 128:
+                raise ValidationError("Invalid bounded Account Code review result identities.")
+            for identity in items:
+                require_uuid4(identity)
+            if len(set(items)) != len(items):
+                raise ValidationError("Duplicate Account Code review result identity.")
+        _reason(value["reason_category"])
+
+    return validate
+
+
+def reference_audit_contracts() -> tuple[AuditContract, ...]:
+    safe = lambda value: False
+    return (
+        AuditContract(
+            "local_user_profile.created",
+            1,
+            "LocalUserProfileAuditV1",
+            1,
+            _profile_created,
+            safe,
+        ),
+        AuditContract(
+            "local_user_profile.display_name_updated",
+            1,
+            "LocalUserProfileDisplayNameAuditV1",
+            1,
+            _profile_updated,
+            safe,
+        ),
+        AuditContract(
+            "reference.customer_organization.created",
+            1,
+            "CustomerOrganizationAuditV1",
+            1,
+            _customer_created,
+            safe,
+        ),
+        AuditContract(
+            "reference.customer_organization.descriptive_updated",
+            1,
+            "ReferenceDescriptiveAuditV1",
+            1,
+            _customer_descriptive_updated,
+            safe,
+        ),
+        AuditContract(
+            "reference.customer_account_code.set",
+            1,
+            "CustomerAccountCodeAuditV1",
+            1,
+            _account_code_set,
+            safe,
+        ),
+        AuditContract(
+            "reference.customer_account_code.shared_claim_confirmed",
+            1,
+            "CustomerAccountCodeReviewAuditV1",
+            1,
+            _review_validator("CONFIRM_SHARED_CLAIM"),
+            safe,
+        ),
+        AuditContract(
+            "reference.customer_account_code.reassigned",
+            1,
+            "CustomerAccountCodeReviewAuditV1",
+            1,
+            _review_validator("REASSIGN_CLAIM"),
+            safe,
+        ),
+    )
+
+
+def reference_audit_writer() -> AuditWriter:
+    return AuditWriter(reference_audit_contracts())
