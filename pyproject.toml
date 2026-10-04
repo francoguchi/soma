@@ -24,6 +24,7 @@ where = ["src/core"]
 [tool.setuptools.package-data]
 "soma.foundation" = ["contracts.schemas.json"]
 "soma.foundation.build" = ["identity.json"]
+"soma.modules.reference.assets" = ["unicode_match_v1.json"]
 "soma.db" = ["schema_manifest.json", "migrations/manifest.json", "migrations/*/*.sql"]
 
 [tool.pytest.ini_options]
