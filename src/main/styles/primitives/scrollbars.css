@@ -1,0 +1,17 @@
+/* One appearance-driven scrollbar family for all governed scroll owners. */
+:where([data-scroll-owner], .main-scroll, .workspace-nav, .product-workspaces, .workbench-panes>section, .selectable-collection, .bounded-table, .modal, .autocomplete-popup) { scrollbar-color: var(--soma-scrollbar-thumb) var(--soma-scrollbar-track); scrollbar-width: auto; }
+:where([data-scroll-owner], .main-scroll, .workspace-nav, .product-workspaces, .workbench-panes>section, .selectable-collection, .bounded-table, .modal, .autocomplete-popup)::-webkit-scrollbar { width: var(--soma-scrollbar-size); height: var(--soma-scrollbar-size); }
+:where([data-scroll-owner], .main-scroll, .workspace-nav, .product-workspaces, .workbench-panes>section, .selectable-collection, .bounded-table, .modal, .autocomplete-popup)::-webkit-scrollbar-track,
+:where([data-scroll-owner], .main-scroll, .workspace-nav, .product-workspaces, .workbench-panes>section, .selectable-collection, .bounded-table, .modal, .autocomplete-popup)::-webkit-scrollbar-corner { background: var(--soma-scrollbar-track); }
+:where([data-scroll-owner], .main-scroll, .workspace-nav, .product-workspaces, .workbench-panes>section, .selectable-collection, .bounded-table, .modal, .autocomplete-popup)::-webkit-scrollbar-thumb { background: var(--soma-scrollbar-thumb); border: 3px solid var(--soma-scrollbar-track); border-radius: var(--soma-radius-scrollbar); min-height: 24px; }
+:where([data-scroll-owner], .main-scroll, .workspace-nav, .product-workspaces, .workbench-panes>section, .selectable-collection, .bounded-table, .modal, .autocomplete-popup)::-webkit-scrollbar-thumb:hover,
+:where([data-scroll-owner], .main-scroll, .workspace-nav, .product-workspaces, .workbench-panes>section, .selectable-collection, .bounded-table, .modal, .autocomplete-popup)::-webkit-scrollbar-thumb:active { background: var(--soma-scrollbar-thumb-hover); }
+/* Standards colors supersede pseudo-element styling in Chromium. */
+@supports selector(::-webkit-scrollbar) { :where([data-scroll-owner], .main-scroll, .workspace-nav, .product-workspaces, .workbench-panes>section, .selectable-collection, .bounded-table, .modal, .autocomplete-popup) { scrollbar-color: auto; } }
+@media (forced-colors: active) {
+  :where([data-scroll-owner], .main-scroll, .workspace-nav, .product-workspaces, .workbench-panes>section, .selectable-collection, .bounded-table, .modal, .autocomplete-popup) { scrollbar-color: auto; scrollbar-width: auto; }
+  :where([data-scroll-owner], .main-scroll, .workspace-nav, .product-workspaces, .workbench-panes>section, .selectable-collection, .bounded-table, .modal, .autocomplete-popup)::-webkit-scrollbar,
+  :where([data-scroll-owner], .main-scroll, .workspace-nav, .product-workspaces, .workbench-panes>section, .selectable-collection, .bounded-table, .modal, .autocomplete-popup)::-webkit-scrollbar-track,
+  :where([data-scroll-owner], .main-scroll, .workspace-nav, .product-workspaces, .workbench-panes>section, .selectable-collection, .bounded-table, .modal, .autocomplete-popup)::-webkit-scrollbar-corner,
+  :where([data-scroll-owner], .main-scroll, .workspace-nav, .product-workspaces, .workbench-panes>section, .selectable-collection, .bounded-table, .modal, .autocomplete-popup)::-webkit-scrollbar-thumb { all: revert; }
+}

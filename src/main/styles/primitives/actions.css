@@ -1,0 +1,40 @@
+button {
+  font: inherit;
+  border: 1px solid var(--soma-border);
+  color: var(--soma-text-primary);
+  border-radius: var(--soma-radius-control);
+  cursor: pointer;
+  background: transparent;
+  padding: 4px 8px;
+  min-height: var(--soma-control-height);
+}
+
+button:hover:not(:disabled) {
+  border-color: var(--soma-current);
+}
+
+button:disabled {
+  color: var(--soma-text-disabled);
+  cursor: not-allowed;
+  background: transparent;
+}
+
+button.primary {
+  background: var(--soma-color-electric);
+  color: var(--soma-on-brand);
+  border-color: var(--soma-color-electric);
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--soma-space-2);
+  margin-top: 16px;
+  font-family: var(--soma-font-code);
+}
+
+@media (forced-colors:active) {
+  button[aria-current=page] {
+    outline: 2px solid Highlight;
+  }
+}

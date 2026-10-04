@@ -1,0 +1,71 @@
+:root {
+  color-scheme: dark;
+  --soma-color-slate: #0f1115;
+  --soma-color-electric: #5a33ff;
+  --soma-color-mist: #eceef2;
+  --soma-color-white: #ffffff;
+  --soma-surface: #171b23;
+  --soma-surface-raised: #1d2330;
+  --soma-border: #30394b;
+  --soma-text-primary: #e9eef8;
+  --soma-text-muted: #a8b4ca;
+  --soma-command: #b7a2ff;
+  --soma-current: #b7a2ff;
+  --soma-current-title: #d2c7ff;
+  --soma-info: #8fcbd6;
+  --soma-focus: #d0c2ff;
+  --soma-selection: #30254f;
+  --soma-warning: #d8b768;
+  --soma-destructive: #e58b86;
+  --soma-text-disabled: #9ca6b8;
+  --soma-font-body: system-ui,-apple-system,'Segoe UI',sans-serif;
+  --soma-font-code: Consolas,monospace;
+  --soma-space-unit: 8px;
+  --soma-radius-control: 2px;
+  --soma-radius-scrollbar: 8px;
+  --soma-scrollbar-track: #11151c;
+  --soma-scrollbar-thumb: #596579;
+  --soma-scrollbar-thumb-hover: #8292aa;
+  --soma-scrollbar-size: 12px;
+  background: var(--soma-color-slate);
+  --soma-canvas: var(--soma-color-slate);
+  --soma-on-brand: var(--soma-color-white);
+  --soma-shadow-color: #0008;
+  --soma-overlay: #000a;
+  --soma-success: #8fc5a5;
+  --soma-unknown: var(--soma-text-muted);
+  --soma-space-1: 4px;
+  --soma-metric-gap: 6px;
+  --soma-space-2: 8px;
+  --soma-space-3: 12px;
+  --soma-space-4: 16px;
+  --soma-font-size-body: 14px;
+  --soma-font-size-evidence: 12px;
+  --soma-line-height-body: 1.5;
+  --soma-header-height: 48px;
+  --soma-navigation-width: 208px;
+  --soma-status-height: 28px;
+  --soma-status-height-narrow: 32px;
+  --soma-control-height: 30px;
+  --soma-control-height-field: 40px;
+
+}
+
+@media (forced-colors:active) {
+  :root {
+    --soma-border: CanvasText;
+    --soma-text-primary: CanvasText;
+    --soma-text-muted: CanvasText;
+    --soma-focus: Highlight;
+    --soma-selection: Highlight;
+    --soma-surface: Canvas;
+    --soma-surface-raised: Canvas;
+    --soma-current: LinkText;
+    --soma-current-title: LinkText;
+    --soma-command: LinkText;
+    --soma-info: LinkText;
+    --soma-success: CanvasText;
+    --soma-warning: CanvasText;
+    --soma-destructive: CanvasText;
+  }
+}

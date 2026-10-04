@@ -1,0 +1,179 @@
+input {
+  font: inherit;
+  color: var(--soma-text-primary);
+  background: var(--soma-canvas);
+  border: 1px solid var(--soma-border);
+  border-radius: var(--soma-radius-control);
+  padding: 8px;
+  min-height: var(--soma-control-height-field);
+  max-width: 100%;
+}
+
+.auth-surface {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.auth-card {
+  width: min(100%,440px);
+  padding: 32px;
+  border: 1px solid var(--soma-border);
+  background: var(--soma-surface);
+  border-radius: var(--soma-radius-control);
+}
+
+.auth-card label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--soma-space-2);
+  margin-bottom: 16px;
+}
+
+.auth-card input {
+  width: 100%;
+  background: var(--soma-canvas);
+  border: 1px solid var(--soma-border);
+  border-radius: var(--soma-radius-control);
+  padding: 10px;
+  color: var(--soma-text-primary);
+}
+
+.auth-card button.primary {
+  width: 100%;
+  margin: 8px 0 20px;
+}
+
+textarea {
+  font: inherit;
+  color: var(--soma-text-primary);
+  background: var(--soma-canvas);
+  border: 1px solid var(--soma-border);
+  border-radius: var(--soma-radius-control);
+  padding: 8px;
+  min-height: var(--soma-control-height-field);
+  max-width: 100%;
+}
+
+select {
+  font: inherit;
+  color: var(--soma-text-primary);
+  background: var(--soma-canvas);
+  border: 1px solid var(--soma-border);
+  border-radius: var(--soma-radius-control);
+  padding: 8px;
+  min-height: var(--soma-control-height-field);
+  max-width: 100%;
+}
+
+input[type=checkbox] {
+  min-width: 32px;
+  min-height: 32px;
+  vertical-align: middle;
+  accent-color: var(--soma-current);
+}
+
+fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+
+.autocomplete {
+  position: relative;
+  max-width: 440px;
+  margin: 12px 0;
+}
+
+.autocomplete>label {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.autocomplete>input {
+  width: 100%;
+}
+
+.autocomplete-popup {
+  position: absolute;
+  inset-inline: 0;
+  z-index: 30;
+  overflow: auto;
+  list-style: none;
+  margin: 4px 0;
+  padding: 5px;
+  background: var(--soma-surface-raised);
+  border: 1px solid var(--soma-border);
+  border-radius: var(--soma-radius-control);
+  box-shadow: 0 8px 24px var(--soma-shadow-color);
+}
+
+.autocomplete-popup [role=option] {
+  min-height: var(--soma-control-height-field);
+  padding: 8px;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+
+.autocomplete-popup [aria-selected=true] {
+  background: var(--soma-selection);
+  outline: 2px solid var(--soma-focus);
+  outline-offset: -2px;
+}
+
+.autocomplete-popup [aria-disabled=true] {
+  color: var(--soma-text-disabled);
+  cursor: not-allowed;
+}
+
+.impact-preview li {
+  overflow-wrap: anywhere;
+}
+
+.autocomplete-popup ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.autocomplete-popup>button {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.auth-mark {
+  width: 60px;
+  height: 60px;
+  margin-bottom: 18px;
+}
+
+@media (forced-colors:active) {
+  input {
+    background: Canvas;
+  }
+
+  textarea {
+    background: Canvas;
+  }
+
+  select {
+    background: Canvas;
+  }
+
+  .autocomplete-popup [aria-selected=true] {
+    outline: 2px solid Highlight;
+  }
+
+  .autocomplete-popup {
+    box-shadow: none;
+    border: 2px solid CanvasText;
+  }
+}
+
+@media (max-width:600px) {
+  .auth-card {
+    padding: 24px;
+  }
+}

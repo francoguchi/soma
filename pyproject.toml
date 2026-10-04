@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools==84.0.0", "wheel==0.45.1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "soma"
+version = "0.1.0.dev0"
+description = "SOMA local operations platform"
+requires-python = ">=3.13,<3.15"
+dependencies = ["jsonschema==4.25.1", "referencing==0.37.0", "argon2-cffi==25.1.0", "starlette==1.6.0", "uvicorn==0.52.4", "sqlcipher3==0.6.2"]
+
+[project.optional-dependencies]
+dev = ["pytest==8.4.2", "ruff==0.12.12"]
+
+[tool.soma.sqlcipher]
+core-version = "4.17.0"
+binding-version = "0.6.2"
+development-wheel-sha256 = "ae151e020ce45b60aac8be3fc8628ae4a7894b2c543fbfb5bc1f4047db22618f"
+development-wheel-tag = "cp314-cp314-win_amd64"
+
+[tool.setuptools.packages.find]
+where = ["src/core"]
+
+[tool.setuptools.package-data]
+"soma.foundation" = ["contracts.schemas.json"]
+"soma.foundation.build" = ["identity.json"]
+"soma.db" = ["schema_manifest.json", "migrations/manifest.json", "migrations/*/*.sql"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+pythonpath = ["src/core", "."]
+testpaths = ["tests/core"]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100

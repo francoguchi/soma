@@ -1,0 +1,14 @@
+@layer reset, tokens, base, primitives, components, utilities, features;
+@import "./reset.css" layer(reset);
+@import "./tokens.css" layer(tokens);
+@import "./base.css" layer(base);
+@import "./primitives/actions.css" layer(primitives);
+@import "./primitives/panes.css" layer(primitives);
+@import "./primitives/collections.css" layer(primitives);
+@import "./primitives/forms.css" layer(primitives);
+@import "./primitives/feedback.css" layer(primitives);
+@import "./primitives/scrollbars.css" layer(primitives);
+@import "./primitives/status.css" layer(primitives);
+@import "./primitives/shell.css" layer(primitives);
+@import "./components.css" layer(components);
+@import "./utilities.css" layer(utilities);

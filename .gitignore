@@ -16,7 +16,7 @@ venv/
 # JavaScript / frontend
 node_modules/
 dist/
-build/
+/build/
 coverage/
 *.tsbuildinfo
 

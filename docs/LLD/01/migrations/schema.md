@@ -273,4 +273,3 @@ The current schema verifier treats the following trigger identities/behaviors as
 - `setting_key_update_guard` — `setting_key` cannot be renamed in place; owner upgrades preserve the registered semantic key.
 
 Trigger messages are stable internal integrity identities and are mapped through `REF.ERRORS`; raw SQLite text never crosses transport.
-

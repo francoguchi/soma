@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "generation": 6,
+  "migrations": [
+    {
+      "migration_id": "M00.001",
+      "owner_scope": "00",
+      "path": "00/001_bootstrap.sql",
+      "content_sha256": "d41b4ab67d3ffb6b8c61cc68845cadd5af43edce7ca1b559169e218ec79c884b",
+      "depends_on": []
+    },
+    {
+      "migration_id": "M00.002",
+      "owner_scope": "00",
+      "path": "00/002_command_replay.sql",
+      "content_sha256": "d9b72cab87df06890f1bd4d2c167c632602b0794789c8de79ab98c1aac17d139",
+      "depends_on": [
+        "M00.001"
+      ]
+    },
+    {
+      "migration_id": "M00.003",
+      "owner_scope": "00",
+      "path": "00/003_audit.sql",
+      "content_sha256": "117fa898f1b0a797911e9d90d1e58d9297f993b99595e28bc15061e403c5631c",
+      "depends_on": [
+        "M00.002"
+      ]
+    },
+    {
+      "migration_id": "M00.004",
+      "owner_scope": "00",
+      "path": "00/004_durable_jobs.sql",
+      "content_sha256": "2a8c6f569c06f680a0ff0ee189c76c4a6d46e88eeef00067abb3c06d71eb9e7b",
+      "depends_on": [
+        "M00.003"
+      ]
+    },
+    {
+      "migration_id": "M00.006",
+      "owner_scope": "00",
+      "path": "00/006_local_admin_auth.sql",
+      "content_sha256": "2be81e68b9da30df2ea9155b295028b0308987bd93b88a95d0de51600689a1f8",
+      "depends_on": [
+        "M00.004"
+      ]
+    },
+    {
+      "migration_id": "M00.005",
+      "owner_scope": "00",
+      "path": "00/005_working_copies.sql",
+      "content_sha256": "5a929c4ffbbfd40f0682d6d052e7d660c6262e1ef4597650f2b1cd84324a1a2d",
+      "depends_on": [
+        "M00.006"
+      ]
+    }
+  ]
+}

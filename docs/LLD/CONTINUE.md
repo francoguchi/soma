@@ -18,8 +18,8 @@ This is the single current-state entry point for humans and agents. Do not appen
 | Design migration ledger | `docs/LLD/00/migration.md` |
 | Overall migration map | `docs/LLD/MIGRATION.md` |
 | Mode | Foundation convergence checkpoint; Scope 02 design is paused, not discarded |
-| Implementation note | Scope-00 implementation is complete/pushed on `feat/00-foundation`; PR #1 targets `main` but is currently `dirty` because the implementation branch predates later accepted design/docs. Reconcile `main` into the implementation branch without discarding either side, rerun focused checks, then merge. |
-| Design blocker | none; second live visual refinement is accepted on `main`, awaiting `IMP-00-07` implementation/live review before Scope 02 resumes |
+| Implementation note | Scope-00 implementation is complete on `feat/00-foundation`; accepted main baseline `5ccaef1` is reconciled for PR #1, preserving completed Foundation implementation/evidence and newer Scope-01/02 documentation. IMP-01-01 remains unstarted; PR merge is a separate next action. |
+| Design blocker | none; IMP-00-07 implementation and required live review are complete; Scope 02 remains paused until selected |
 | Certification | deferred until whole-application implementation and live testing |
 
 ## Resume
@@ -39,7 +39,7 @@ The intended handoff can be as small as:
 4. Implement, run the goal's focused checks plus directly affected tests, and fix failures.
 5. Update the goal's Run/Remaining/status, close its migration rows, then advance this file to the next implementation goal.
 
-Current next action: reconcile the latest accepted Scope-00/`IMP-00-07` refinement into local `feat/00-foundation` without overwriting completed work. Make detached Run windowless; make Stop clean only proven-dead exact-owned stale runtime artifacts; keep untrusted/unreachable/live ambiguity fail-closed. Then apply the final style-library refinement: richer semantic terminal accents, muted-green READY, shared `$` / `--` / `>` cues, active-title tint, fixed pane header + scrollable body, and vertically centered Durable-job contents with the odd final cell left in natural asymmetric grid order. Rerun launcher/runtime/style/focus/scroll/live checks before resuming Scope 02.
+Current checkpoint: IMP-00-01..07 are working, with prior implementation/live evidence preserved in their goals and closed migration rows. Main reconciliation changes documentation only; 57 focused runtime/tooling checks, 50 Main tests, typecheck/build, contract sync and documentation impact checks passed before pushing PR #1. Fresh verification on 2026-10-04 confirmed current main is included, reran those checks successfully after rebuilding matching assets, and found PR #1 OPEN/MERGEABLE/CLEAN. Do not begin IMP-01-01 in this pass.
 
 ### Design lane
 
@@ -49,7 +49,7 @@ Current next action: reconcile the latest accepted Scope-00/`IMP-00-07` refineme
 4. Record every donor behavior/code slice as reused, rewritten, rejected, deferred, or new.
 5. Update the design scope backend/frontend/checks/contracts/migrations and create implementation goals only after ownership and behavior are clear.
 
-Current next action: keep `design/02-tickets-core` frozen; implement and live-review `IMP-00-07`. Resume Scope 02 only after that convergence goal is working.
+Current next action: keep `design/02-tickets-core` paused until selected. Its accepted documentation and Scope-01 goals are preserved; no future-scope implementation is started.
 
 ## Do not
 

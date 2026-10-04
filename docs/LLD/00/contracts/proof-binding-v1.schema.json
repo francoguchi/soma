@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:soma:00:proof-binding:v1",
+  "title": "ProofBindingV1",
+  "type": "object",
+  "properties": {
+    "action_code": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "target_type": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "target_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "base_revision": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "preview_fingerprint": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 64,
+      "maxLength": 64,
+      "pattern": "^[0-9a-f]{64}(?![\\s\\S])"
+    }
+  },
+  "required": [
+    "action_code",
+    "target_type",
+    "target_id",
+    "base_revision",
+    "preview_fingerprint"
+  ],
+  "additionalProperties": false
+}
