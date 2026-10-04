@@ -18,7 +18,7 @@ This is the single current-state entry point for humans and agents. Do not appen
 | Design migration ledger | `docs/LLD/00/migration.md` |
 | Overall migration map | `docs/LLD/MIGRATION.md` |
 | Mode | Foundation convergence checkpoint; Scope 02 design is paused, not discarded |
-| Implementation note | local `feat/00-foundation` may contain completed/unpushed Foundation work; reconcile the accepted docs surgically and preserve local implementation before starting 00.07 |
+| Implementation note | Scope-00 implementation is complete/pushed on `feat/00-foundation`; PR #1 targets `main` but is currently `dirty` because the implementation branch predates later accepted design/docs. Reconcile `main` into the implementation branch without discarding either side, rerun focused checks, then merge. |
 | Design blocker | none; second live visual refinement is accepted on `main`, awaiting `IMP-00-07` implementation/live review before Scope 02 resumes |
 | Certification | deferred until whole-application implementation and live testing |
 
