@@ -162,7 +162,8 @@ def _review_validator(expected_action):
 
 
 def reference_audit_contracts() -> tuple[AuditContract, ...]:
-    safe = lambda value: False
+    def safe(value):
+        return False
     return (
         AuditContract(
             "local_user_profile.created",
