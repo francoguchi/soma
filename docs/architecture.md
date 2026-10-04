@@ -202,7 +202,7 @@ A later module registers only the minimum data needed by a foundation registry (
 | Domain | Entities, identities, policies, and valid business transitions. | Uses pure domain types/utilities. Imports no HTTP, SQL, UI, filesystem, or OS implementation. |
 | Ports/contracts | Typed operations provided or required by a module. | Describe a boundary without importing its concrete provider. |
 | Adapters | Persistence, source readers, exports, and native mechanisms. | Implement ports and use foundation infrastructure or external libraries. |
-| Runtime | Process lifecycle, readiness, trusted local control, source-launch integration, native tray lifecycle, scheduling, and workers. | Runs application operations; owns no independent business mutation rules. |
+| Runtime | Process-internal lifecycle/readiness, controller-side trusted local observation/control, source-launch integration, native tray lifecycle, scheduling, and workers. | Runs application operations; owns no independent business mutation rules. Host state and controller observation are distinct authorities. |
 | Composition | Construction and wiring of concrete providers. | Imports implementations required to assemble the application. |
 
 Transport does not execute SQL or decide business transitions. The application operation owns the transaction; participating adapters use its context and do not commit independently. A query may use a dedicated read adapter without constructing entities.
@@ -219,10 +219,14 @@ Shared foundation provides mechanisms. Domain-specific customer, ticket, SLA, in
 
 | Layer | Owns |
 |---|---|
-| App shell | First-run/login gate, routing, startup presentation, capability-aware navigation, workspace and pane composition. |
+| App shell | First-run/login gate, routing, startup presentation, closed workspace-registry navigation, workspace and pane composition. |
 | Feature views | Tables, forms, record inspectors, and actions. |
 | Feature state | Selection, working copies, local validation, request identity, loading/error/conflict behavior, and API orchestration. |
 | Shared presentation/API | Reusable interactions, semantic styles, time formatting, typed requests, and generated/validated API bindings. |
+
+The primary product workspace registry is closed and Foundation-owned as a navigation contract: **Overview, Tickets, Objectives, Inventory, Infrastructure, Settings**. Diagnostics is a separate System/Foundation destination. Capability registration controls availability of declared workspaces/features but never invents navigation labels from module/capability IDs.
+
+Shared visual composition follows the Foundation operational grammar: compact terminal-inspired typography, thin separators, dense rows and pane-based inspection rather than generic SaaS dashboard cards. Narrow layouts deliberately recompose/switch panes instead of merely stacking the desktop grid vertically.
 
 The system plane owns durable business rules and resulting facts. The user plane presents those facts and manages interaction state. Until a later settings owner supplies an accepted preference, Main starts in SOMA Core Dark; semantic-token ownership prevents feature CSS from depending on that default.
 
