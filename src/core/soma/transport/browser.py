@@ -20,7 +20,12 @@ class Browser:
     def __init__(self, host):
         self.host = host
         self.sessions = Sessions(host.run_id, host.origin)
-        self.auth = Authentication(host.factory, self.sessions, host.log)
+        self.auth = Authentication(
+            host.factory,
+            self.sessions,
+            host.log,
+            profile_participant=host.profile_participant,
+        )
         self.proofs = DeliberateProofs(host.run_id, host.proof_actions)
         self.copies = WorkingCopies(host.factory, host.copy_contracts)
         registry = CapabilityRegistry()
