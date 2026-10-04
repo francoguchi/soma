@@ -226,7 +226,7 @@ Shared foundation provides mechanisms. Domain-specific customer, ticket, SLA, in
 
 The primary product workspace registry is closed and Foundation-owned as a navigation contract: **Overview, Tickets, Objectives, Inventory, Infrastructure, Settings**. Diagnostics is a separate System/Foundation destination. Capability registration controls availability of declared workspaces/features but never invents navigation labels from module/capability IDs.
 
-Shared visual composition follows the Foundation operational grammar: compact terminal-inspired typography, thin separators, dense rows and pane-based inspection rather than generic SaaS dashboard cards. Narrow layouts deliberately recompose/switch panes instead of merely stacking the desktop grid vertically.
+Shared visual composition follows the Foundation operational grammar: compact terminal-inspired typography, thin separators, dense rows and pane-based inspection rather than generic SaaS dashboard cards. The working pane system owns the available viewport, exposes one explicit active interaction pane, and carries a persistent compact operator status strip. Narrow layouts deliberately recompose/switch panes instead of merely stacking the desktop grid vertically.
 
 The system plane owns durable business rules and resulting facts. The user plane presents those facts and manages interaction state. Until a later settings owner supplies an accepted preference, Main starts in SOMA Core Dark; semantic-token ownership prevents feature CSS from depending on that default.
 
