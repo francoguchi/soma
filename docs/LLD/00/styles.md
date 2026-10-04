@@ -7,7 +7,7 @@
     {
       "id": "UI.STYLE_LIBRARY",
       "anchor": "ui-style-library",
-      "depends_on": ["UI.TOKENS", "UI.VISUAL_GRAMMAR", "UI.ACCESSIBILITY"],
+      "depends_on": ["UI.TOKENS", "UI.VISUAL_GRAMMAR"],
       "code_paths": ["src/main/styles/", "src/main/shared/components/"]
     },
     {
