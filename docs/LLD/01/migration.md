@@ -173,10 +173,50 @@ A clean implementation partition is possible without temporary ownership: matchi
 
 ## Approval state
 
-**PASS-1 through PASS-4 are complete, but scope 01 remains UNAPPROVED pending owner sign-off.** Do not close the global LLD-02 migration entry or create implementation goals until that approval is given.
+**APPROVED — 2026-10-03.** Owner approved continuation after PASS-1 through PASS-4 and Foundation reconciliation. The design packet may now be treated as the accepted Scope-01 baseline; implementation remains queued and is not certified.
+
+## Implementation donor checklist
+
+A checked row means the donor decision is closed, not that the implementation goal is complete. Before one `IMP-01-xx` goal becomes `working`, all rows for that goal must have an explicit terminal disposition.
+
+### IMP-01-01 — Reference kernel, profile and Customer
+
+- [ ] **R01.01-A — PENDING:** inspect/restructure `src/soma/reference/domain/{matching.py,validation.py}` plus `assets/unicode_match_v1.json`. Strong reuse candidate: pinned Unicode asset integrity/profile behavior and bounded normalization/validation algorithms; do not preserve old package paths.
+- [ ] **R01.01-B — PENDING:** inspect/restructure `application/{profile_service.py,customer_service.py}`, `domain/account_code_review.py`, and `audit_registry.py` into current application/domain/audit ownership. Preserve same-UoW/replay/review-fingerprint semantics, but remove service-owned Foundation construction.
+- [ ] **R01.01-C — PENDING:** inspect only the matching/profile/Customer/Account-Code slices of `src/soma/migrations/0002_identity_reference.sql`; rewrite them into `M01.001`. Reject migration-time SQLite wall clock, stale username authority, and monolithic packet ownership.
+- [ ] **R01.01-D — PENDING:** selectively migrate focused regressions from `tests/test_reference_{matching,matching_profile_guard,customers,customer_replay_results,no_change_acceptance,schema_contract,replay_results}.py` plus Local User Profile cases from Beta acceptance evidence.
+
+### IMP-01-02 — Contacts and communication identity
+
+- [ ] **R01.02-A — PENDING:** inspect/restructure `application/contact_service.py`, `queries/{channels.py,history.py}`, and applicable validation helpers for Contact/channel/affiliation behavior. Keep email-only initial channel policy and append-preserving affiliation history.
+- [ ] **R01.02-B — PENDING:** inspect only Contact/channel/affiliation slices of `src/soma/migrations/0002_identity_reference.sql`; rewrite them into `M01.002` with current STRICT/index/trigger authority.
+- [ ] **R01.02-C — PENDING:** selectively migrate `tests/test_reference_{contacts,contact_replay_results}.py` and the Contact/channel/affiliation acceptance/failure cases already mapped into `CHK01.CONTACT` / `CHK01.ADVERSARIAL`.
+
+### IMP-01-03 — Dispatch and governed lifecycle
+
+- [ ] **R01.03-A — PENDING:** inspect/restructure `application/{dispatch_service.py,lifecycle_service.py}` and `domain/dependencies.py`. Preserve same-UoW Site participant and bounded fail-closed dependency/lifecycle mechanics; concrete Inventory/Site owners remain outside scope 01.
+- [ ] **R01.03-B — PENDING:** inspect Dispatch/lifecycle slices of `src/soma/migrations/0002_identity_reference.sql`; rewrite into `M01.003` with current address-ownership and append-only evidence guards.
+- [ ] **R01.03-C — PENDING:** selectively migrate `tests/test_reference_{lifecycle_replay_results,inventory_dependencies,acceptance_closure}.py` only for current Dispatch/lifecycle/dependency behavior; do not import future owner-domain implementation.
+
+### IMP-01-04 — Typed settings store
+
+- [ ] **R01.04-A — PENDING:** inspect/restructure `domain/settings.py` and `application/settings_service.py` into the current closed ordinary-nonsecret registry/store. Reuse useful typed definition/default/version/bounds logic but **reject** Beta generic preserve/quarantine fallback behavior.
+- [ ] **R01.04-B — PENDING:** inspect the Settings slice of `src/soma/migrations/0002_identity_reference.sql`; rewrite into `M01.004` with immutable setting key, explicit write provenance and no read-time default materialization.
+- [ ] **R01.04-C — PENDING:** selectively migrate Settings-focused cases from `tests/test_reference_{final_authorities,acceptance_closure,no_change_acceptance}.py`; add current Foundation-appearance-through-generic-provider coverage where Beta had no clean equivalent.
+
+### IMP-01-05 — Reference queries, providers and API
+
+- [ ] **R01.05-A — PENDING:** inspect/restructure `queries/{matching.py,references.py,channels.py,history.py,_cursor.py}`. Reuse bounded indexed query/matching SQL where it still matches current behavior; **reject module-local cursor authority** and bind all pagination to Foundation `QUERY.PAGE`.
+- [ ] **R01.05-B — PENDING:** inspect/restructure `api/routes_reference.py` and `results.py` for payload/result semantics only. Rewrite transport/session/error/route policy against current `REF.API`, Foundation browser security and generated contract source.
+- [ ] **R01.05-C — PENDING:** selectively migrate `tests/test_reference_{api_routes,owner_queries,queries,query_cost_acceptance,final_authorities}.py`; keep static-SQL, bounded-query, candidate-state and provider regressions without Beta route/scaffolding ownership.
+
+### IMP-01-06 — Reference and Settings workspaces
+
+- [x] **R01.06-A — NEW:** no direct LLD-02 implementation donor provides the current Reference/Settings React workspaces. Implement them from `frontend.md` using Foundation shared shell/interactions; do not import unrelated Beta domain workspace components merely to accelerate rendering.
+- [ ] **R01.06-B — PENDING:** selectively reuse only UI-facing assertions/behavioral fixtures explicitly linked from Beta LLD-02/LLD-10 once they match current Customer/Contact/Dispatch/Profile/Settings surfaces; otherwise write focused current browser/component tests.
 
 ## Completion rule
 
 Each design row becomes `REUSED`, `REWRITTEN`, `REJECTED`, `DEFERRED`, or `NEW` only after the current owner behavior is explicit in the scope-01 LLD.
 
-Design behavior clusters are now mapped into the current backend/frontend/check/migration documents. Implementation donor rows remain intentionally unallocated until implementation goals are partitioned from the completed design rather than from Beta file layout.
+Design behavior clusters are mapped into the current backend/frontend/check/migration documents. Implementation donor rows are now partitioned by `IMP-01-01..06`; those rows remain open until implementation actually inspects and dispositions each donor slice.
