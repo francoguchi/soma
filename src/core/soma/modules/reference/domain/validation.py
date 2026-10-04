@@ -49,3 +49,9 @@ def validate_reason_category(value: str | None) -> str | None:
     if value is None:
         return None
     return validate_single_line_text(value, field="reason_category", max_utf8_bytes=128)
+
+
+def validate_review_context_id(value: str | None) -> str | None:
+    if value is None:
+        return None
+    return validate_single_line_text(value, field="review_context_id", max_utf8_bytes=256)
