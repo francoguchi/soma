@@ -92,7 +92,7 @@ When closing a donor row, replace **PENDING** with `REUSED`, `REWRITTEN`, `REJEC
 ### IMP-00-07 — Foundation shell and runtime convergence
 
 - [x] **R00.07-A — REWRITTEN:** Beta/current `LocalHostLifecycle` reuse is corrected so process-internal host lifecycle no longer includes controller absence/trust states. Preserve useful host/trust/launcher implementation, but split it into `RUNTIME.LIFECYCLE` and `RUNTIME.CONTROL_OBSERVATION` under the current exact-run trust model.
-- [x] **R00.07-B — NEW:** closed top-level `UI.WORKSPACE_REGISTRY`, operational `UI.VISUAL_GRAMMAR`, `UI.TEXT_INTEGRITY`, explicit `UI.PANE_FOCUS`, and persistent `UI.OPERATOR_STATUS_STRIP` were discovered through live Foundation review. They have no direct Beta implementation donor; current code is converged in place rather than replaced wholesale.
+- [x] **R00.07-B — NEW:** closed top-level `UI.WORKSPACE_REGISTRY`, operational `UI.VISUAL_GRAMMAR`, `UI.TEXT_INTEGRITY`, explicit `UI.PANE_FOCUS`, persistent `UI.OPERATOR_STATUS_STRIP`, internal `UI.STYLE_LIBRARY`, and shared `UI.SCROLLBAR` were discovered through live Foundation review. They have no direct Beta implementation donor; current code is converged/restructured in place rather than replaced wholesale.
 
 ## Cross-scope reconciliation
 
@@ -112,6 +112,8 @@ Live Foundation review exposed additional accepted Foundation corrections:
 - host lifecycle and controller observation are split before later scopes depend on runtime state semantics.
 
 Second live visual review confirmed the first convergence pass was directionally correct but still too static. The accepted refinement adds viewport-filling pane ownership, explicit active-pane/focus language, restrained Electric-blue current-locus accents, stronger typographic hierarchy, compact controls/unavailable state, runtime-event vs warning separation, and a persistent operator status strip.
+
+Third live Foundation review found three implementation-level design-system gaps before later scopes should reuse the CSS: full-pane focus-visible could create a giant outline, the odd Durable-jobs metric could look left-stranded, and scrollbars still used unthemed browser chrome. The accepted correction makes the pane focus indicator local, balances metric-grid orphans, themes governed scrollbars, and formalizes the current CSS into a reusable layered Foundation style library instead of continuing an append-only `soma.css` override stack.
 
 ## Completion rule
 
