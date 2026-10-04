@@ -39,7 +39,48 @@ The intended handoff can be as small as:
 4. Implement, run the goal's focused checks plus directly affected tests, and fix failures.
 5. Update the goal's Run/Remaining/status, close its migration rows, then advance this file to the next implementation goal.
 
-Current next action: reconcile the latest Scope-00/`IMP-00-07` refinement into local `feat/00-foundation` without overwriting completed work. Fix the full-pane focus-outline regression, remove visible ACTIVE pane text, balance the odd Durable-jobs metric row, theme governed scrollbars, and restructure the current append-only `soma.css` into `UI.STYLE_LIBRARY` while preserving `soma.css` as the stable entry point. Then rerun the focused visual/interaction checks before resuming Scope 02.
+Current next action: reconcile the latest accepted Scope-00/`IMP-00-07` refinement into local `feat/00-foundation` without overwriting completed work. Make detached Run windowless; make Stop clean only proven-dead exact-owned stale runtime artifacts; keep untrusted/unreachable/live ambiguity fail-closed. Then apply the final style-library refinement: richer semantic terminal accents, muted-green READY, shared `# Continue SOMA
+
+This is the single current-state entry point for humans and agents. Do not append history here; completed evidence stays in implementation goals and migration dispositions.
+
+## Active lanes
+
+| Lane | Current value |
+|---|---|
+| Implementation scope | `00 — Foundation` |
+| Implementation branch | `feat/00-foundation` |
+| Implementation goal | `IMP-00-07 — Foundation shell and runtime convergence` |
+| Implementation goal file | `docs/implementation/00/00.07.md` |
+| Implementation migration ledger | `docs/LLD/00/migration.md` |
+| Queued next implementation | `01 — Identity / Reference` (`IMP-01-01..06`), after required Foundation checkpoints |
+| Design scope | `00 — Foundation convergence` |
+| Design branch | `design/00-foundation-convergence` |
+| Design source | live Foundation desktop/mobile review + accepted SOMA/init.Habits directional references |
+| Design migration ledger | `docs/LLD/00/migration.md` |
+| Overall migration map | `docs/LLD/MIGRATION.md` |
+| Mode | Foundation convergence checkpoint; Scope 02 design is paused, not discarded |
+| Implementation note | local `feat/00-foundation` may contain completed/unpushed Foundation work; reconcile the accepted docs surgically and preserve local implementation before starting 00.07 |
+| Design blocker | none; second live visual refinement is accepted on `main`, awaiting `IMP-00-07` implementation/live review before Scope 02 resumes |
+| Certification | deferred until whole-application implementation and live testing |
+
+## Resume
+
+The intended handoff can be as small as:
+
+- **Implementation:** “Read `docs/LLD/CONTINUE.md` and continue the implementation lane.”
+- **Design:** “Read `docs/LLD/CONTINUE.md` and continue the design lane.”
+
+`AGENTS.md` supplies the standing implementation rules.
+
+### Implementation lane
+
+1. Read the active implementation goal.
+2. Read only the LLD items referenced by that goal and the matching active-goal rows in the implementation scope migration ledger.
+3. Reuse/restructure donor code only where the current LLD still wants the same behavior.
+4. Implement, run the goal's focused checks plus directly affected tests, and fix failures.
+5. Update the goal's Run/Remaining/status, close its migration rows, then advance this file to the next implementation goal.
+
+ / `--` / `>` cues, active-title tint, fixed pane header + scrollable body, and vertically centered Durable-job contents with the odd final cell left in natural asymmetric grid order. Rerun launcher/runtime/style/focus/scroll/live checks before resuming Scope 02.
 
 ### Design lane
 
