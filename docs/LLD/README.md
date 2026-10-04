@@ -6,3 +6,4 @@ Define current behavior by permanent capability scope. Resume all design/impleme
 - [Migration map](MIGRATION.md)
 - [00 — Foundation](00/README.md)
 - [01 — Identity / Reference](01/README.md)
+- [02 — Tickets Core](02/README.md)
