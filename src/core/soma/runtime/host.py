@@ -45,10 +45,12 @@ class Host:
         tray=True,
         copy_contracts=(),
         proof_actions=(),
+        profile_participant=None,
     ):
         self.config, self.console, self.with_tray = config, console, tray
         self.job_contracts, self.job_handlers = job_contracts, job_handlers or {}
         self.copy_contracts, self.proof_actions = copy_contracts, proof_actions
+        self.profile_participant = profile_participant
         self.state = "BOOTSTRAPPING"
         self.shutdown_requested = threading.Event()
         self.lease = None
