@@ -785,7 +785,7 @@ Reuse provenance: Beta LLD-12 `RuntimeRegistryV2` and `TrustedLocalInstanceV1`.
 - Setup is rerunnable and preserves unrelated checkout/user data.
 - Source launchers are development controls, not the future production installer contract; production shortcuts may later call the same trusted control capabilities.
 
-**Failure:** Missing/unsupported environment, unsafe checkout/runtime path, failed native dependency verification, startup crash, READY timeout, or trust failure produces a nonzero exit and an actionable diagnostic/log location. Run/console buttons retain the error window until acknowledged; stale/untrusted/unreachable observations name the canonical runtime and diagnostics locations and preserve database/runtime artifacts for explicit inspection. No fake success or plaintext fallback is allowed.
+**Failure:** Missing/unsupported environment, unsafe checkout/runtime path, failed native dependency verification, startup crash, READY timeout, or trust failure produces a nonzero exit and an actionable diagnostic/log location. No fake success or plaintext fallback is allowed.
 
 **Side effects:** Setup may create/update the repository-local environment. Run/console/stop operate the local runtime through RUNTIME.TRUSTED_CONTROL. Reset may destroy and recreate only the explicitly confirmed canonical development database and seed state.
 

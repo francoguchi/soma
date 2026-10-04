@@ -17,9 +17,9 @@ This is the single current-state entry point for humans and agents. Do not appen
 | Design source | live Foundation desktop/mobile review + accepted SOMA/init.Habits directional references |
 | Design migration ledger | `docs/LLD/00/migration.md` |
 | Overall migration map | `docs/LLD/MIGRATION.md` |
-| Mode | Foundation fourth-refinement checkpoint complete; next implementation queued |
-| Implementation note | `IMP-00-01..07` are working on `feat/00-foundation`; accepted design at `1a3bdd5` is reconciled, prior implementation/evidence is preserved, and the latest convergence remains uncommitted |
-| Design blocker | none; IMP-00-07 passed focused checks and required live review; Scope 02 may resume when selected |
+| Mode | Foundation convergence checkpoint; Scope 02 design is paused, not discarded |
+| Implementation note | Scope-00 implementation is complete on `feat/00-foundation`; accepted main baseline `5ccaef1` is reconciled for PR #1, preserving completed Foundation implementation/evidence and newer Scope-01/02 documentation. IMP-01-01 remains unstarted; PR merge is a separate next action. |
+| Design blocker | none; IMP-00-07 implementation and required live review are complete; Scope 02 remains paused until selected |
 | Certification | deferred until whole-application implementation and live testing |
 
 ## Resume
@@ -39,7 +39,7 @@ The intended handoff can be as small as:
 4. Implement, run the goal's focused checks plus directly affected tests, and fix failures.
 5. Update the goal's Run/Remaining/status, close its migration rows, then advance this file to the next implementation goal.
 
-Current checkpoint: IMP-00-07 is working after 50 Main tests, strict build/typecheck, 35 focused runtime scenarios, 22 tooling checks and both encrypted-host Chrome workflows. Detached Run is windowless; Stop cleans only a revalidated exact-owned proven-dead stale registration and otherwise fails closed. The accepted semantic accents/cues, muted-green READY, active-title tint, natural odd-metric order and fixed pane header/scrolling body are implemented in the shared style library. Compiled layouts were reviewed at 1440/1040/1039/390px, forced colors, doubled text and 200% scrollbar surface zoom. The actual designated launcher passed READY/reuse/no-console-membership/graceful/idempotent stop and leaves the instance absent with an empty runtime directory; the development database was not reset. Next implementation is IMP-01-01 when selected; no future scope was started.
+Current checkpoint: IMP-00-01..07 are working, with prior implementation/live evidence preserved in their goals and closed migration rows. Main reconciliation changes documentation only; 57 focused runtime/tooling checks, 50 Main tests, typecheck/build, contract sync and documentation impact checks passed before pushing PR #1. Do not begin IMP-01-01 in this pass.
 
 ### Design lane
 
@@ -49,13 +49,13 @@ Current checkpoint: IMP-00-07 is working after 50 Main tests, strict build/typec
 4. Record every donor behavior/code slice as reused, rewritten, rejected, deferred, or new.
 5. Update the design scope backend/frontend/checks/contracts/migrations and create implementation goals only after ownership and behavior are clear.
 
-Current next action: the Foundation style-library prerequisite is satisfied. Resume `design/02-tickets-core` only when selected; no Scope-02 work was made in this pass.
+Current next action: keep `design/02-tickets-core` paused until selected. Its accepted documentation and Scope-01 goals are preserved; no future-scope implementation is started.
 
 ## Do not
 
 Do not reconstruct project status by rereading Alpha/Beta or the whole repository. Do not copy Beta wholesale, preserve its old directory ownership, or treat compiled/static artifacts as authority.
 
-Do not merge implementation-in-progress from `feat/00-foundation` into design branches merely to inspect it. Foundation convergence updates the owning Scope-00 LLD first, then Codex reconciles those changes into its local implementation. The accepted style-library checkpoint has been live-reviewed; subsequent design remains a separately selected lane.
+Do not merge implementation-in-progress from `feat/00-foundation` into design branches merely to inspect it. Foundation convergence updates the owning Scope-00 LLD first, then Codex reconciles those changes into its local implementation. Scope 02 remains frozen until the convergence checkpoint is live-reviewed.
 
 Do not create a branch/PR/certification packet per goal, run unrelated full suites, perform release packaging/signing, or block design on future implementation details. A `working` goal is a development checkpoint, not certification.
 

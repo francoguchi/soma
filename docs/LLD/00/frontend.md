@@ -399,7 +399,7 @@ Reuse provenance: Beta LLD-10 safe-undo principle, moved into shared user-plane 
 - Failed diagnostic subpanels remain visibly partial rather than making the whole application unavailable.
 - Normal host lifecycle transitions are presented as compact runtime/event evidence, not as recent warning/error codes.
 - Capability diagnostics report registered descriptors only. Missing future workspace owners appear through the workspace unavailable state rather than synthetic diagnostic entries.
-- Compact metric groups such as Durable jobs use the shared metric-grid primitive. Equal columns stay aligned, label/value content is vertically centered within each box, and an odd final metric remains in natural grid order unless its owner explicitly requests another layout.
+- Compact metric groups such as Durable jobs use the shared balanced metric-grid primitive. Equal columns stay aligned and an odd final metric is centered/spans intentionally rather than being stranded at the left edge.
 
 **Failure:** Diagnostic provider failure shows unavailable/partial state and never changes authoritative readiness/domain results.
 
@@ -610,9 +610,10 @@ Reuse provenance: Beta LLD-10 safe-undo principle, moved into shared user-plane 
 **Rules:**
 - Example wide presentation: `run 1cf8147f · READY · schema M00.005 · development · loopback/encrypted`.
 - The strip is factual status, not a warning/event log and not a second navigation bar.
-- `READY` in the persistent strip uses the muted success/ready token, not plain white and not a neon green. Pre-ready/checking stays neutral/current; degraded/failed uses governed warning/destructive treatment.
+- Normal READY/startup state uses neutral/brand-current emphasis; warning/error emphasis appears only for actual degraded/failed conditions.
 - Run/build/schema/trust facts come from current Foundation providers and never from feature-local guesses.
 - Values are compact and bounded; exact/canonical detail remains available through Diagnostics when needed.
+- `READY` in the persistent strip uses the muted success/ready token, not plain white and not a neon green. Pre-ready/checking stays neutral/current; degraded/failed uses governed warning/destructive treatment.
 - On narrow width, preserve at least run identity + readiness and provide a labelled overflow/detail affordance for secondary facts rather than wrapping into a tall footer.
 - The strip does not display secrets, full reusable tokens, unrestricted filesystem paths, or customer/domain data.
 
