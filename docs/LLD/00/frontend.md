@@ -384,6 +384,8 @@ Reuse provenance: Beta LLD-10 safe-undo principle, moved into shared user-plane 
 - Time uses TIME.DISPLAY while an evidence/detail affordance may expose canonical UTC.
 - Open-log/log-folder actions use declared diagnostics/trusted local mechanisms.
 - Failed diagnostic subpanels remain visibly partial rather than making the whole application unavailable.
+- Normal host lifecycle transitions are presented as compact runtime/event evidence, not as recent warning/error codes.
+- Capability diagnostics report registered descriptors only. Missing future workspace owners appear through the workspace unavailable state rather than synthetic diagnostic entries.
 
 **Failure:** Diagnostic provider failure shows unavailable/partial state and never changes authoritative readiness/domain results.
 
