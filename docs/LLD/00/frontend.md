@@ -52,9 +52,27 @@
       "code_paths": ["src/main/styles/"]
     },
     {
+      "id": "UI.WORKSPACE_REGISTRY",
+      "anchor": "ui-workspace-registry",
+      "depends_on": ["CAPABILITY.REGISTRY"],
+      "code_paths": ["src/main/app/workspaces/"]
+    },
+    {
+      "id": "UI.VISUAL_GRAMMAR",
+      "anchor": "ui-visual-grammar",
+      "depends_on": ["UI.BRAND", "UI.TOKENS"],
+      "code_paths": ["src/main/styles/", "src/main/shared/components/"]
+    },
+    {
+      "id": "UI.TEXT_INTEGRITY",
+      "anchor": "ui-text-integrity",
+      "depends_on": ["BUILD.IDENTITY"],
+      "code_paths": ["src/main/shared/text/", "src/main/app/bootstrap/"]
+    },
+    {
       "id": "UI.SHELL",
       "anchor": "ui-shell",
-      "depends_on": ["UI.TOKENS", "API.CLIENT", "UI.BOOTSTRAP", "UI.AUTH_GATE"],
+      "depends_on": ["UI.TOKENS", "UI.VISUAL_GRAMMAR", "UI.WORKSPACE_REGISTRY", "UI.TEXT_INTEGRITY", "API.CLIENT", "UI.BOOTSTRAP", "UI.AUTH_GATE"],
       "code_paths": ["src/main/app/", "src/main/shared/components/"]
     },
     {
@@ -260,7 +278,7 @@ Reuse provenance: Beta LLD-10 presentation lessons and LLD-09 chronology refinem
 **Visible result:** Navigation/actions truthfully reflect what this assembled build can perform.
 
 **Rules:**
-- Declared future workspaces remain visible in primary navigation while unavailable; they render disabled/unavailable state rather than disappearing or invoking stubs/500s.
+- Only workspaces declared by UI.WORKSPACE_REGISTRY participate in primary navigation. Declared future workspaces remain visible while unavailable; they render disabled/unavailable state rather than disappearing or invoking stubs/500s.
 - `available` capability surfaces may be entered; `unavailable` surfaces stay visibly disabled with concise “Not available in this build” meaning.
 - `development` may be shown with a concise non-authoritative development indicator.
 - Capability state controls exposure/availability only; it is never business authorization or a replacement for owner action blockers.
@@ -366,6 +384,8 @@ Reuse provenance: Beta LLD-10 safe-undo principle, moved into shared user-plane 
 - Time uses TIME.DISPLAY while an evidence/detail affordance may expose canonical UTC.
 - Open-log/log-folder actions use declared diagnostics/trusted local mechanisms.
 - Failed diagnostic subpanels remain visibly partial rather than making the whole application unavailable.
+- Normal host lifecycle transitions are presented as compact runtime/event evidence, not as recent warning/error codes.
+- Capability diagnostics report registered descriptors only. Missing future workspace owners appear through the workspace unavailable state rather than synthetic diagnostic entries.
 
 **Failure:** Diagnostic provider failure shows unavailable/partial state and never changes authoritative readiness/domain results.
 
@@ -399,14 +419,14 @@ Reuse provenance: Beta LLD-10 safe-undo principle, moved into shared user-plane 
 **Visible result:** SOMA starts in **SOMA Core Dark** when no accepted preference exists and all components consume theme-independent semantic tokens.
 
 **Rules:**
-- `core-dark` is the initial development and product default.
+- `core_dark` is the initial development and product default.
 - Scope 00 owns appearance semantics. The accepted current/future mode enum is `core_dark | system | light`; `core_dark` is the default. When a typed settings store is available, Foundation may register/persist this preference through that generic store without transferring appearance meaning to the settings module.
 - Beta terminal-green/amber/violet decorative skins are not part of the current Foundation contract; adding skins later requires a new accepted appearance decision rather than inheriting old Beta values.
 - Components never branch on raw palette values to infer business meaning.
 - Theme changes, when later exposed, preserve selection/focus/warning/destructive distinctions and accessibility requirements.
 - Brand assets and semantic state remain legible in Core Dark; small text/focus colors may use accessible derived blues rather than forcing raw brand blue.
 
-**Failure:** Missing/invalid appearance preference falls back deterministically to `core-dark`.
+**Failure:** Missing/invalid appearance preference falls back deterministically to `core_dark`.
 
 **Side effects:** presentation theme state only.
 
@@ -436,9 +456,9 @@ Reuse provenance: Beta LLD-10 safe-undo principle, moved into shared user-plane 
 
 **Rules:**
 - Canonical permanent assets live under `src/main/assets/brand/`; `.tmp/` screenshots/design candidates are never runtime dependencies.
-- Primary brand blue: `#0A33FF`. Primary dark slate: `#0F1115`.
+- Canonical brand palette is Electric `#5A33FF`, Slate `#0F1115`, Mist `#ECEEF2`, and Pure `#FFFFFF`. Semantic UI accents may derive accessible variants; raw palette values never encode domain state.
 - The brand blue may be used freely for the logo, large graphic accents, and sufficiently contrasted surfaces.
-- Small dark-mode text/focus/status use a derived semantic accent that meets current accessibility contrast targets rather than forcing `#0A33FF`.
+- Small dark-mode text/focus/status use a derived semantic accent that meets current accessibility contrast targets rather than forcing the raw brand-blue value.
 - Do not copy third-party product branding/trade dress from directional references.
 
 **Failure:** Missing canonical asset falls back to a SOMA text identity rather than loading from remote/untracked files.
@@ -464,6 +484,79 @@ Reuse provenance: Beta LLD-10 safe-undo principle, moved into shared user-plane 
 
 **Side effects:** none.
 
+<a id="ui-workspace-registry"></a>
+## UI.WORKSPACE_REGISTRY
+
+**Trigger/input:** Main constructs primary navigation for the assembled build.
+
+**Visible result:** SOMA exposes one closed, deterministic set of top-level product workspaces in this order:
+
+1. **Overview**
+2. **Tickets**
+3. **Objectives**
+4. **Inventory**
+5. **Infrastructure**
+6. **Settings**
+
+**System surface:** **Diagnostics** is a Foundation/System destination and is visually separated from product workspaces. It is not inserted into the product workspace sequence merely because it is available.
+
+**Rules:**
+- Workspace names/order are product contract, not inferred from capability IDs, module names, database tables, Beta packet names, or agent guesses.
+- Capability availability controls whether a declared workspace is active/development/unavailable; it never creates a new top-level workspace.
+- Declared-but-unavailable product workspaces remain visible with concise unavailable state.
+- Unknown capabilities remain absent from primary navigation unless this registry is deliberately revised.
+- **Finance**, **Products**, **Service levels**, **Workflows**, and **Customers** are not current top-level SOMA workspaces. Domain concepts with those meanings may appear inside their owning workspace/context, but Main must not invent primary navigation entries for them.
+- Scope-01 reusable reference administration is reached through the Settings/reference-data surface or owning contextual links; Customer identity does not automatically create a primary **Customers** workspace.
+- Deep links may enter a feature route without adding that route to top-level navigation.
+- Future top-level workspace changes require an explicit LLD revision and corresponding navigation/check update.
+
+**Failure:** Missing/invalid workspace registry blocks ordinary shell navigation rather than falling back to module/capability enumeration.
+
+**Side effects:** presentation/navigation registration only.
+
+<a id="ui-visual-grammar"></a>
+## UI.VISUAL_GRAMMAR
+
+**Trigger/input:** SOMA shell/shared components render authenticated operational UI.
+
+**Visible result:** The interface uses a restrained terminal-inspired operational grammar: dense information, thin structural separation, compact controls, strong textual hierarchy, and multi-pane inspectability without becoming a literal terminal emulator.
+
+**Rules:**
+- Primary structure comes from alignment, whitespace rhythm, 1px separators/borders, typography, and pane boundaries. Large floating rounded cards are exceptional rather than the default container.
+- Initial surface radii are restrained: square/near-square operational panes and rows; controls may use a small radius. Large soft SaaS-style card radii/shadows are not the default visual hierarchy.
+- Operational chrome, navigation labels, status bands, identifiers, timestamps, metrics, command cues, table/list rows, evidence keys and compact section labels favor the approved local monospace stack. Long notes, explanations and form help may use the readable proportional stack.
+- Typical dense list/status rows target approximately 28–36 CSS px height at default zoom when content permits. Empty padding must not dominate information-bearing space.
+- Pane/content padding is compact and consistent; use nested card-within-card presentation only when the nested boundary has real interaction/authority meaning.
+- Buttons/actions are compact and textual. Large full-width call-to-action styling is reserved for genuine gates such as first-run authentication or narrow layouts where width is necessary.
+- Status/evidence presentation may use terminal cues such as `$`, `>`, `//`, compact brackets, monospace labels and restrained semantic accents, but controls remain discoverable and accessible.
+- The supplied init.Habits references are inspiration for density, pane composition and textual rhythm only; SOMA keeps its own brand, information architecture and domain language.
+- Diagnostics is the Foundation exemplar: current-run/runtime/capability/log facts should read as one operational console composed of panes/rows, not four marketing/dashboard cards.
+- Wide business workspaces should support navigation/context rail, primary operational list/work area, contextual/evidence pane, plus bounded lower activity surface where the owner needs it.
+- Semantic state remains visible without relying on color alone. Focus/selection/warning/destructive/unavailable states remain distinct under forced colors/high contrast.
+- Visual density never permits clipping/truncating authoritative identifiers/evidence without an explicit inspect/copy path.
+
+**Failure:** Shared component or feature styling that reintroduces an unregistered visual hierarchy/ad-hoc palette is a development conformance failure, not a new implicit design convention.
+
+**Side effects:** presentation only.
+
+<a id="ui-text-integrity"></a>
+## UI.TEXT_INTEGRITY
+
+**Trigger/input:** Static Main assets or runtime strings are rendered.
+
+**Visible result:** Operator-facing text is valid Unicode and displays intended separators/symbols without mojibake.
+
+**Rules:**
+- Repository source/static text is UTF-8; transport JSON follows the contract encoding.
+- Do not render accidental mojibake sequences such as `Â·`, `Ã—`, replacement-character `�`, or mis-decoded UTF-8.
+- Prefer ordinary Unicode glyphs only when available in the local font stack and understandable in accessible text; otherwise use ASCII text.
+- Decorative separators are presentation characters, never protocol/domain delimiters.
+- Build/test fixtures include representative SOMA symbols/separators and fail when bytes are decoded through the wrong code page.
+
+**Failure:** Invalid/mis-decoded visible text falls back to safe plain text and is reported as a development defect; it never silently ships as the canonical label.
+
+**Side effects:** none.
+
 <a id="ui-shell"></a>
 ## UI.SHELL
 
@@ -474,6 +567,7 @@ Reuse provenance: Beta LLD-10 safe-undo principle, moved into shared user-plane 
 **Rules:**
 - Shell navigation does not own business truth.
 - Domain features own their workbench content/actions; shared shell owns placement and navigation mechanics.
+- Primary product navigation comes only from UI.WORKSPACE_REGISTRY; the shell never enumerates CAPABILITY.REGISTRY into guessed workspace labels.
 - Returning from a record preserves applicable filter/query, selected/active records, scroll context, and focus where the referenced result survives.
 - Deep operational surfaces favor dense inspectable information over decorative dashboard space.
 - Jobs, warnings, imports, reviews, and recent processing may use a shared activity surface, but their facts remain owner-produced.
@@ -567,8 +661,9 @@ Reuse provenance: Beta LLD-10 `SCROLL_OWNERSHIP_V1`.
 
 **Rules:**
 - Initial workbench prototype uses `1040 CSS px` as the wide split baseline; live testing may revise this value by updating this item.
-- Wide layouts may show operational list/work pane beside context/communications/evidence.
-- Narrow layouts use labelled pane switching/drawers/stacks rather than deleting either side.
+- Wide layouts use compact persistent workspace/context navigation plus owner panes; operational list/work area and context/communications/evidence may coexist where useful.
+- Narrow layouts must **recompose**, not merely stack every wide-layout panel vertically. Primary workspace navigation becomes a compact labelled tab/command strip with bounded horizontal scrolling or an explicit overflow control; owner workbench panes switch one-at-a-time/drawer/stack as appropriate.
+- Diagnostics narrow mode presents one operational panel at a time in deliberate order and preserves access to all facts/actions without forcing a page-length copy of the desktop grid.
 - Tables remain tabular inside bounded horizontal scroll rather than causing page overflow.
 - Layout changes preserve active pane, filters, selection, scroll context, working copies, unsaved protection, and applicable focus.
 - Responsive behavior is capability-based, not named-device-specific.
