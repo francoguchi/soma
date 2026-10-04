@@ -347,14 +347,16 @@ Build a synthetic three-pane shell with a selectable list, evidence pane and act
 
 Verify exactly one logical pane owns pane-local keyboard/scroll commands at a time; active pane, DOM focus, row selection, opened record and hover remain distinguishable. Activating a pane must not create a record selection. Pointer or programmatic activation after prior keyboard use must never produce the current full-pane rectangular focus-outline regression; pane focus is localized to the rail/header treatment and nested controls still receive normal focus-visible rings. Modal focus temporarily supersedes and then restores the surviving invoker pane. Crossing the responsive threshold preserves the logical active pane where possible and otherwise chooses a deterministic labelled fallback without losing filters/working copies.
 
-At least one non-color structural cue plus the restrained current-locus treatment identifies the active pane under normal and forced-color/high-contrast presentation. No visible `ACTIVE` word/badge is required in the pane heading; screen-reader active-pane status remains available.
+At least one non-color structural cue plus the restrained current-locus treatment identifies the active pane under normal and forced-color/high-contrast presentation. The active pane title receives the governed readable current-title tint. No visible `ACTIVE` word/badge is required in the pane heading; screen-reader active-pane status remains available.
+
+Populate a pane with enough evidence to scroll. Verify the pane heading remains fixed while only the body scrolls, the scrollbar belongs to the body, focus targets are never hidden beneath the header, and switching/reflow preserves the same logical pane.
 
 <a id="chk-ui-status-strip"></a>
 ## CHK00.UI.STATUS_STRIP
 
 Render the authenticated shell against healthy READY, pre-ready/degraded and partially unavailable provider states. Verify the persistent bottom strip presents bounded current run/readiness/schema/build/trust facts without becoming a second event log or navigation area.
 
-At wide width the strip remains one compact line. At phone/narrow width it preserves run identity + readiness and exposes secondary facts through a labelled overflow/detail affordance rather than wrapping into a tall footer. Exact canonical details remain available through Diagnostics.
+At wide width the strip remains one compact line. Healthy `READY` uses the muted success/ready token and is clearly green without neon brightness; checking/pre-ready remains neutral/current and degraded/failed remains warning/destructive. At phone/narrow width it preserves run identity + readiness and exposes secondary facts through a labelled overflow/detail affordance rather than wrapping into a tall footer. Exact canonical details remain available through Diagnostics.
 
 Assert no secrets, full tokens, unrestricted filesystem paths or domain data appear; actual degraded/failed conditions are distinguishable from normal READY state without relying on color alone.
 
@@ -363,9 +365,376 @@ Assert no secrets, full tokens, unrestricted filesystem paths or domain data app
 
 Inspect/build the Main style entry and prove the shared style system has one declared cascade order and no append-only override dependency. Shared Foundation controls/panes/navigation/forms/collections/status consume semantic tokens/primitives; feature-local styles do not override global body/button/input/shell/pane selectors.
 
-Fail the check on duplicate raw palette declarations outside the token owner, ordinary `!important`, selector-order overrides that cross owning layers, or a feature copy of an existing shared primitive. Verify the stable `soma.css` entry can import/re-export the layered library without changing feature import paths.
+Fail the check on duplicate raw palette declarations outside the token owner, ordinary `!important`, selector-order overrides that cross owning layers, or a feature copy of an existing shared primitive. Verify the stable `soma.css` entry can import/re-export the layered library without changing feature import paths. Verify the shared console-cue primitive renders `<!-- soma-meta
+{
+  "version": 1,
+  "id": "LLD-00-CHECKS",
+  "scope": "00",
+  "items": [
+    {
+      "id": "CHK00.RUNTIME.TRUST",
+      "anchor": "chk-runtime-trust",
+      "covers": ["RUNTIME.TRUSTED_CONTROL"]
+    },
+    {
+      "id": "CHK00.LAUNCHERS.LIFECYCLE",
+      "anchor": "chk-launchers-lifecycle",
+      "covers": ["DEV.SOURCE_LAUNCHERS", "RUNTIME.TRUSTED_CONTROL", "DIAGNOSTICS.OPERATOR_LOGS"]
+    },
+    {
+      "id": "CHK00.TRAY.CONTROL",
+      "anchor": "chk-tray-control",
+      "covers": ["UI.SYSTEM_TRAY", "RUNTIME.TRUSTED_CONTROL", "DIAGNOSTICS.OPERATOR_LOGS"]
+    },
+    {
+      "id": "CHK00.RUNTIME.LIFECYCLE",
+      "anchor": "chk-runtime-lifecycle",
+      "covers": ["RUNTIME.INSTANCE", "RUNTIME.LIFECYCLE", "RUNTIME.HEALTH", "RUNTIME.SHUTDOWN"]
+    },
+    {
+      "id": "CHK00.CONFIG.PATHS",
+      "anchor": "chk-config-paths",
+      "covers": ["CONFIG.RUNTIME", "FS.SAFE", "FS.TEMP"]
+    },
+    {
+      "id": "CHK00.BUILD.STATIC",
+      "anchor": "chk-build-static",
+      "covers": ["PLATFORM.BASELINE", "BUILD.IDENTITY", "STATIC.ASSETS", "BRAND.ASSETS"]
+    },
+    {
+      "id": "CHK00.ERROR.TRACE",
+      "anchor": "chk-error-trace",
+      "covers": ["ERROR.CONTRACT", "TRACE.CORRELATION", "IDENTITY.UUID", "SERIALIZATION.STRICT_JSON"]
+    },
+    {
+      "id": "CHK00.CLOCKS.SEAMS",
+      "anchor": "chk-clocks-seams",
+      "covers": ["TIME.MONOTONIC", "TEST.SEAMS"]
+    },
+    {
+      "id": "CHK00.AUTH.LOCAL_ADMIN",
+      "anchor": "chk-auth-local-admin",
+      "covers": ["AUTH.LOCAL_ADMIN", "SECURITY.BROWSER_SESSION", "UI.AUTH_GATE", "M00.006"]
+    },
+    {
+      "id": "CHK00.SESSION.CSRF",
+      "anchor": "chk-session-csrf",
+      "covers": ["SECURITY.BROWSER_SESSION"]
+    },
+    {
+      "id": "CHK00.READ.SNAPSHOT",
+      "anchor": "chk-read-snapshot",
+      "covers": ["PERSISTENCE.READ_SNAPSHOT"]
+    },
+    {
+      "id": "CHK00.SNAPSHOT",
+      "anchor": "chk-snapshot",
+      "covers": ["PERSISTENCE.SNAPSHOT"]
+    },
+    {
+      "id": "CHK00.AUDIT.APPEND",
+      "anchor": "chk-audit-append",
+      "covers": ["AUDIT.APPEND_ONLY", "TX.UOW", "M00.003"]
+    },
+    {
+      "id": "CHK00.JOB.EXECUTION",
+      "anchor": "chk-job-execution",
+      "covers": ["JOBS.EXECUTION", "JOBS.COORDINATOR", "RUNTIME.SHUTDOWN", "M00.004"]
+    },
+    {
+      "id": "CHK00.SEED.RESET",
+      "anchor": "chk-seed-reset",
+      "covers": ["DEV.SEED", "DEV.DB_RESET", "MIGRATION.MANIFEST"]
+    },
+    {
+      "id": "CHK00.RUNTIME.OBSERVATION",
+      "anchor": "chk-runtime-observation",
+      "covers": ["RUNTIME.CONTROL_OBSERVATION", "RUNTIME.TRUSTED_CONTROL", "RUNTIME.HEALTH"]
+    },
+    {
+      "id": "CHK00.CAPABILITIES",
+      "anchor": "chk-capabilities",
+      "covers": ["CAPABILITY.REGISTRY", "UI.BOOTSTRAP", "UI.CAPABILITY_STATE"]
+    },
+    {
+      "id": "CHK00.UI.WORKSPACES",
+      "anchor": "chk-ui-workspaces",
+      "covers": ["UI.WORKSPACE_REGISTRY", "UI.CAPABILITY_STATE", "UI.ROUTING"]
+    },
+    {
+      "id": "CHK00.UI.VISUAL_GRAMMAR",
+      "anchor": "chk-ui-visual-grammar",
+      "covers": ["UI.VISUAL_GRAMMAR", "UI.SHELL", "UI.RESPONSIVE", "UI.BRAND", "UI.TOKENS"]
+    },
+    {
+      "id": "CHK00.UI.TEXT_INTEGRITY",
+      "anchor": "chk-ui-text-integrity",
+      "covers": ["UI.TEXT_INTEGRITY"]
+    },
+    {
+      "id": "CHK00.UI.PANE_FOCUS",
+      "anchor": "chk-ui-pane-focus",
+      "covers": ["UI.PANE_FOCUS", "UI.SELECTION", "UI.SCROLL"]
+    },
+    {
+      "id": "CHK00.UI.STATUS_STRIP",
+      "anchor": "chk-ui-status-strip",
+      "covers": ["UI.OPERATOR_STATUS_STRIP"]
+    },
+    {
+      "id": "CHK00.UI.STYLE_LIBRARY",
+      "anchor": "chk-ui-style-library",
+      "covers": ["UI.STYLE_LIBRARY"]
+    },
+    {
+      "id": "CHK00.UI.SCROLLBAR",
+      "anchor": "chk-ui-scrollbar",
+      "covers": ["UI.SCROLLBAR"]
+    },
+    {
+      "id": "CHK00.PAGE.COLLECTION",
+      "anchor": "chk-page-collection",
+      "covers": ["QUERY.PAGE", "API.CLIENT"]
+    },
+    {
+      "id": "CHK00.UI.ROUTING",
+      "anchor": "chk-ui-routing",
+      "covers": ["UI.ROUTING"]
+    },
+    {
+      "id": "CHK00.UI.AUTOCOMPLETE",
+      "anchor": "chk-ui-autocomplete",
+      "covers": ["UI.AUTOCOMPLETE", "UI.COLLECTIONS", "UI.SCROLL"]
+    },
+    {
+      "id": "CHK00.UI.DIALOG",
+      "anchor": "chk-ui-dialog",
+      "covers": ["UI.DIALOG_FOCUS", "UI.SCROLL"]
+    },
+    {
+      "id": "CHK00.UI.UNDO",
+      "anchor": "chk-ui-undo",
+      "covers": ["UI.SAFE_UNDO", "UI.CONFIRMATION"]
+    },
+    {
+      "id": "CHK00.UI.DIAGNOSTICS",
+      "anchor": "chk-ui-diagnostics",
+      "covers": ["UI.DIAGNOSTICS_STATE", "UI.ERROR_STATE", "RUNTIME.HEALTH", "DIAGNOSTICS.OPERATOR_LOGS", "DIAGNOSTICS.SAFE"]
+    },
+    {
+      "id": "CHK00.UI.APPEARANCE",
+      "anchor": "chk-ui-appearance",
+      "covers": ["UI.APPEARANCE", "UI.BRAND", "UI.TOKENS"]
+    },
+    {
+      "id": "CHK00.UI.ACCESSIBILITY",
+      "anchor": "chk-ui-accessibility",
+      "covers": ["UI.ACCESSIBILITY", "UI.TOKENS", "UI.DIALOG_FOCUS", "UI.SELECTION", "UI.SHELL"]
+    },
+    {
+      "id": "CHK00.TIME.ROUNDTRIP",
+      "anchor": "chk-time-roundtrip",
+      "covers": ["TIME.UTC", "TIME.DISPLAY"]
+    },
+    {
+      "id": "CHK00.DB.PROTECTED_OPEN",
+      "anchor": "chk-db-protected-open",
+      "covers": ["SECURITY.LIVE_DATA_KEY", "PERSISTENCE.CONNECTION"]
+    },
+    {
+      "id": "CHK00.TX.ROLLBACK",
+      "anchor": "chk-tx-rollback",
+      "covers": ["TX.UOW"]
+    },
+    {
+      "id": "CHK00.MIGRATION.REBUILD",
+      "anchor": "chk-migration-rebuild",
+      "covers": ["MIGRATION.MANIFEST", "PERSISTENCE.SCHEMA_VERIFY", "M00.001"]
+    },
+    {
+      "id": "CHK00.MIGRATION.STATUS",
+      "anchor": "chk-migration-status",
+      "covers": ["MIGRATION.STATUS"]
+    },
+    {
+      "id": "CHK00.REPLAY.EXACT",
+      "anchor": "chk-replay-exact",
+      "covers": ["COMMAND.REPLAY", "M00.002"]
+    },
+    {
+      "id": "CHK00.JOB.RECOVERY",
+      "anchor": "chk-job-recovery",
+      "covers": ["JOBS.COORDINATOR"]
+    },
+    {
+      "id": "CHK00.CONTRACT.SYNC",
+      "anchor": "chk-contract-sync",
+      "covers": ["CONTRACT.SOURCE"]
+    },
+    {
+      "id": "CHK00.UI.SELECTION",
+      "anchor": "chk-ui-selection",
+      "covers": ["UI.SELECTION"]
+    },
+    {
+      "id": "CHK00.UI.SCROLL",
+      "anchor": "chk-ui-scroll",
+      "covers": ["UI.SCROLL"]
+    },
+    {
+      "id": "CHK00.UI.REFLOW",
+      "anchor": "chk-ui-reflow",
+      "covers": ["UI.RESPONSIVE", "UI.WORKING_COPY", "WORKING_COPY.STORE", "M00.005"]
+    },
+    {
+      "id": "CHK00.UI.HOLD",
+      "anchor": "chk-ui-hold",
+      "covers": ["UI.CONFIRMATION", "SECURITY.DELIBERATE_PROOF"]
+    },
+    {
+      "id": "CHK00.DOC.IMPACT",
+      "anchor": "chk-doc-impact",
+      "covers": ["TOOLING.IMPACT"]
+    }
+  ],
+  "tags": ["foundation", "checks"]
+}
+-->
 
-Exercise the shared metric grid with 6 and 7 items. Equal columns remain aligned; the odd final metric is intentionally centered/spanned rather than visually stranded.
+# Foundation checks
+
+These are development checks, not release certification. Each scenario becomes executable when its covered behavior is implemented.
+
+<a id="chk-runtime-lifecycle"></a>
+## CHK00.RUNTIME.LIFECYCLE
+
+Start one real host process and observe the process-local startup sequence `BOOTSTRAPPING -> MIGRATING -> BINDING -> SERVING_NOT_READY -> READY`. Verify readiness verification does not fabricate a durable `VERIFYING` state, ordinary application routes reject before READY, and the process never reports controller-only absence/trust states as its own lifecycle. Trigger graceful shutdown and verify `QUIESCING -> EXITING` rejects new mutations, stops new job claims, drains bounded work, removes exact-owned runtime/tray artifacts and releases the instance lock before process exit. Inject a required readiness failure and verify FAILED is truthful and never reported as READY.
+
+<a id="chk-config-paths"></a>
+## CHK00.CONFIG.PATHS
+
+Resolve default development configuration and verify all authoritative roots remain beneath the canonical LocalAppData development instance, while checkout paths remain code-only. Exercise explicit test/development override, path traversal, symlink/reparse redirection, atomic replacement, exact-owned deletion, and runtime temp allocation/cleanup. Unsafe/ambiguous paths fail before authoritative mutation and repository `.tmp/` is never used as application temp state.
+
+<a id="chk-build-static"></a>
+## CHK00.BUILD.STATIC
+
+Build Main using the pinned source toolchain, record build/protocol/contract identity, start SOMA without Node present, and verify the local Python host serves only the verified static bundle and registered SPA routes. Tamper/mismatch the asset manifest or required protocol identity and verify READY is blocked or bootstrap displays explicit incompatibility; no remote/CDN fallback occurs.
+
+<a id="chk-error-trace"></a>
+## CHK00.ERROR.TRACE
+
+Issue one request that succeeds and one that fails inside a nested application/adapter path. Verify a single correlation identity is available across safe logs/audit/job metadata and the failure envelope while remaining non-authoritative. Inject raw SQL/OS/framework exception text, paths, and secret-like values and verify none cross the application boundary; the client receives a stable code/recoverability/summary/correlation contract.
+
+<a id="chk-clocks-seams"></a>
+## CHK00.CLOCKS.SEAMS
+
+Use injected UTC, monotonic, and UUID providers to deterministically exercise a timeout/retry/session scenario. Change wall-clock UTC during elapsed timing and verify timeout semantics do not change. Verify production/source composition cannot enable test providers through ordinary runtime configuration.
+
+<a id="chk-auth-local-admin"></a>
+## CHK00.AUTH.LOCAL_ADMIN
+
+On a freshly migrated unseeded credential table, bootstrap shows `setup_required` and ordinary workspaces remain gated. Reject passwords shorter than 12 Unicode scalars, larger than 1024 UTF-8 bytes, mismatched confirmation, or any setup attempt after the singleton exists. Verify exact password bytes are hashed with the accepted Argon2id profile, only the PHC verifier is persisted, one stable actor UUID is created, and no raw password/confirmation reaches logs, diagnostics, audit, replay, browser storage, or errors.
+
+Then verify password-only login: correct password issues a current-run session, wrong password returns the same public `AUTH_INVALID_CREDENTIALS` response, the per-run delay begins after five consecutive failures with 1/2/4/8-second monotonic steps and no durable lockout, successful login clears the failure counter, and logout invalidates the presented session. A new process run requires a fresh browser session but reuses the persisted credential. Password/profile management remains absent.
+
+<a id="chk-session-csrf"></a>
+## CHK00.SESSION.CSRF
+
+Using a test authentication provider, issue a browser session and verify exact Host, current-run binding, idle/absolute deadlines, host-only HttpOnly SameSite cookie behavior, and mutation CSRF + exact Origin checks. Reject wrong run, expired session, missing/null/cross-origin Origin, wrong CSRF, proxy/forwarded substitution, and invalid Fetch Metadata before application dispatch. Confirm browser never receives run-control secret.
+
+<a id="chk-read-snapshot"></a>
+## CHK00.READ.SNAPSHOT
+
+Within one projection, read several related facts while a concurrent writer commits between individual SELECT opportunities. Verify every participating read observes the same snapshot generation and one captured as-of reference. Inject BEGIN/read/commit setup failures and verify the read connection/transaction is always cleaned up and no mixed-generation projection is returned.
+
+<a id="chk-snapshot"></a>
+## CHK00.SNAPSHOT
+
+Create authoritative data, take a Foundation snapshot while the real encrypted database is active, and verify the snapshot represents one consistent committed point without becoming a portable-backup artifact by itself. Inject busy/cipher/integrity/publication failures and verify no apparently complete snapshot is published.
+
+<a id="chk-audit-append"></a>
+## CHK00.AUDIT.APPEND
+
+Execute a command requiring audit evidence and verify domain mutation, command receipt/result, and typed audit event/results commit in the same outer UnitOfWork. Inject unknown action schema, sensitive/oversized payload, duplicate audit identity, and persistence failure and verify the entire mutation rolls back. Attempt audit UPDATE/DELETE through repository and database paths and verify append-only enforcement.
+
+<a id="chk-job-execution"></a>
+## CHK00.JOB.EXECUTION
+
+Run more registered durable work than the background worker bound, verify at most the configured concurrent handlers execute, no handler holds a writer transaction during long file/CPU work, and accepted domain effects go through owner commands. Enter QUIESCING while jobs run and verify no new claims occur; safe checkpoint/terminal completion or next-start recovery preserves authority and stale handlers cannot commit.
+
+<a id="chk-seed-reset"></a>
+## CHK00.SEED.RESET
+
+Against only the designated development instance, execute reset -> migrations -> registered deterministic seed contributors -> startup. Repeat and verify useful synthetic identity is deterministic where declared and no Alpha/Beta/customer evidence is imported. Inject one seed-contributor failure and verify reset/reseed reports incomplete state rather than claiming seed success.
+
+<a id="chk-runtime-observation"></a>
+## CHK00.RUNTIME.OBSERVATION
+
+From the launcher/controller side, exercise each observation independently from the host lifecycle: no registry/process -> `absent`; plausible registry before trust -> `candidate`; trusted host before READY -> `verified_not_ready`; trusted READY host -> `verified_ready`; dead/replaced prior run -> `stale`; wrong ACL/origin/secret/process birth/image/protocol -> `untrusted`; plausible exact host with unreachable authenticated health -> `unreachable`.
+
+Verify only `verified_ready` authorizes ordinary Open/reuse, verified states use exact current-run trust, and no observation changes the host state machine. Human-facing launcher text may say “Stopped” for `absent`, but the authenticated host API never returns STOPPED as a process state.
+
+<a id="chk-ui-workspaces"></a>
+## CHK00.UI.WORKSPACES
+
+Render the shell with all product capabilities unavailable, then make selected capabilities available/development. Primary navigation must contain exactly, in order: **Overview, Tickets, Objectives, Inventory, Infrastructure, Settings**. Diagnostics remains a distinct System/Foundation destination.
+
+Assert that capability IDs or module names such as `customers`, `products`, `sla`, `workflows`, `finance`, or arbitrary registered test capabilities do **not** create primary workspace labels. In particular, the shell must never show invented top-level **Finance**, **Products**, **Service levels**, **Workflows**, or **Customers** entries unless UI.WORKSPACE_REGISTRY is deliberately revised.
+
+Direct navigation to unavailable declared workspaces remains understandable and sends no owner API request. Deep feature routes may exist without becoming primary navigation entries.
+
+<a id="chk-ui-visual-grammar"></a>
+## CHK00.UI.VISUAL_GRAMMAR
+
+Perform a Foundation shell convergence review at three representative widths: wide desktop, around the initial `1040 CSS px` split threshold, and phone/narrow width.
+
+At wide desktop verify:
+- operational hierarchy is primarily alignment, compact spacing, typography and thin pane separators rather than large rounded floating dashboard cards;
+- Diagnostics current-run/runtime/capability/log information reads as a dense operational console with compact rows and panes;
+- the working pane system owns/fills the available application height below top chrome and above the status strip without inventing fake content; facts remain top-aligned and pane-local scrolling owns overflow;
+- pane sizing may be intentionally asymmetric when information density differs; an equal four-card dashboard is not required;
+- navigation/status/data chrome uses the intended monospace hierarchy while long explanatory/help text remains readable;
+- page title, pane heading and compact label/value/evidence text are visibly distinct hierarchy levels;
+- Electric-blue-derived accent identifies the current interaction locus sparingly rather than decorating every heading;
+- normal controls are compact/flat enough to read as operational actions and large full-width CTA treatment is limited to genuine gates/consequential narrow actions;
+- no decorative whitespace occupies more visual attention than the facts/actions it separates.
+
+At narrow width verify:
+- the desktop grid is **recomposed**, not copied into one extremely long stack;
+- product navigation is a compact labelled tab/command strip with bounded horizontal/overflow behavior;
+- Diagnostics/workbench panes can be switched deliberately one-at-a-time while preserving access to all facts/actions;
+- selected pane, navigation state, working copies, warnings and focus survive threshold changes.
+
+Capture development screenshots under ignored scratch output for review; screenshots are evidence only and never runtime/design authority. Compare structure/density against the approved directional references without copying their branding/trade dress.
+
+<a id="chk-ui-pane-focus"></a>
+## CHK00.UI.PANE_FOCUS
+
+Build a synthetic three-pane shell with a selectable list, evidence pane and activity pane. Exercise pointer activation, Tab/Shift+Tab traversal, arrows/page/scroll commands, row selection, modal open/close and responsive pane switching.
+
+Verify exactly one logical pane owns pane-local keyboard/scroll commands at a time; active pane, DOM focus, row selection, opened record and hover remain distinguishable. Activating a pane must not create a record selection. Pointer or programmatic activation after prior keyboard use must never produce the current full-pane rectangular focus-outline regression; pane focus is localized to the rail/header treatment and nested controls still receive normal focus-visible rings. Modal focus temporarily supersedes and then restores the surviving invoker pane. Crossing the responsive threshold preserves the logical active pane where possible and otherwise chooses a deterministic labelled fallback without losing filters/working copies.
+
+At least one non-color structural cue plus the restrained current-locus treatment identifies the active pane under normal and forced-color/high-contrast presentation. The active pane title receives the governed readable current-title tint. No visible `ACTIVE` word/badge is required in the pane heading; screen-reader active-pane status remains available.
+
+Populate a pane with enough evidence to scroll. Verify the pane heading remains fixed while only the body scrolls, the scrollbar belongs to the body, focus targets are never hidden beneath the header, and switching/reflow preserves the same logical pane.
+
+<a id="chk-ui-status-strip"></a>
+## CHK00.UI.STATUS_STRIP
+
+Render the authenticated shell against healthy READY, pre-ready/degraded and partially unavailable provider states. Verify the persistent bottom strip presents bounded current run/readiness/schema/build/trust facts without becoming a second event log or navigation area.
+
+At wide width the strip remains one compact line. Healthy `READY` uses the muted success/ready token and is clearly green without neon brightness; checking/pre-ready remains neutral/current and degraded/failed remains warning/destructive. At phone/narrow width it preserves run identity + readiness and exposes secondary facts through a labelled overflow/detail affordance rather than wrapping into a tall footer. Exact canonical details remain available through Diagnostics.
+
+Assert no secrets, full tokens, unrestricted filesystem paths or domain data appear; actual degraded/failed conditions are distinguishable from normal READY state without relying on color alone.
+
+<a id="chk-ui-style-library"></a>
+## CHK00.UI.STYLE_LIBRARY
+
+Inspect/build the Main style entry and prove the shared style system has one declared cascade order and no append-only override dependency. Shared Foundation controls/panes/navigation/forms/collections/status consume semantic tokens/primitives; feature-local styles do not override global body/button/input/shell/pane selectors.
+
+ for command/page titles, `--` for pane/major sections and `>` for nested subsections without those decorative glyphs entering accessible names.
+
+Exercise the shared metric grid with 6 and 7 items. Equal columns remain aligned; label/value content is vertically centered inside each metric box. With 7 items, the final metric remains in the natural next grid cell unless an owner explicitly requests a different layout—Foundation must not auto-center the orphan box.
 
 <a id="chk-ui-scrollbar"></a>
 ## CHK00.UI.SCROLLBAR
@@ -414,7 +783,7 @@ Register a synthetic reversible owner action with exact preview/fingerprint and 
 <a id="chk-ui-diagnostics"></a>
 ## CHK00.UI.DIAGNOSTICS
 
-Open the System/Diagnostics surface on a healthy and partially failing host. Verify build/run/schema/capability/job/executor/connection/transaction/log state is visible, local time is readable, and canonical evidence remains inspectable where appropriate. Durable-job metrics remain horizontally balanced for the current odd number of states rather than leaving the final state stranded in one half-column. Normal lifecycle transitions render as runtime/event chronology; warning/error codes remain a separate list and READY/TRAY_READY-style normal events never masquerade as errors. Capability rows correspond to actually registered descriptors; absent future workspace owners do not appear as synthetic capability entries. Repeated unavailable state remains concise while its full meaning is accessible. Provider failure produces partial/unavailable panels without mutating jobs/migrations/domain state or exposing secrets/raw bodies.
+Open the System/Diagnostics surface on a healthy and partially failing host. Verify build/run/schema/capability/job/executor/connection/transaction/log state is visible, local time is readable, and canonical evidence remains inspectable where appropriate. Durable-job metric labels/counts are vertically centered within their cells; the current odd final state remains deliberately asymmetric in the natural next grid cell rather than being auto-centered. Normal lifecycle transitions render as runtime/event chronology; warning/error codes remain a separate list and READY/TRAY_READY-style normal events never masquerade as errors. Capability rows correspond to actually registered descriptors; absent future workspace owners do not appear as synthetic capability entries. Repeated unavailable state remains concise while its full meaning is accessible. Provider failure produces partial/unavailable panels without mutating jobs/migrations/domain state or exposing secrets/raw bodies.
 
 <a id="chk-ui-appearance"></a>
 ## CHK00.UI.APPEARANCE
@@ -438,6 +807,10 @@ Start a real local host, verify its registry/DPAPI run secret/process birth/orig
 From a clean supported Windows source checkout, run `soma_setup.bat`, then `soma_run_console.bat`; verify foreground sanitized logging, READY origin, tray presence, and Ctrl+C graceful shutdown. Then execute `soma_run.bat` twice, `soma_stop.bat` twice, and a fresh run/stop cycle. The second run reuses the verified host, the second stop is idempotent, each new run receives a new run identity, no runtime action installs dependencies, and all detached startup/runtime logs are available under the canonical diagnostics root.
 
 Exercise `soma_reset_dev.bat`: verify it prints the exact LocalAppData development instance, does nothing when confirmation is absent/wrong, refuses a non-development target, gracefully stops a verified live host only after literal `RESET` confirmation, rebuilds migrations + DEV.SEED, leaves SOMA stopped, and never deletes the checkout or an unrelated/packaged instance.
+
+For detached `soma_run.bat`, verify the retained host has **no persistent console window**; only the transient BAT/launcher console may appear while authenticated READY is awaited. `soma_run_console.bat` remains the only source mode with an intentional persistent host terminal.
+
+Abruptly terminate a detached test host so its exact owner-protected registry/secret remain while the recorded process is provably dead. `soma_stop.bat` must clean only those exact stale runtime artifacts, preserve the database, return idempotent success, and leave observation `absent`; a subsequent Run must start normally. A live PID/birth/image mismatch, unreachable live host, foreign ACL/path, or otherwise untrusted candidate must still fail closed and preserve artifacts.
 
 Inject startup failure and READY timeout: launcher returns nonzero with an actionable current log path and never opens an unverified origin. Inject a graceful-stop timeout: no process-name/PID-only termination occurs.
 
