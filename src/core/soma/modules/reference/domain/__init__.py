@@ -1,0 +1,1 @@
+"""Pure Reference domain rules."""
