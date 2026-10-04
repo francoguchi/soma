@@ -89,6 +89,11 @@ When closing a donor row, replace **PENDING** with `REUSED`, `REWRITTEN`, `REJEC
 - [ ] **R00.06-C — PENDING:** selectively migrate `tests/test_ui_working_copies.py`, `src/web/tests/interactions.test.mjs`, and only the browser-workbench assertions that exercise shared interactions.
 - [x] **R00.06-D — DEFERRED:** Beta visual fixture manifests/pixel baselines are not required for rapid Foundation implementation. Revisit visual-regression governance after the shared shell is stable.
 
+### IMP-00-07 — Foundation shell and runtime convergence
+
+- [x] **R00.07-A — REWRITTEN:** Beta/current `LocalHostLifecycle` reuse is corrected so process-internal host lifecycle no longer includes controller absence/trust states. Preserve useful host/trust/launcher implementation, but split it into `RUNTIME.LIFECYCLE` and `RUNTIME.CONTROL_OBSERVATION` under the current exact-run trust model.
+- [x] **R00.07-B — NEW:** closed top-level `UI.WORKSPACE_REGISTRY`, operational `UI.VISUAL_GRAMMAR`, and `UI.TEXT_INTEGRITY` were discovered through live Foundation review. They have no direct Beta implementation donor; current code is converged in place rather than replaced wholesale.
+
 ## Cross-scope reconciliation
 
 Scope-01 design review exposed three accepted Foundation clarifications:
@@ -98,6 +103,13 @@ Scope-01 design review exposed three accepted Foundation clarifications:
 - confirmed appearance semantics remain Foundation-owned while later generic settings persistence is only storage.
 
 These changes are design corrections, not new scope-01 ownership.
+
+Live Foundation review exposed additional accepted Foundation corrections:
+
+- capability availability had been interpreted as permission to invent primary navigation labels (for example Finance/Products/Service levels/Workflows/Customers); the new closed workspace registry prevents this;
+- the functional shell had drifted toward generic rounded-card dashboard presentation and narrow vertical stacking, so the visual grammar now defines dense pane-based SOMA composition and explicit narrow recomposition;
+- visible mojibake such as `Â·` is now a governed text-integrity defect;
+- host lifecycle and controller observation are split before later scopes depend on runtime state semantics.
 
 ## Completion rule
 
