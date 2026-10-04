@@ -19,7 +19,7 @@ This is the single current-state entry point for humans and agents. Do not appen
 | Overall migration map | `docs/LLD/MIGRATION.md` |
 | Mode | Foundation convergence checkpoint; Scope 02 design is paused, not discarded |
 | Implementation note | local `feat/00-foundation` may contain completed/unpushed Foundation work; reconcile the accepted docs surgically and preserve local implementation before starting 00.07 |
-| Design blocker | none; convergence docs/checks are being reconciled before resuming Scope 02 |
+| Design blocker | none; convergence contract is accepted on `main`, awaiting `IMP-00-07` implementation/live review before Scope 02 resumes |
 | Certification | deferred until whole-application implementation and live testing |
 
 ## Resume
@@ -49,7 +49,7 @@ Current next action: reconcile current accepted Scope-00 documentation into the 
 4. Record every donor behavior/code slice as reused, rewritten, rejected, deferred, or new.
 5. Update the design scope backend/frontend/checks/contracts/migrations and create implementation goals only after ownership and behavior are clear.
 
-Current next action: finish and live-review the Foundation convergence contract/goal. Keep `design/02-tickets-core` frozen at its current checkpoint; resume it only after `IMP-00-07` is working.
+Current next action: keep `design/02-tickets-core` frozen; implement and live-review `IMP-00-07`. Resume Scope 02 only after that convergence goal is working.
 
 ## Do not
 
