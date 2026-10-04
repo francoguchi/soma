@@ -48,6 +48,11 @@ def _asset() -> _UnicodeMatchAsset:
     raw = resources.files("soma.modules.reference.assets").joinpath(
         "unicode_match_v1.json"
     ).read_bytes()
+    # Git may materialize repository text with CRLF on Windows. Integrity is
+    # defined over the repository-canonical LF bytes; bare CR is never accepted.
+    raw = raw.replace(b"\r\n", b"\n")
+    if b"\r" in raw:
+        raise RuntimeError("UNICODE_MATCH_V1 asset contains non-canonical line endings")
     digest = hashlib.sha256(raw).hexdigest()
     if digest != EXPECTED_ASSET_SHA256:
         raise RuntimeError(
