@@ -368,6 +368,52 @@ def test_controller_preserves_stale_and_untrusted_candidates(host, field, value,
     host.config.path("runtime", "runtime.json").unlink()
 
 
+def test_stop_cleans_only_exact_owned_proven_dead_stale_registration(host):
+    from soma.runtime.observation import observe
+
+    record = dict(host.record)
+    secret_path = host.config.path("runtime", record["protected_secret"])
+    secret_blob = secret_path.read_bytes()
+    database = host.config.path("data", "soma.db")
+    database_before = database.read_bytes()
+    assert host.stop()
+    record["pid"] = 99999999
+    atomic_write(
+        host.config.instance_root,
+        "runtime/" + record["protected_secret"],
+        secret_blob,
+        protect=protect_owner,
+    )
+    atomic_write(
+        host.config.instance_root,
+        "runtime/runtime.json",
+        canonical_json_bytes(record),
+        protect=protect_owner,
+    )
+    assert observe(host.config).state == "stale"
+    assert stop_current(host.config)
+    assert observe(host.config).state == "absent"
+    assert not host.config.path("runtime", record["protected_secret"]).exists()
+    assert database.read_bytes() == database_before
+
+
+def test_stop_preserves_stale_registration_for_wrong_data_instance(host):
+    record = dict(host.record)
+    record["pid"] = 99999999
+    record["data_instance_id"] = "00000000-0000-4000-8000-000000000099"
+    atomic_write(
+        host.config.instance_root,
+        "runtime/runtime.json",
+        canonical_json_bytes(record),
+        protect=protect_owner,
+    )
+    with pytest.raises(SomaError):
+        stop_current(host.config)
+    assert host.config.path("runtime", "runtime.json").read_bytes() == canonical_json_bytes(record)
+    assert host.stop()
+    host.config.path("runtime", "runtime.json").unlink()
+
+
 def test_real_browser_foundation_convergence(runtime_config):
     import subprocess
 

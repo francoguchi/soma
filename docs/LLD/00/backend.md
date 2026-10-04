@@ -482,12 +482,13 @@ Reuse provenance: Beta `LocalHostLifecycle`, corrected to separate process state
 - `candidate`: syntactically plausible registry/process material exists but has not completed fresh trust verification; no control/open action is authorized yet.
 - `verified_not_ready`: RUNTIME.TRUSTED_CONTROL succeeds for the exact current run but authenticated health reports a host lifecycle other than READY.
 - `verified_ready`: RUNTIME.TRUSTED_CONTROL succeeds and authenticated health reports READY.
-- `stale`: candidate artifacts refer to a dead/replaced/nonmatching prior process/run and are preserved/cleaned only under exact ownership rules.
+- `stale`: candidate artifacts refer to a prior process/run that can no longer be current. A dead recorded process is recoverable only when the runtime registry/secret paths and ACL ownership are exact; process-birth/image mismatch against a live PID remains untrusted rather than cleanable.
 - `untrusted`: candidate material fails path/ACL/origin/secret/process-image/birth/protocol/identity proof.
 - `unreachable`: exact candidate identity is otherwise plausible but the authenticated direct health endpoint cannot be reached within the governed observation budget.
 - Controller observation never invents or drives host lifecycle transitions. It decides only what control/open/remediation action is safe.
 - `STOPPED` is presentation shorthand permitted for human-facing launcher text when observation is `absent`; it is not a host-process lifecycle state.
 - Observation is freshly recomputed before every Open/Stop/reuse decision and is never cached as authority across process/run changes.
+- Explicit Stop may convert **proven-dead + exact-owned** `stale` into `absent` by removing only that run's exact runtime registry/protected-secret artifacts. Run/Open never performs this repair implicitly; it instructs the operator to use Stop/recovery so stale evidence is not silently erased.
 
 **Failure:** Ambiguous observation fails closed to a non-controllable state with bounded remediation evidence; no PID/port/name-only fallback is allowed.
 
@@ -769,9 +770,9 @@ Reuse provenance: Beta LLD-12 `RuntimeRegistryV2` and `TrustedLocalInstanceV1`.
 | Entry point | Required behavior |
 |---|---|
 | `soma_setup.bat` | Create/reuse the repository-local development environment, install/verify declared development dependencies and native prerequisites, and validate the source checkout. It does not fabricate runtime state, start SOMA, reset the database, or silently substitute insecure dependencies. |
-| `soma_run.bat` | Reuse and open an already verified READY instance, or start SOMA detached, capture an owner-only run log, wait up to 30 seconds for authenticated READY, then open only the verified origin. |
+| `soma_run.bat` | Reuse and open an already verified READY instance, or start SOMA as a **windowless background host**, capture an owner-only run log, wait up to 30 seconds for authenticated READY, then open only the verified origin. Double-click may show only the transient BAT/launcher console; the retained host must not own a persistent console window. |
 | `soma_run_console.bat` | Start the real SOMA host in the foreground, mirror sanitized runtime logging to the terminal, print the verified READY origin, and perform graceful owned shutdown on Ctrl+C. If a verified instance already runs, report/open that instance instead of creating a second host. |
-| `soma_stop.bat` | Freshly verify the current run, request graceful authenticated shutdown, and wait up to 10 seconds. No valid running instance is an idempotent success. Timeout reports failure and does not kill by process name, stale PID, or port alone. |
+| `soma_stop.bat` | Freshly verify the current run, request graceful authenticated shutdown, and wait up to 10 seconds. No valid running instance is an idempotent success. If the exact owner-protected runtime registry proves its recorded process has already exited, Stop performs bounded **stale-runtime cleanup** and succeeds. Timeout/untrusted/unreachable/live-identity ambiguity still fails closed and never kills by process name, PID alone, image name, or port. |
 | `soma_reset_dev.bat` | Resolve and display the exact development instance, require the operator to type literal `RESET`, gracefully stop a verified live host if required, recreate only the disposable development database from the current migration manifest, run DEV.SEED, and leave SOMA stopped. It never resets a packaged/non-development instance and never treats a double-click alone as confirmation. |
 
 **Rules:**
@@ -779,6 +780,7 @@ Reuse provenance: Beta LLD-12 `RuntimeRegistryV2` and `TrustedLocalInstanceV1`.
 - Runtime actions never install or update dependencies. Environment mutation belongs only to explicit setup.
 - `soma_reset_dev.bat` is the only root-level destructive development button; it requires the explicit typed confirmation above and refuses a target whose CONFIG.RUNTIME mode/root is not the canonical development instance.
 - Source launchers operate against the canonical development instance, not a database under the checkout.
+- Detached `soma_run.bat` uses a Windows no-console process creation path for the retained host. `soma_run_console.bat` is the only source-run mode that intentionally retains a visible host terminal.
 - Concurrent run attempts converge on the single instance lock; the losing launcher waits for/verifies the winning host rather than creating a second authoritative instance.
 - Setup is rerunnable and preserves unrelated checkout/user data.
 - Source launchers are development controls, not the future production installer contract; production shortcuts may later call the same trusted control capabilities.

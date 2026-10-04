@@ -11,16 +11,16 @@
 
 .panel {
   min-width: 0;
-  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
   border: 0;
   border-right: 1px solid var(--soma-border);
   border-bottom: 1px solid var(--soma-border);
   border-radius: 0;
   background: var(--soma-surface);
   min-height: 0;
-  overflow: auto;
-  overscroll-behavior: contain;
-  scrollbar-gutter: stable;
+  overflow: hidden;
 
 }
 
@@ -63,14 +63,25 @@
   text-transform: uppercase;
   border-bottom: 1px solid var(--soma-border);
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: baseline;
   gap: var(--soma-space-2);
   font-size: 13px;
   letter-spacing: .03em;
-  margin: 0 0 14px;
-  padding-bottom: 8px;
+  margin: 0;
+  padding: 10px 14px 8px;
   font-family: var(--soma-font-code);
+  flex: 0 0 auto;
+  background: var(--soma-surface);
+}
+
+.panel-body {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  padding: 12px 14px;
 }
 
 .panel h3 {
@@ -120,6 +131,10 @@
   box-shadow: inset 3px 0 var(--soma-current);
 }
 
+[data-pane-active=true]>h2 {
+  color: var(--soma-current-title);
+}
+
 [data-pane-id]:focus-visible {
   outline: none;
   box-shadow: inset 3px 0 var(--soma-focus);
@@ -165,8 +180,25 @@
   background: transparent;
 }
 
-.console-cue {
-  color: var(--soma-current);
+.console-cue[data-console-cue]::before {
+  display: inline-block;
+  margin-inline-end: .55em;
+  font-weight: 700;
+}
+
+[data-console-cue=command]::before {
+  content: '$';
+  color: var(--soma-command);
+}
+
+[data-console-cue=section]::before {
+  content: '--';
+  color: var(--soma-info);
+}
+
+[data-console-cue=subsection]::before {
+  content: '>';
+  color: var(--soma-info);
 }
 
 @media (max-width:1039px) {
@@ -213,8 +245,9 @@
     gap: 4px;
   }
 
-  .panel {
-    padding: var(--soma-space-3);
+  .panel h2,
+  .panel-body {
+    padding-inline: var(--soma-space-3);
   }
 }
 
@@ -222,6 +255,10 @@
   [data-pane-active=true] {
     box-shadow: none;
     border-inline-start: 3px double Highlight;
+  }
+
+  [data-pane-active=true]>h2 {
+    color: LinkText;
   }
 
   .pane-switcher button[aria-pressed=true] {

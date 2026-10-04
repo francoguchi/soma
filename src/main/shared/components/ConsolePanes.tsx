@@ -1,5 +1,6 @@
 import {useLayoutEffect, useRef, useState, type ReactNode} from 'react';
 import {usePaneFocus} from '../interactions/pane-focus';
+import {ConsoleCue} from './ConsoleCue';
 
 export function ConsolePanes({panes}: {panes: readonly {id: string; title: string; content: ReactNode}[]}) {
   const [wide, setWide] = useState(false);
@@ -33,6 +34,6 @@ export function ConsolePanes({panes}: {panes: readonly {id: string; title: strin
       {panes.map(pane => <button key={pane.id} aria-pressed={active === pane.id} aria-controls={`console-${pane.id}`} onClick={() => activate(pane.id)}>{pane.title}</button>)}
     </div>
     <p className="sr-only" role="status">Active pane: {panes.find(pane => pane.id === active)?.title}</p>
-    <div className="diagnostics-grid">{panes.map(pane => <section key={pane.id} id={`console-${pane.id}`} data-console-pane={pane.id} data-pane-id={pane.id} data-pane-active={pane.id === active} data-scroll-owner="y" className="panel" tabIndex={0} aria-labelledby={`console-title-${pane.id}`} hidden={!wide && pane.id !== active}><h2 id={`console-title-${pane.id}`}>{pane.title}</h2>{pane.content}</section>)}</div>
+    <div className="diagnostics-grid">{panes.map(pane => <section key={pane.id} id={`console-${pane.id}`} data-console-pane={pane.id} data-pane-id={pane.id} data-pane-active={pane.id === active} className="panel" tabIndex={0} aria-labelledby={`console-title-${pane.id}`} hidden={!wide && pane.id !== active}><h2 id={`console-title-${pane.id}`}><ConsoleCue kind="section"/>{pane.title}</h2><div className="panel-body" data-pane-body data-scroll-owner="y">{pane.content}</div></section>)}</div>
   </div>;
 }

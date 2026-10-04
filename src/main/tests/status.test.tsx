@@ -17,6 +17,7 @@ test('status preserves bounded provider facts and never guesses readiness or sch
   expect(screen.getAllByText('schema unavailable')).toHaveLength(2);
   rerender(<OperatorStatus bootstrap={bootstrap} diagnostics={value}/>);
   expect(screen.getByText('READY')).toBeTruthy();
+  expect(screen.getByLabelText('Operator status').dataset['condition']).toBe('ready');
   expect(screen.getByLabelText('Operator status').textContent).toContain('run 00000000');
   expect(screen.getByLabelText('Operator status').textContent).not.toContain(run);
   expect(screen.getByLabelText('Operator status').textContent).not.toContain('diagnostics/run.jsonl');

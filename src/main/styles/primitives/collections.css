@@ -27,6 +27,7 @@
 .metric-grid span {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   background: var(--soma-surface-raised);
   min-height: 28px;
   padding: 4px 8px;
@@ -100,12 +101,6 @@
 
 .selectable-collection [role=gridcell]:last-child {
   flex-shrink: 0;
-}
-
-.metric-grid>:last-child:nth-child(odd) {
-  grid-column: 1/-1;
-  width: calc((100% - var(--soma-metric-gap)) / 2);
-  justify-self: center;
 }
 
 @media (forced-colors:active) {

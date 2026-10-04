@@ -58,12 +58,20 @@
   color: var(--soma-warning);
 }
 
+.shell-status[data-condition=ready] .status-readiness {
+  color: var(--soma-success);
+}
+
 @media (forced-colors:active) {
   .status-good {
     font-weight: 700;
   }
 
   .shell-status[data-condition=degraded] .status-readiness {
+    color: CanvasText;
+  }
+
+  .shell-status[data-condition=ready] .status-readiness {
     color: CanvasText;
   }
 }

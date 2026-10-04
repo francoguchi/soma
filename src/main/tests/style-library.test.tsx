@@ -16,3 +16,20 @@ test('palette ownership and semantic token names do not drift into shared primit
     if (!path.endsWith('/reset.css') && !path.endsWith('/utilities.css')) expect(source, path).not.toContain('!important');
   }
 });
+
+test('semantic terminal cues, natural metrics and pane body scrolling stay shared', () => {
+  const tokens = library['../styles/tokens.css'];
+  const panes = library['../styles/primitives/panes.css'];
+  const collections = library['../styles/primitives/collections.css'];
+  const status = library['../styles/primitives/status.css'];
+  for (const token of ['--soma-command', '--soma-current-title', '--soma-info', '--soma-success', '--soma-warning', '--soma-destructive']) expect(tokens).toContain(token);
+  expect(panes).toContain("[data-console-cue=command]::before");
+  expect(panes).toContain("content: '$'");
+  expect(panes).toContain("content: '--'");
+  expect(panes).toContain("content: '>'");
+  expect(panes).toContain('.panel-body');
+  expect(panes).toContain('overflow: hidden');
+  expect(collections).toContain('align-items: center');
+  expect(collections).not.toContain(':last-child:nth-child(odd)');
+  expect(status).toContain('[data-condition=ready]');
+});

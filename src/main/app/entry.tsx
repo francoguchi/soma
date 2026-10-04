@@ -42,7 +42,7 @@ export function Application() {
   const context = useRef<ReturnState | null>(null);
   const navigation = useRef(new Navigation(() => context.current));
   useEffect(() => {applyAppearance();}, []);
-  useEffect(() => installScrollOwnership(document.documentElement, () => main.current?.querySelector<HTMLElement>('[data-pane-active=true]:not([hidden])') ?? main.current), [bootstrap?.auth_state]);
+  useEffect(() => installScrollOwnership(document.documentElement, () => main.current?.querySelector<HTMLElement>('[data-pane-active=true]:not([hidden]) [data-pane-body]') ?? main.current), [bootstrap?.auth_state]);
   useEffect(() => {
     const query = new QueryController<BootstrapV1>();
     void query.query(signal => api.request('/api/v1/bootstrap', 'bootstrap', {signal}), value => {

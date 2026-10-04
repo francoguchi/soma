@@ -9,6 +9,12 @@ from tools import build_identity, contracts, impact
 ROOT = Path(__file__).resolve().parents[3]
 
 
+def test_detached_source_run_uses_windowless_host_creation():
+    source = (ROOT / "tools/source_launcher.py").read_text(encoding="utf-8")
+    assert "creationflags=subprocess.CREATE_NO_WINDOW | subprocess.CREATE_NEW_PROCESS_GROUP" in source
+    assert "subprocess.DETACHED_PROCESS" not in source
+
+
 def doc(metadata, body=""):
     return "<!-- soma-meta\n" + json.dumps(metadata) + "\n-->\n# Test\n" + body
 

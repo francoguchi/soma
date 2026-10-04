@@ -54,6 +54,7 @@ try {
     assert(stripBounds.height <= 32);
     assert(await page.locator('.shell-status').evaluate(node => Array.from(node.children).filter(child => getComputedStyle(child).display !== 'none').every(child => child.getBoundingClientRect().bottom <= node.getBoundingClientRect().bottom + 1)));
     await expect(page.locator('.status-primary')).toContainText('READY');
+    assert(await page.locator('.status-readiness').evaluate(node => getComputedStyle(node).color === getComputedStyle(document.documentElement).getPropertyValue('--soma-success').trim().replace(/^#([0-9a-f]{6})$/iu, (_, hex) => `rgb(${parseInt(hex.slice(0,2),16)}, ${parseInt(hex.slice(2,4),16)}, ${parseInt(hex.slice(4,6),16)})`)));
     if (!wide) {
       await page.getByLabel('Operator status details').click();
       await expect(page.getByLabel('Secondary operator status')).toContainText('schema M00.005');
@@ -69,7 +70,8 @@ try {
     // must never outline the whole region; nested controls retain their own ring.
     await page.keyboard.press('Tab');
     for (const pane of await page.locator('[data-console-pane]:visible').all()) {
-      assert.equal(await pane.evaluate(node => getComputedStyle(node).overflow), 'auto');
+      assert.equal(await pane.evaluate(node => getComputedStyle(node).overflow), 'hidden');
+      assert.equal(await pane.locator('[data-pane-body]').evaluate(node => getComputedStyle(node).overflow), 'auto');
       await pane.focus();
       assert.notEqual(await pane.evaluate(node => getComputedStyle(node).boxShadow), 'none');
       assert.equal(await pane.evaluate(node => getComputedStyle(node).outlineStyle), 'none');
@@ -80,6 +82,7 @@ try {
     assert.notEqual(await page.getByRole('button', {name: 'Refresh', exact: true}).evaluate(node => getComputedStyle(node).outlineStyle), 'none');
     assert.equal(await page.locator('.active-pane-label').count(), 0);
     assert(await page.locator('.operational-console [role=status]').evaluate(node => node.getBoundingClientRect().width <= 1));
+    assert.equal(await page.getByRole('heading', {name: 'Diagnostics', exact: true}).locator('.console-cue').evaluate(node => getComputedStyle(node, '::before').content), '"$"');
     if (!wide) await page.getByRole('button', {name: 'Runtime activity', exact: true}).click();
     const metrics = page.locator('.metric-grid');
     for (const count of [6, 7]) {
@@ -90,14 +93,19 @@ try {
         const bounds = cells.map(node => node.getBoundingClientRect()), owner = grid.getBoundingClientRect();
         const sameColumns = bounds.every(box => Math.abs(box.width - bounds[0].width) < 1);
         const last = bounds[count - 1];
-        const balanced = count % 2 === 0 || Math.abs(last.x + last.width / 2 - owner.x - owner.width / 2) < 1;
+        const balanced = count % 2 === 0 || Math.abs(last.x - bounds[0].x) < 1;
+        const centeredContent = cells.every(node => getComputedStyle(node).alignItems === 'center');
         grid.replaceChildren(...original);
-        return sameColumns && balanced;
+        return sameColumns && balanced && centeredContent;
       }, count));
     }
     const activity = page.locator('[data-console-pane=activity]');
     await activity.focus();
-    const scrollStyle = await activity.evaluate(node => ({size: getComputedStyle(node, '::-webkit-scrollbar').width, thumb: getComputedStyle(node, '::-webkit-scrollbar-thumb').backgroundColor}));
+    const activityBody = activity.locator('[data-pane-body]');
+    const headerTop = await activity.locator('h2').evaluate(node => node.getBoundingClientRect().top);
+    await activityBody.evaluate(node => {node.scrollTop = node.scrollHeight;});
+    assert.equal(await activity.locator('h2').evaluate(node => node.getBoundingClientRect().top), headerTop);
+    const scrollStyle = await activityBody.evaluate(node => ({size: getComputedStyle(node, '::-webkit-scrollbar').width, thumb: getComputedStyle(node, '::-webkit-scrollbar-thumb').backgroundColor}));
     assert.equal(scrollStyle.size, '12px');
     assert.equal(scrollStyle.thumb, 'rgb(89, 101, 121)');
     await page.screenshot({path: `../../.tmp/styles-activity-${width}.png`, fullPage: true});
@@ -137,7 +145,7 @@ try {
   await zoomOwner.evaluate(node => node.remove());
   await page.emulateMedia({forcedColors: 'active', reducedMotion: 'reduce'});
   await expect(page.getByRole('button', {name: 'Open current log'})).toBeVisible();
-  assert.equal(await page.locator('[data-console-pane=logs]').evaluate(node => getComputedStyle(node).scrollbarColor), 'auto');
+  assert.equal(await page.locator('[data-console-pane=logs] [data-pane-body]').evaluate(node => getComputedStyle(node).scrollbarColor), 'auto');
   await page.screenshot({path: '../../.tmp/styles-forced-colors.png', fullPage: true});
   await page.emulateMedia({forcedColors: 'none', reducedMotion: 'no-preference'});
   await page.evaluate(() => {const sheet = document.styleSheets[0]; const sizes = Array.from(document.querySelectorAll('body,h1,h2,h3,p,li,dt,dd,code,span,small,time,button,summary,input,label'), node => [node, parseFloat(getComputedStyle(node).fontSize)]); sizes.forEach(([node,size],i) => {node.setAttribute('data-text-zoom',String(i)); sheet.insertRule(`[data-text-zoom=\"${i}\"]{font-size:${size*2}px!important}`,sheet.cssRules.length);});});

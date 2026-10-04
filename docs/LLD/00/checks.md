@@ -347,14 +347,16 @@ Build a synthetic three-pane shell with a selectable list, evidence pane and act
 
 Verify exactly one logical pane owns pane-local keyboard/scroll commands at a time; active pane, DOM focus, row selection, opened record and hover remain distinguishable. Activating a pane must not create a record selection. Pointer or programmatic activation after prior keyboard use must never produce the current full-pane rectangular focus-outline regression; pane focus is localized to the rail/header treatment and nested controls still receive normal focus-visible rings. Modal focus temporarily supersedes and then restores the surviving invoker pane. Crossing the responsive threshold preserves the logical active pane where possible and otherwise chooses a deterministic labelled fallback without losing filters/working copies.
 
-At least one non-color structural cue plus the restrained current-locus treatment identifies the active pane under normal and forced-color/high-contrast presentation. No visible `ACTIVE` word/badge is required in the pane heading; screen-reader active-pane status remains available.
+At least one non-color structural cue plus the restrained current-locus treatment identifies the active pane under normal and forced-color/high-contrast presentation. The active pane title receives the governed readable current-title tint. No visible `ACTIVE` word/badge is required in the pane heading; screen-reader active-pane status remains available.
+
+Populate a pane with enough evidence to scroll. Verify the pane heading remains fixed while only the body scrolls, the scrollbar belongs to the body, focus targets are never hidden beneath the header, and switching/reflow preserves the same logical pane.
 
 <a id="chk-ui-status-strip"></a>
 ## CHK00.UI.STATUS_STRIP
 
 Render the authenticated shell against healthy READY, pre-ready/degraded and partially unavailable provider states. Verify the persistent bottom strip presents bounded current run/readiness/schema/build/trust facts without becoming a second event log or navigation area.
 
-At wide width the strip remains one compact line. At phone/narrow width it preserves run identity + readiness and exposes secondary facts through a labelled overflow/detail affordance rather than wrapping into a tall footer. Exact canonical details remain available through Diagnostics.
+At wide width the strip remains one compact line. Healthy `READY` uses the muted success/ready token and is clearly green without neon brightness; checking/pre-ready remains neutral/current and degraded/failed remains warning/destructive. At phone/narrow width it preserves run identity + readiness and exposes secondary facts through a labelled overflow/detail affordance rather than wrapping into a tall footer. Exact canonical details remain available through Diagnostics.
 
 Assert no secrets, full tokens, unrestricted filesystem paths or domain data appear; actual degraded/failed conditions are distinguishable from normal READY state without relying on color alone.
 
@@ -363,9 +365,9 @@ Assert no secrets, full tokens, unrestricted filesystem paths or domain data app
 
 Inspect/build the Main style entry and prove the shared style system has one declared cascade order and no append-only override dependency. Shared Foundation controls/panes/navigation/forms/collections/status consume semantic tokens/primitives; feature-local styles do not override global body/button/input/shell/pane selectors.
 
-Fail the check on duplicate raw palette declarations outside the token owner, ordinary `!important`, selector-order overrides that cross owning layers, or a feature copy of an existing shared primitive. Verify the stable `soma.css` entry can import/re-export the layered library without changing feature import paths.
+Fail the check on duplicate raw palette declarations outside the token owner, ordinary `!important`, selector-order overrides that cross owning layers, or a feature copy of an existing shared primitive. Verify the stable `soma.css` entry can import/re-export the layered library without changing feature import paths. Verify the shared console-cue primitive renders `$` for command/page titles, `--` for pane/major sections and `>` for nested subsections without those decorative glyphs entering accessible names.
 
-Exercise the shared metric grid with 6 and 7 items. Equal columns remain aligned; the odd final metric is intentionally centered/spanned rather than visually stranded.
+Exercise the shared metric grid with 6 and 7 items. Equal columns remain aligned; label/value content is vertically centered inside each metric box. With 7 items, the final metric remains in the natural next grid cell unless an owner explicitly requests a different layout—Foundation must not auto-center the orphan box.
 
 <a id="chk-ui-scrollbar"></a>
 ## CHK00.UI.SCROLLBAR
@@ -438,6 +440,10 @@ Start a real local host, verify its registry/DPAPI run secret/process birth/orig
 From a clean supported Windows source checkout, run `soma_setup.bat`, then `soma_run_console.bat`; verify foreground sanitized logging, READY origin, tray presence, and Ctrl+C graceful shutdown. Then execute `soma_run.bat` twice, `soma_stop.bat` twice, and a fresh run/stop cycle. The second run reuses the verified host, the second stop is idempotent, each new run receives a new run identity, no runtime action installs dependencies, and all detached startup/runtime logs are available under the canonical diagnostics root.
 
 Exercise `soma_reset_dev.bat`: verify it prints the exact LocalAppData development instance, does nothing when confirmation is absent/wrong, refuses a non-development target, gracefully stops a verified live host only after literal `RESET` confirmation, rebuilds migrations + DEV.SEED, leaves SOMA stopped, and never deletes the checkout or an unrelated/packaged instance.
+
+For detached `soma_run.bat`, verify the retained host has **no persistent console window**; only the transient BAT/launcher console may appear while authenticated READY is awaited. `soma_run_console.bat` remains the only source mode with an intentional persistent host terminal.
+
+Abruptly terminate a detached test host so its exact owner-protected registry/secret remain while the recorded process is provably dead. `soma_stop.bat` must clean only those exact stale runtime artifacts, preserve the database, return idempotent success, and leave observation `absent`; a subsequent Run must start normally. A live PID/birth/image mismatch, unreachable live host, foreign ACL/path, or otherwise untrusted candidate must still fail closed and preserve artifacts.
 
 Inject startup failure and READY timeout: launcher returns nonzero with an actionable current log path and never opens an unverified origin. Inject a graceful-stop timeout: no process-name/PID-only termination occurs.
 

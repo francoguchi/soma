@@ -13,9 +13,15 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def observation_failure(config, state):
+    action = (
+        "Run soma_stop.bat to clean the registration only if exact ownership and a dead process can be proven.\n"
+        if state == "stale"
+        else "No control action authorized.\n"
+    )
     return RuntimeError(
-        "Runtime observation: " + state + ". No control action authorized.\n"
-        "Inspect runtime state in " + str(config.path("runtime")) + "\n"
+        "Runtime observation: " + state + ".\n"
+        + action
+        + "Inspect runtime state in " + str(config.path("runtime")) + "\n"
         "Run diagnostics are in " + str(config.path("diagnostics")) + "\n"
         "Preserve the database; do not reset it to clear a runtime registration."
     )
@@ -148,7 +154,7 @@ def main(argv=None):
                 stdin=subprocess.DEVNULL,
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
-                creationflags=subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP,
+                creationflags=subprocess.CREATE_NO_WINDOW | subprocess.CREATE_NEW_PROCESS_GROUP,
             )
             verified = wait_ready(config, child)
             print("Verified SOMA READY " + verified[0]["origin"], flush=True)

@@ -9,11 +9,14 @@
   --soma-border: #30394b;
   --soma-text-primary: #e9eef8;
   --soma-text-muted: #a8b4ca;
+  --soma-command: #b7a2ff;
   --soma-current: #b7a2ff;
+  --soma-current-title: #d2c7ff;
+  --soma-info: #8fcbd6;
   --soma-focus: #d0c2ff;
   --soma-selection: #30254f;
-  --soma-warning: #ffdc88;
-  --soma-destructive: #ffadad;
+  --soma-warning: #d8b768;
+  --soma-destructive: #e58b86;
   --soma-text-disabled: #9ca6b8;
   --soma-font-body: system-ui,-apple-system,'Segoe UI',sans-serif;
   --soma-font-code: Consolas,monospace;
@@ -29,7 +32,7 @@
   --soma-on-brand: var(--soma-color-white);
   --soma-shadow-color: #0008;
   --soma-overlay: #000a;
-  --soma-success: #b3d9c4;
+  --soma-success: #8fc5a5;
   --soma-unknown: var(--soma-text-muted);
   --soma-space-1: 4px;
   --soma-metric-gap: 6px;
@@ -58,5 +61,11 @@
     --soma-surface: Canvas;
     --soma-surface-raised: Canvas;
     --soma-current: LinkText;
+    --soma-current-title: LinkText;
+    --soma-command: LinkText;
+    --soma-info: LinkText;
+    --soma-success: CanvasText;
+    --soma-warning: CanvasText;
+    --soma-destructive: CanvasText;
   }
 }

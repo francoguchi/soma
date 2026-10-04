@@ -4,7 +4,7 @@ import re
 import sys
 
 from soma.foundation.errors import SomaError
-from soma.foundation.filesystem import OwnedArtifact, safe_path
+from soma.foundation.filesystem import OwnedArtifact, remove_owned, safe_path
 from soma.foundation.identity import require_uuid4
 from soma.foundation.security.dpapi import WindowsDpapiProvider
 from soma.foundation.strict_json import canonical_json_bytes, loads_strict_bytes
@@ -123,26 +123,7 @@ def direct_request(record, secret, route, *, body=None, timeout=2):
         connection.close()
 
 
-def inspect_candidate(config):
-    registry = config.path("runtime", "runtime.json")
-    if not registry.exists():
-        # An owned instance can be bootstrapping before registry publication.
-        # Inspect the existing lock without creating files or altering its bytes.
-        import msvcrt
-
-        lock = config.path("data", "soma.instance.lock")
-        if lock.exists():
-            path = safe_path(config.instance_root, "data/soma.instance.lock")
-            verify_owner(path.parent)
-            verify_owner(path)
-            with path.open("r+b", buffering=0) as handle:
-                try:
-                    msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
-                except OSError:
-                    raise SomaError("RUNTIME_CANDIDATE", "Instance ownership is not yet verified.") from None
-                else:
-                    msvcrt.locking(handle.fileno(), msvcrt.LK_UNLCK, 1)
-        return None
+def _read_registry(config):
     try:
         record = loads_strict_bytes(
             owned_read(config, "runtime/runtime.json", 16384), max_bytes=16384
@@ -168,6 +149,35 @@ def inspect_candidate(config):
         require_uuid4(record["data_instance_id"])
         if record["protected_secret"] != "run-" + record["run_id"] + ".dpapi":
             raise trust_failure()
+        return record
+    except SomaError:
+        raise
+    except Exception:
+        raise trust_failure() from None
+
+
+def inspect_candidate(config):
+    registry = config.path("runtime", "runtime.json")
+    if not registry.exists():
+        # An owned instance can be bootstrapping before registry publication.
+        # Inspect the existing lock without creating files or altering its bytes.
+        import msvcrt
+
+        lock = config.path("data", "soma.instance.lock")
+        if lock.exists():
+            path = safe_path(config.instance_root, "data/soma.instance.lock")
+            verify_owner(path.parent)
+            verify_owner(path)
+            with path.open("r+b", buffering=0) as handle:
+                try:
+                    msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
+                except OSError:
+                    raise SomaError("RUNTIME_CANDIDATE", "Instance ownership is not yet verified.") from None
+                else:
+                    msvcrt.locking(handle.fileno(), msvcrt.LK_UNLCK, 1)
+        return None
+    try:
+        record = _read_registry(config)
         process = process_identity(record["pid"])
         # Windows venv launchers run the base interpreter executable.
         expected = {
@@ -183,6 +193,35 @@ def inspect_candidate(config):
         raise trust_failure() from None
     except Exception:
         raise trust_failure() from None
+
+
+def cleanup_exact_owned_stale(config):
+    """Remove only a dead run's revalidated registry and protected secret."""
+    from soma.foundation.persistence.instance import InstanceLease
+
+    with InstanceLease(config) as lease:
+        record = _read_registry(config)
+        if record["data_instance_id"] != lease.instance_id:
+            raise trust_failure()
+        registry = OwnedArtifact.capture(config.instance_root, "runtime/runtime.json")
+        secret_relative = "runtime/" + record["protected_secret"]
+        raw = owned_read(config, secret_relative, 65664)
+        WindowsDpapiProvider().unprotect_current_user(raw, "run_control", record["run_id"])
+        secret = OwnedArtifact.capture(config.instance_root, secret_relative)
+        try:
+            process_identity(record["pid"])
+        except SomaError as exc:
+            if exc.code != "RUNTIME_PROCESS_STALE":
+                raise trust_failure() from None
+        else:
+            raise trust_failure()
+        if not registry.matches(config.instance_root) or not secret.matches(config.instance_root):
+            raise trust_failure()
+        if not remove_owned(config.instance_root, registry):
+            raise trust_failure()
+        if not remove_owned(config.instance_root, secret):
+            raise trust_failure()
+        return True
 
 
 def verify_candidate(config, candidate):
@@ -221,9 +260,16 @@ def verify_current(config, *, allow_starting=False):
 
 
 def stop_current(config):
-    verified = verify_current(config, allow_starting=True)
-    if verified is None:
+    from soma.runtime.observation import observe
+
+    observation = observe(config)
+    if observation.state == "absent":
         return True
+    if observation.state == "stale":
+        return cleanup_exact_owned_stale(config)
+    if observation.state not in {"verified_ready", "verified_not_ready"}:
+        raise trust_failure()
+    verified = observation.verified
     record, secret, process = verified
     # Retained process handle prevents PID reuse from satisfying the stop wait.
     wait = VerifiedProcessWait(process)
