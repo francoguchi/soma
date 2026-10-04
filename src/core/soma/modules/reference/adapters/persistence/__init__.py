@@ -1,0 +1,1 @@
+"""Reference persistence adapters."""
