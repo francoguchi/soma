@@ -10,8 +10,9 @@ from soma.foundation.time import utc_epoch_seconds
 
 
 class Authentication:
-    def __init__(self, factory, sessions, log):
+    def __init__(self, factory, sessions, log, *, profile_participant=None):
         self.factory, self.sessions, self.log = factory, sessions, log
+        self.profile_participant = profile_participant
         self.passwords, self.throttle = Passwords(), AuthenticationThrottle()
         self.setup_lock = threading.Lock()
         self.login_lock = threading.Lock()
@@ -79,6 +80,17 @@ class Authentication:
                     "INSERT INTO local_admin_credentials VALUES (1,?,?,1,?,?)",
                     (actor, phc, now, now),
                 )
+                if self.profile_participant is not None:
+                    profile_id = self.profile_participant.create_for_local_admin(
+                        uow,
+                        parent_command_id=command,
+                        actor_id=actor,
+                        display_name="Local Administrator",
+                    )
+                    if profile_id != actor:
+                        raise ValidationError(
+                            "Local User Profile participant returned a mismatched actor identity."
+                        )
                 event = AuditEvent(
                     new_uuid4(),
                     "foundation.local_admin_configured",
