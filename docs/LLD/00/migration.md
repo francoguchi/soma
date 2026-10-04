@@ -92,7 +92,7 @@ When closing a donor row, replace **PENDING** with `REUSED`, `REWRITTEN`, `REJEC
 ### IMP-00-07 — Foundation shell and runtime convergence
 
 - [x] **R00.07-A — REWRITTEN:** Beta/current `LocalHostLifecycle` reuse is corrected so process-internal host lifecycle no longer includes controller absence/trust states. Preserve useful host/trust/launcher implementation, but split it into `RUNTIME.LIFECYCLE` and `RUNTIME.CONTROL_OBSERVATION` under the current exact-run trust model.
-- [x] **R00.07-B — NEW:** closed top-level `UI.WORKSPACE_REGISTRY`, operational `UI.VISUAL_GRAMMAR`, and `UI.TEXT_INTEGRITY` were discovered through live Foundation review. They have no direct Beta implementation donor; current code is converged in place rather than replaced wholesale.
+- [x] **R00.07-B — NEW:** closed top-level `UI.WORKSPACE_REGISTRY`, operational `UI.VISUAL_GRAMMAR`, `UI.TEXT_INTEGRITY`, explicit `UI.PANE_FOCUS`, and persistent `UI.OPERATOR_STATUS_STRIP` were discovered through live Foundation review. They have no direct Beta implementation donor; current code is converged in place rather than replaced wholesale.
 
 ## Cross-scope reconciliation
 
@@ -110,6 +110,8 @@ Live Foundation review exposed additional accepted Foundation corrections:
 - the functional shell had drifted toward generic rounded-card dashboard presentation and narrow vertical stacking, so the visual grammar now defines dense pane-based SOMA composition and explicit narrow recomposition;
 - visible mojibake such as `Â·` is now a governed text-integrity defect;
 - host lifecycle and controller observation are split before later scopes depend on runtime state semantics.
+
+Second live visual review confirmed the first convergence pass was directionally correct but still too static. The accepted refinement adds viewport-filling pane ownership, explicit active-pane/focus language, restrained Electric-blue current-locus accents, stronger typographic hierarchy, compact controls/unavailable state, runtime-event vs warning separation, and a persistent operator status strip.
 
 ## Completion rule
 
