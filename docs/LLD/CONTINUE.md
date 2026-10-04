@@ -6,20 +6,20 @@ This is the single current-state entry point for humans and agents. Do not appen
 
 | Lane | Current value |
 |---|---|
-| Implementation scope | `00 — Foundation` |
-| Implementation branch | `feat/00-foundation` |
-| Implementation goal | `IMP-00-07 — Foundation shell and runtime convergence` |
-| Implementation goal file | `docs/implementation/00/00.07.md` |
-| Implementation migration ledger | `docs/LLD/00/migration.md` |
-| Queued next implementation | `01 — Identity / Reference` (`IMP-01-01..06`), after required Foundation checkpoints |
-| Design scope | `00 — Foundation convergence` |
-| Design branch | `design/00-foundation-convergence` |
-| Design source | live Foundation desktop/mobile review + accepted SOMA/init.Habits directional references |
-| Design migration ledger | `docs/LLD/00/migration.md` |
+| Implementation scope | `01 — Identity / Reference` |
+| Implementation branch | `feat/01-identity-reference` |
+| Implementation goal | `IMP-01-01 — Reference kernel, profile and Customer` |
+| Implementation goal file | `docs/implementation/01/01.01.md` |
+| Implementation migration ledger | `docs/LLD/01/migration.md` |
+| Queued next implementation | `02 — Tickets Core`, after Scope-02 design approval and required Scope-01 dependencies |
+| Design scope | `02 — Tickets Core` |
+| Design branch | `design/02-tickets-core` |
+| Design source | `SOMA Beta LLD-03 — Service Requests, RFCs, Device References, Ticket Relationships` |
+| Design migration ledger | `docs/LLD/02/migration.md` |
 | Overall migration map | `docs/LLD/MIGRATION.md` |
-| Mode | Foundation convergence checkpoint; Scope 02 design is paused, not discarded |
-| Implementation note | Scope-00 implementation is complete on `feat/00-foundation`; accepted main baseline `5ccaef1` is reconciled for PR #1, preserving completed Foundation implementation/evidence and newer Scope-01/02 documentation. IMP-01-01 remains unstarted; PR merge is a separate next action. |
-| Design blocker | none; IMP-00-07 implementation and required live review are complete; Scope 02 remains paused until selected |
+| Mode | parallel design N+1 / implementation N |
+| Implementation note | Scope 00 merged through PR #1 at `429793fc`; Foundation is the accepted platform baseline. Scope 01 is approved and begins from the post-merge `main` baseline on `feat/01-identity-reference`. |
+| Design blocker | none; Scope 02 design resumes from the merged Foundation baseline |
 | Certification | deferred until whole-application implementation and live testing |
 
 ## Resume
@@ -39,7 +39,7 @@ The intended handoff can be as small as:
 4. Implement, run the goal's focused checks plus directly affected tests, and fix failures.
 5. Update the goal's Run/Remaining/status, close its migration rows, then advance this file to the next implementation goal.
 
-Current checkpoint: IMP-00-01..07 are working, with prior implementation/live evidence preserved in their goals and closed migration rows. Main reconciliation changes documentation only; 57 focused runtime/tooling checks, 50 Main tests, typecheck/build, contract sync and documentation impact checks passed before pushing PR #1. Fresh verification on 2026-10-04 confirmed current main is included, reran those checks successfully after rebuilding matching assets, and found PR #1 OPEN/MERGEABLE/CLEAN. Do not begin IMP-01-01 in this pass.
+Current checkpoint: Scope 00 is merged and working. Scope 01 design is approved; `IMP-01-01` is the active implementation goal. Begin from the named R01.01 donor rows only: preserve/restructure matching, validation, Account Code review, Customer/Profile behavior and focused regressions into the current domain/application/ports/adapters architecture. Do not begin Contacts, Dispatch, Settings, public Reference API routes or feature UI in this increment.
 
 ### Design lane
 
@@ -49,13 +49,13 @@ Current checkpoint: IMP-00-01..07 are working, with prior implementation/live ev
 4. Record every donor behavior/code slice as reused, rewritten, rejected, deferred, or new.
 5. Update the design scope backend/frontend/checks/contracts/migrations and create implementation goals only after ownership and behavior are clear.
 
-Current next action: keep `design/02-tickets-core` paused until selected. Its accepted documentation and Scope-01 goals are preserved; no future-scope implementation is started.
+Current next action: resume `design/02-tickets-core` with D02-A through D02-C first: Service Request identity/adoption, Customer/Contact relationship ownership, and accepted Advanced Search source authority. Continue recording every Beta LLD-03 behavior as reused, rewritten, rejected, deferred, or new; do not allocate Scope-02 implementation goals until its pre-approval audit is complete.
 
 ## Do not
 
 Do not reconstruct project status by rereading Alpha/Beta or the whole repository. Do not copy Beta wholesale, preserve its old directory ownership, or treat compiled/static artifacts as authority.
 
-Do not merge implementation-in-progress from `feat/00-foundation` into design branches merely to inspect it. Foundation convergence updates the owning Scope-00 LLD first, then Codex reconciles those changes into its local implementation. Scope 02 remains frozen until the convergence checkpoint is live-reviewed.
+Do not merge implementation-in-progress from `feat/01-identity-reference` into the Scope-02 design branch merely to design Tickets. Scope 02 consumes accepted contracts from `main`; if Scope-01 implementation proves an accepted contract wrong, update the owning LLD explicitly and reconcile dependents.
 
 Do not create a branch/PR/certification packet per goal, run unrelated full suites, perform release packaging/signing, or block design on future implementation details. A `working` goal is a development checkpoint, not certification.
 
