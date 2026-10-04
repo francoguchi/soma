@@ -175,15 +175,55 @@ A clean implementation partition is possible without temporary ownership: matchi
 
 **APPROVED — 2026-10-03.** Owner approved continuation after PASS-1 through PASS-4 and Foundation reconciliation. The design packet may now be treated as the accepted Scope-01 baseline; implementation remains queued and is not certified.
 
+## IMP-01-01 pre-coding reconciliation
+
+Completed before handing implementation to the coding agent. The purpose is to remove architectural choices from the coding pass: the agent should execute this map and surface gaps, not rediscover ownership.
+
+### Foundation / current-architecture gaps discovered
+
+- **Unicode runtime dependency:** Beta matching intentionally depends on `unicodedata2==17.0.1` so NFKC behavior is pinned to Unicode 17 across supported Python lines. Current SOMA does not yet declare this dependency. IMP-01-01 must add the exact runtime dependency in build metadata before importing the donor algorithm; built-in `unicodedata` or ambient interpreter Unicode behavior is not an acceptable fallback.
+- **AUTH.LOCAL_ADMIN integration seam:** the accepted Scope-00 contract already requires an optional same-UoW profile participant, but the current Foundation implementation does not yet inject/call one. IMP-01-01 must complete that **existing** optional seam only: Foundation-only composition still works with no participant; assembled Scope 01 requires `PROFILE.AUTH_PARTICIPANT` for fresh setup. The participant receives the existing UoW, parent command ID and actor ID, appends its own scope-01 audit in that same UoW, never commits, and any failure rolls back credentials/profile/audit/session issuance together.
+- **NO_CHANGE boundary:** current `CommandBoundary` assumes every first execution supplies audit evidence. Scope-01 contracts require explicit semantic NO_CHANGE with **receipt + exact replay result only**, no domain/history write and no fake audit event. The Foundation replay contract is now clarified accordingly. Implementation must make change/no-change explicit to the boundary; it must not infer from result strings, and an APPLIED mutation still fails when required audit is absent.
+- **Lifecycle evidence migration order:** Beta Customer create/descriptive-update already writes reference lifecycle evidence. Therefore `reference_lifecycle_events` is now owned by **M01.001**, not introduced later by M01.003. This preserves Customer/Contact chronology from their first accepted mutations while `REF.LIFECYCLE` archive/reactivate commands remain an IMP-01-03 behavior.
+- **Layering:** Beta `matching.py` and `account_code_review.py` mix pure algorithms with SQL reads. Current SOMA does not. Keep deterministic normalization/hash/document logic in `domain/`; relocate persisted matching-profile checks, Customer state/claimant reads and other SQL to application/adapters.
+- **Audit API mismatch:** Beta's `AuditRegistry/ObjectContract/AuditEventInput` types are implementation donors only. Current Foundation uses `AuditContract/AuditEvent/AuditWriter`. Re-register only the actions needed by IMP-01-01 with current contracts and privacy rules; defer Contact/Dispatch/Settings audit actions to their goals.
+- **Command API mismatch:** Beta services use `CommandEnvelope/PreparedMutation`; current Foundation `CommandBoundary.execute` has a different API. Preserve ordering, replay identity, revision/review checks, atomicity and result semantics—not the Beta service wrapper classes.
+
+### Exact IMP-01-01 donor disposition target
+
+| Beta donor | Current target | Pre-coding disposition |
+|---|---|---|
+| `domain/matching.py` | `src/core/soma/modules/reference/domain/matching.py` + persistence guard in adapters/application | **REUSE/RESTRUCTURE**: copy pinned Unicode asset validation + normalization behavior; move SQL profile check out of domain. |
+| `assets/unicode_match_v1.json` | `src/core/soma/modules/reference/assets/unicode_match_v1.json` | **REUSE** byte-for-byte after verifying recorded SHA-256; package it explicitly. |
+| `domain/validation.py` | `domain/validation.py` | **PARTIAL REUSE** now: single-line/display-name/Customer-name/Account-Code/reason helpers. Contact/email/Dispatch validators stay deferred to IMP-01-02/03. |
+| `domain/account_code_review.py` | `domain/account_code.py` + `application/customer.py`/read adapter | **RESTRUCTURE**: preserve canonical review document/fingerprint + constant-time comparison semantics; move claimant/customer SQL reads out of domain. |
+| `application/profile_service.py` | `application/profile.py` + `ports/profile.py` | **REWRITE AROUND CURRENT FOUNDATION**: preserve singleton/profile/revision/same-UoW participant behavior; discard service-owned factory/UoW/boundary construction. |
+| `application/customer_service.py` | `application/customer.py` + adapters | **REWRITE AROUND CURRENT FOUNDATION**: preserve precondition order, conflict/review semantics, supersession history and atomic write ordering; discard Beta wrapper/infrastructure ownership. |
+| `audit_registry.py` | `modules/reference/audit.py` | **REWRITE CONTRACT REGISTRATION** using current Foundation `AuditContract/AuditEvent/AuditWriter`; only IMP-01-01 actions now. |
+| `0002_identity_reference.sql` | `db/migrations/01/001_customer_profile.sql` | **SPLIT/REWRITE**: matching/profile/Customer/Account-Code + shared lifecycle-evidence table only; add current immutable/FK/generation/append-only guards; remove SQLite wall clock and all later-scope tables. |
+| focused `test_reference_*.py` | `tests/core/reference/` | **SELECTIVE REUSE** of vectors/regressions; rewrite fixtures around current encrypted Foundation/UoW/replay APIs. |
+
+### IMP-01-01 stop conditions
+
+Do not let implementation silently continue when any of these is unresolved:
+
+- `unicodedata2` is absent/mismatched from Unicode 17;
+- Foundation setup cannot call the profile participant inside its existing UoW;
+- NO_CHANGE still requires/fabricates an audit event;
+- Customer create/descriptive correction cannot persist lifecycle evidence under M01.001;
+- matching/review domain modules still execute SQL directly;
+- a Beta service creates its own ConnectionFactory/UoW/AuditWriter;
+- M01.001 contains Contact, Dispatch, Settings or Beta migration-time wall-clock behavior.
+
 ## Implementation donor checklist
 
 A checked row means the donor decision is closed, not that the implementation goal is complete. Before one `IMP-01-xx` goal becomes `working`, all rows for that goal must have an explicit terminal disposition.
 
 ### IMP-01-01 — Reference kernel, profile and Customer
 
-- [ ] **R01.01-A — PENDING:** inspect/restructure `src/soma/reference/domain/{matching.py,validation.py}` plus `assets/unicode_match_v1.json`. Strong reuse candidate: pinned Unicode asset integrity/profile behavior and bounded normalization/validation algorithms; do not preserve old package paths.
-- [ ] **R01.01-B — PENDING:** inspect/restructure `application/{profile_service.py,customer_service.py}`, `domain/account_code_review.py`, and `audit_registry.py` into current application/domain/audit ownership. Preserve same-UoW/replay/review-fingerprint semantics, but remove service-owned Foundation construction.
-- [ ] **R01.01-C — PENDING:** inspect only the matching/profile/Customer/Account-Code slices of `src/soma/migrations/0002_identity_reference.sql`; rewrite them into `M01.001`. Reject migration-time SQLite wall clock, stale username authority, and monolithic packet ownership.
+- [ ] **R01.01-A — PENDING:** execute the pre-coding map above for `domain/{matching.py,validation.py}` + `assets/unicode_match_v1.json`: reuse the pinned asset/normalizer, add pinned `unicodedata2==17.0.1`, move persisted-profile SQL out of domain, and migrate only IMP-01-01 validators.
+- [ ] **R01.01-B — PENDING:** execute the reconciled profile/Customer/Account-Code/audit rewrite above. Complete the existing optional Foundation auth-participant seam and explicit NO_CHANGE boundary semantics; preserve same-UoW/replay/review-fingerprint behavior while removing Beta service-owned Foundation construction.
+- [ ] **R01.01-C — PENDING:** rewrite only matching/profile/Customer/Account-Code **plus shared `reference_lifecycle_events`** from Beta `0002_identity_reference.sql` into M01.001. Add current FK/immutable/generation/append-only guards; reject SQLite wall clock, stale username authority and all Contact/Dispatch/Settings tables.
 - [ ] **R01.01-D — PENDING:** selectively migrate focused regressions from `tests/test_reference_{matching,matching_profile_guard,customers,customer_replay_results,no_change_acceptance,schema_contract,replay_results}.py` plus Local User Profile cases from Beta acceptance evidence.
 
 ### IMP-01-02 — Contacts and communication identity
@@ -195,7 +235,7 @@ A checked row means the donor decision is closed, not that the implementation go
 ### IMP-01-03 — Dispatch and governed lifecycle
 
 - [ ] **R01.03-A — PENDING:** inspect/restructure `application/{dispatch_service.py,lifecycle_service.py}` and `domain/dependencies.py`. Preserve same-UoW Site participant and bounded fail-closed dependency/lifecycle mechanics; concrete Inventory/Site owners remain outside scope 01.
-- [ ] **R01.03-B — PENDING:** inspect Dispatch/lifecycle slices of `src/soma/migrations/0002_identity_reference.sql`; rewrite into `M01.003` with current address-ownership and append-only evidence guards.
+- [ ] **R01.03-B — PENDING:** inspect the Dispatch slice of `src/soma/migrations/0002_identity_reference.sql`; rewrite into M01.003 with current address-ownership guards. Reuse the append-only `reference_lifecycle_events` store already created by M01.001 rather than reintroducing lifecycle DDL.
 - [ ] **R01.03-C — PENDING:** selectively migrate `tests/test_reference_{lifecycle_replay_results,inventory_dependencies,acceptance_closure}.py` only for current Dispatch/lifecycle/dependency behavior; do not import future owner-domain implementation.
 
 ### IMP-01-04 — Typed settings store
