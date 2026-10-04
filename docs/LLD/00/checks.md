@@ -95,16 +95,6 @@
       "covers": ["UI.WORKSPACE_REGISTRY", "UI.CAPABILITY_STATE", "UI.ROUTING"]
     },
     {
-      "id": "CHK00.UI.STYLE_LIBRARY",
-      "anchor": "chk-ui-style-library",
-      "covers": ["UI.STYLE_LIBRARY"]
-    },
-    {
-      "id": "CHK00.UI.SCROLLBAR",
-      "anchor": "chk-ui-scrollbar",
-      "covers": ["UI.SCROLLBAR", "UI.SCROLL"]
-    },
-    {
       "id": "CHK00.UI.VISUAL_GRAMMAR",
       "anchor": "chk-ui-visual-grammar",
       "covers": ["UI.VISUAL_GRAMMAR", "UI.SHELL", "UI.RESPONSIVE", "UI.BRAND", "UI.TOKENS"]
@@ -123,6 +113,16 @@
       "id": "CHK00.UI.STATUS_STRIP",
       "anchor": "chk-ui-status-strip",
       "covers": ["UI.OPERATOR_STATUS_STRIP"]
+    },
+    {
+      "id": "CHK00.UI.STYLE_LIBRARY",
+      "anchor": "chk-ui-style-library",
+      "covers": ["UI.STYLE_LIBRARY"]
+    },
+    {
+      "id": "CHK00.UI.SCROLLBAR",
+      "anchor": "chk-ui-scrollbar",
+      "covers": ["UI.SCROLLBAR"]
     },
     {
       "id": "CHK00.PAGE.COLLECTION",
@@ -345,10 +345,9 @@ Capture development screenshots under ignored scratch output for review; screens
 
 Build a synthetic three-pane shell with a selectable list, evidence pane and activity pane. Exercise pointer activation, Tab/Shift+Tab traversal, arrows/page/scroll commands, row selection, modal open/close and responsive pane switching.
 
-Verify exactly one logical pane owns pane-local keyboard/scroll commands at a time; active pane, DOM focus, row selection, opened record and hover remain distinguishable. Activating a pane must not create a record selection. Modal focus temporarily supersedes and then restores the surviving invoker pane. Crossing the responsive threshold preserves the logical active pane where possible and otherwise chooses a deterministic labelled fallback without losing filters/working copies.
+Verify exactly one logical pane owns pane-local keyboard/scroll commands at a time; active pane, DOM focus, row selection, opened record and hover remain distinguishable. Activating a pane must not create a record selection. Pointer or programmatic activation after prior keyboard use must never produce the current full-pane rectangular focus-outline regression; pane focus is localized to the rail/header treatment and nested controls still receive normal focus-visible rings. Modal focus temporarily supersedes and then restores the surviving invoker pane. Crossing the responsive threshold preserves the logical active pane where possible and otherwise chooses a deterministic labelled fallback without losing filters/working copies.
 
-At least one non-color structural cue plus the restrained Electric-blue current-locus accent identifies the active pane under normal and forced-color/high-contrast presentation.
-A focus-visible pane has only a localized rail/header cue, never a rectangle around the full pane. No visible ACTIVE badge is required; a screen-reader status announces the active pane. An odd final Durable-jobs metric is centered or intentionally spans the row. The stable style entry imports the ordered Foundation layers, and all governed scroll owners use the shared semantic scrollbar tokens with usable forced-color/native fallback.
+At least one non-color structural cue plus the restrained current-locus treatment identifies the active pane under normal and forced-color/high-contrast presentation. No visible `ACTIVE` word/badge is required in the pane heading; screen-reader active-pane status remains available.
 
 <a id="chk-ui-status-strip"></a>
 ## CHK00.UI.STATUS_STRIP
@@ -358,6 +357,22 @@ Render the authenticated shell against healthy READY, pre-ready/degraded and par
 At wide width the strip remains one compact line. At phone/narrow width it preserves run identity + readiness and exposes secondary facts through a labelled overflow/detail affordance rather than wrapping into a tall footer. Exact canonical details remain available through Diagnostics.
 
 Assert no secrets, full tokens, unrestricted filesystem paths or domain data appear; actual degraded/failed conditions are distinguishable from normal READY state without relying on color alone.
+
+<a id="chk-ui-style-library"></a>
+## CHK00.UI.STYLE_LIBRARY
+
+Inspect/build the Main style entry and prove the shared style system has one declared cascade order and no append-only override dependency. Shared Foundation controls/panes/navigation/forms/collections/status consume semantic tokens/primitives; feature-local styles do not override global body/button/input/shell/pane selectors.
+
+Fail the check on duplicate raw palette declarations outside the token owner, ordinary `!important`, selector-order overrides that cross owning layers, or a feature copy of an existing shared primitive. Verify the stable `soma.css` entry can import/re-export the layered library without changing feature import paths.
+
+Exercise the shared metric grid with 6 and 7 items. Equal columns remain aligned; the odd final metric is intentionally centered/spanned rather than visually stranded.
+
+<a id="chk-ui-scrollbar"></a>
+## CHK00.UI.SCROLLBAR
+
+Render governed vertical/horizontal scroll owners in Core Dark using Chromium/WebKit-compatible styling and standards `scrollbar-color`/`scrollbar-width` behavior where supported. Verify shared semantic scrollbar tokens produce a visible themed thumb/track across shell, panes, lists, navigation and modal overflow without per-feature CSS.
+
+At hover/active state the thumb gains contrast without using warning/destructive/success semantics. At 200% zoom scrollbars remain usable. In forced-colors/high-contrast mode, branded scrollbar forcing is disabled so the system can provide appropriate colors. Where custom scrollbar theming is unsupported, native scrolling remains fully usable.
 
 <a id="chk-ui-text-integrity"></a>
 ## CHK00.UI.TEXT_INTEGRITY
@@ -399,7 +414,7 @@ Register a synthetic reversible owner action with exact preview/fingerprint and 
 <a id="chk-ui-diagnostics"></a>
 ## CHK00.UI.DIAGNOSTICS
 
-Open the System/Diagnostics surface on a healthy and partially failing host. Verify build/run/schema/capability/job/executor/connection/transaction/log state is visible, local time is readable, and canonical evidence remains inspectable where appropriate. Normal lifecycle transitions render as runtime/event chronology; warning/error codes remain a separate list and READY/TRAY_READY-style normal events never masquerade as errors. Capability rows correspond to actually registered descriptors; absent future workspace owners do not appear as synthetic capability entries. Repeated unavailable state remains concise while its full meaning is accessible. Provider failure produces partial/unavailable panels without mutating jobs/migrations/domain state or exposing secrets/raw bodies.
+Open the System/Diagnostics surface on a healthy and partially failing host. Verify build/run/schema/capability/job/executor/connection/transaction/log state is visible, local time is readable, and canonical evidence remains inspectable where appropriate. Durable-job metrics remain horizontally balanced for the current odd number of states rather than leaving the final state stranded in one half-column. Normal lifecycle transitions render as runtime/event chronology; warning/error codes remain a separate list and READY/TRAY_READY-style normal events never masquerade as errors. Capability rows correspond to actually registered descriptors; absent future workspace owners do not appear as synthetic capability entries. Repeated unavailable state remains concise while its full meaning is accessible. Provider failure produces partial/unavailable panels without mutating jobs/migrations/domain state or exposing secrets/raw bodies.
 
 <a id="chk-ui-appearance"></a>
 ## CHK00.UI.APPEARANCE
@@ -495,13 +510,3 @@ Exercise a synthetic registered deliberate action. Verify continuous 3000 ms cli
 ## CHK00.DOC.IMPACT
 
 Validate metadata/index creation, modify one item and one mapped source path, and verify direct/indirect impact paths. Remove an edge and verify baseline/current union still reports the former dependent. Unmapped changed code is reported as a gap. Verify `docs/LLD/CONTINUE.md` resolves to an existing scope/goal/ledger, duplicate or malformed migration-row IDs fail validation, and a goal marked `working` fails while any matching `RNN.KK-*` row remains unchecked/PENDING.
-
-<a id="chk-ui-style-library"></a>
-## CHK00.UI.STYLE_LIBRARY
-
-Verify `soma.css` remains the stable entry and declares the ordered reset/tokens/base/primitives/components/utilities/features layers. Shared rules live in their owning library files, components use low-specificity classes/data attributes, and feature CSS has no global overrides. Confirm all seven semantic layer imports are present.
-
-<a id="chk-ui-scrollbar"></a>
-## CHK00.UI.SCROLLBAR
-
-Exercise shell navigation, a pane, a bounded list/table and a modal at wide, ~1040px and narrow widths. Verify the shared Core Dark thumb/track are visible and usable in both axes; hover increases neutral contrast. Confirm standards and Chromium/WebKit rules consume scrollbar tokens and forced colors return scrollbar styling to system colors. Scroll ownership and touch/keyboard behavior remain unchanged.

@@ -1,3 +1,62 @@
-/* Foundation tokens styles. */
-:root{color-scheme:dark;--palette-slate:#0f1115;--palette-blue:#5a33ff;--palette-mist:#eceef2;--palette-pure:#ffffff;--surface:#171b23;--surface-raised:#1d2330;--border:#30394b;--text:#e9eef8;--muted:#a8b4ca;--accent:#b7a2ff;--focus:#d0c2ff;--selection:#30254f;--warning:#ffdc88;--destructive:#ffadad;--disabled:#9ca6b8;--font-body:system-ui,-apple-system,'Segoe UI',sans-serif;--font-code:Consolas,monospace;--space:8px;--radius:2px;--soma-scrollbar-track:#11151c;--soma-scrollbar-thumb:#596579;--soma-scrollbar-thumb-hover:#8292aa;--soma-scrollbar-size:12px}
-:root{background:var(--palette-slate)}
+:root {
+  color-scheme: dark;
+  --soma-color-slate: #0f1115;
+  --soma-color-electric: #5a33ff;
+  --soma-color-mist: #eceef2;
+  --soma-color-white: #ffffff;
+  --soma-surface: #171b23;
+  --soma-surface-raised: #1d2330;
+  --soma-border: #30394b;
+  --soma-text-primary: #e9eef8;
+  --soma-text-muted: #a8b4ca;
+  --soma-current: #b7a2ff;
+  --soma-focus: #d0c2ff;
+  --soma-selection: #30254f;
+  --soma-warning: #ffdc88;
+  --soma-destructive: #ffadad;
+  --soma-text-disabled: #9ca6b8;
+  --soma-font-body: system-ui,-apple-system,'Segoe UI',sans-serif;
+  --soma-font-code: Consolas,monospace;
+  --soma-space-unit: 8px;
+  --soma-radius-control: 2px;
+  --soma-radius-scrollbar: 8px;
+  --soma-scrollbar-track: #11151c;
+  --soma-scrollbar-thumb: #596579;
+  --soma-scrollbar-thumb-hover: #8292aa;
+  --soma-scrollbar-size: 12px;
+  background: var(--soma-color-slate);
+  --soma-canvas: var(--soma-color-slate);
+  --soma-on-brand: var(--soma-color-white);
+  --soma-shadow-color: #0008;
+  --soma-overlay: #000a;
+  --soma-success: #b3d9c4;
+  --soma-unknown: var(--soma-text-muted);
+  --soma-space-1: 4px;
+  --soma-metric-gap: 6px;
+  --soma-space-2: 8px;
+  --soma-space-3: 12px;
+  --soma-space-4: 16px;
+  --soma-font-size-body: 14px;
+  --soma-font-size-evidence: 12px;
+  --soma-line-height-body: 1.5;
+  --soma-header-height: 48px;
+  --soma-navigation-width: 208px;
+  --soma-status-height: 28px;
+  --soma-status-height-narrow: 32px;
+  --soma-control-height: 30px;
+  --soma-control-height-field: 40px;
+
+}
+
+@media (forced-colors:active) {
+  :root {
+    --soma-border: CanvasText;
+    --soma-text-primary: CanvasText;
+    --soma-text-muted: CanvasText;
+    --soma-focus: Highlight;
+    --soma-selection: Highlight;
+    --soma-surface: Canvas;
+    --soma-surface-raised: Canvas;
+    --soma-current: LinkText;
+  }
+}

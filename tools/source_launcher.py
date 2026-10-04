@@ -12,6 +12,15 @@ import webbrowser
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def observation_failure(config, state):
+    return RuntimeError(
+        "Runtime observation: " + state + ". No control action authorized.\n"
+        "Inspect runtime state in " + str(config.path("runtime")) + "\n"
+        "Run diagnostics are in " + str(config.path("diagnostics")) + "\n"
+        "Preserve the database; do not reset it to clear a runtime registration."
+    )
+
+
 def check_python():
     if os.name != "nt" or sys.version_info[:2] not in {(3, 13), (3, 14)}:
         raise RuntimeError("Source development requires Windows Python 3.13 or 3.14.")
@@ -74,7 +83,7 @@ def wait_ready(config, child=None, *, seconds=30):
         if observation.state == "verified_ready":
             return observation.verified
         if observation.state in {"stale", "untrusted", "unreachable"}:
-            raise RuntimeError("Runtime observation: " + observation.state + ". Inspect the exact instance before retrying.")
+            raise observation_failure(config, observation.state)
         if child is not None and child.poll() is not None:
             raise RuntimeError(
                 "Host startup failed. Inspect the run logs in " + str(config.path("diagnostics"))
@@ -119,7 +128,7 @@ def main(argv=None):
         if args.action != "host":
             observation = observe(config)
             if observation.state in {"stale", "untrusted", "unreachable"}:
-                raise RuntimeError("Runtime observation: " + observation.state + ". No control action authorized.")
+                raise observation_failure(config, observation.state)
             verified = observation.verified if observation.state == "verified_ready" else None
             if observation.state in {"candidate", "verified_not_ready"}:
                 verified = wait_ready(config)

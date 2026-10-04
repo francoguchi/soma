@@ -52,6 +52,7 @@ try {
     const stripBounds = await page.getByRole('contentinfo', {name: 'Operator status'}).boundingBox();
     assert(Math.abs(gridBounds.y + gridBounds.height - stripBounds.y) <= 16);
     assert(stripBounds.height <= 32);
+    assert(await page.locator('.shell-status').evaluate(node => Array.from(node.children).filter(child => getComputedStyle(child).display !== 'none').every(child => child.getBoundingClientRect().bottom <= node.getBoundingClientRect().bottom + 1)));
     await expect(page.locator('.status-primary')).toContainText('READY');
     if (!wide) {
       await page.getByLabel('Operator status details').click();
@@ -64,7 +65,45 @@ try {
     assert(await page.locator('[data-console-pane]:visible').evaluateAll(nodes => nodes.every(node => node.scrollWidth <= node.clientWidth)));
 
     assert.equal(await page.evaluate(() => /\uFFFD|\u00C2[\u00A0-\u00BF]|\u00C3[\u0080-\u00BF]|\u00E2[\u0080-\u00BF\u20AC\u2122]/u.test(document.body.innerText)), false);
-    await page.screenshot({path: `../../.tmp/refinement-${width}.png`, fullPage: true});
+    // Regression: keyboard modality followed by pointer/programmatic pane activation
+    // must never outline the whole region; nested controls retain their own ring.
+    await page.keyboard.press('Tab');
+    for (const pane of await page.locator('[data-console-pane]:visible').all()) {
+      assert.equal(await pane.evaluate(node => getComputedStyle(node).overflow), 'auto');
+      await pane.focus();
+      assert.notEqual(await pane.evaluate(node => getComputedStyle(node).boxShadow), 'none');
+      assert.equal(await pane.evaluate(node => getComputedStyle(node).outlineStyle), 'none');
+      await pane.locator('h2').click();
+      assert.equal(await pane.evaluate(node => getComputedStyle(node).outlineStyle), 'none');
+    }
+    await page.getByRole('button', {name: 'Refresh', exact: true}).focus();
+    assert.notEqual(await page.getByRole('button', {name: 'Refresh', exact: true}).evaluate(node => getComputedStyle(node).outlineStyle), 'none');
+    assert.equal(await page.locator('.active-pane-label').count(), 0);
+    assert(await page.locator('.operational-console [role=status]').evaluate(node => node.getBoundingClientRect().width <= 1));
+    if (!wide) await page.getByRole('button', {name: 'Runtime activity', exact: true}).click();
+    const metrics = page.locator('.metric-grid');
+    for (const count of [6, 7]) {
+      assert(await metrics.evaluate((grid, count) => {
+        const original = Array.from(grid.children);
+        const cells = Array.from({length: count}, (_, i) => {const cell = document.createElement('span'); cell.innerHTML = `State ${i}<b>${i}</b>`; return cell;});
+        grid.replaceChildren(...cells);
+        const bounds = cells.map(node => node.getBoundingClientRect()), owner = grid.getBoundingClientRect();
+        const sameColumns = bounds.every(box => Math.abs(box.width - bounds[0].width) < 1);
+        const last = bounds[count - 1];
+        const balanced = count % 2 === 0 || Math.abs(last.x + last.width / 2 - owner.x - owner.width / 2) < 1;
+        grid.replaceChildren(...original);
+        return sameColumns && balanced;
+      }, count));
+    }
+    const activity = page.locator('[data-console-pane=activity]');
+    await activity.focus();
+    const scrollStyle = await activity.evaluate(node => ({size: getComputedStyle(node, '::-webkit-scrollbar').width, thumb: getComputedStyle(node, '::-webkit-scrollbar-thumb').backgroundColor}));
+    assert.equal(scrollStyle.size, '12px');
+    assert.equal(scrollStyle.thumb, 'rgb(89, 101, 121)');
+    await page.screenshot({path: `../../.tmp/styles-activity-${width}.png`, fullPage: true});
+    if (!wide) await page.getByRole('button', {name: 'Current run', exact: true}).click();
+    await page.locator('[data-console-pane=run]').focus();
+    await page.screenshot({path: `../../.tmp/styles-${width}.png`, fullPage: true});
     if (!wide) {
       for (const title of ['Runtime activity', 'Capabilities', 'Operator logs', 'Current run']) {
         await page.getByRole('button', {name: title, exact: true}).click();
@@ -80,14 +119,31 @@ try {
   await expect(page.getByRole('button', {name: 'Operator logs', exact: true})).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('[data-console-pane="logs"]')).toBeFocused();
   await page.setViewportSize({width: 390, height: 844});
+  // Both scrollbar axes retain a practical target when the shared surface is zoomed 200%.
+  await page.evaluate(() => {
+    const node = document.createElement('div'); node.id = 'scrollbar-zoom-probe';
+    node.dataset.scrollOwner = 'both'; node.dataset.paneId = 'scrollbar-probe'; node.tabIndex = 0; node.setAttribute('aria-label', 'Zoomed scrollbar verification');
+    node.style.cssText = 'position:fixed;left:10px;top:150px;width:150px;height:110px;overflow:auto;zoom:2;z-index:200;background:var(--soma-surface);color:var(--soma-text-primary)';
+    const content = document.createElement('div'); content.style.cssText = 'width:300px;height:300px;padding:12px'; content.style.whiteSpace = 'nowrap'; content.innerHTML = Array.from({length: 8}, (_, i) => `<p>Shared scrollbar at 200% / evidence ${i}</p>`).join('');
+    node.append(content); document.body.append(node);
+  });
+  const zoomOwner = page.getByLabel('Zoomed scrollbar verification');
+  await zoomOwner.focus(); await zoomOwner.press('End'); await zoomOwner.press('ArrowRight');
+  assert(await zoomOwner.evaluate(node => node.scrollTop > 0 && node.scrollLeft > 0));
+  assert(await zoomOwner.evaluate(node => node.getBoundingClientRect().width - node.clientWidth * 2 >= 20));
+  const zoomBounds = await zoomOwner.boundingBox();
+  await page.mouse.move(zoomBounds.x + zoomBounds.width - 8, zoomBounds.y + zoomBounds.height - 35);
+  await page.screenshot({path: '../../.tmp/styles-scrollbar-200.png', fullPage: true});
+  await zoomOwner.evaluate(node => node.remove());
   await page.emulateMedia({forcedColors: 'active', reducedMotion: 'reduce'});
   await expect(page.getByRole('button', {name: 'Open current log'})).toBeVisible();
-  await page.screenshot({path: '../../.tmp/refinement-forced-colors.png', fullPage: true});
+  assert.equal(await page.locator('[data-console-pane=logs]').evaluate(node => getComputedStyle(node).scrollbarColor), 'auto');
+  await page.screenshot({path: '../../.tmp/styles-forced-colors.png', fullPage: true});
   await page.emulateMedia({forcedColors: 'none', reducedMotion: 'no-preference'});
   await page.evaluate(() => {const sheet = document.styleSheets[0]; const sizes = Array.from(document.querySelectorAll('body,h1,h2,h3,p,li,dt,dd,code,span,small,time,button,summary,input,label'), node => [node, parseFloat(getComputedStyle(node).fontSize)]); sizes.forEach(([node,size],i) => {node.setAttribute('data-text-zoom',String(i)); sheet.insertRule(`[data-text-zoom=\"${i}\"]{font-size:${size*2}px!important}`,sheet.cssRules.length);});});
   assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
   assert(await page.getByRole('button', {name:'Refresh',exact:true}).evaluate(node => node.getBoundingClientRect().right <= innerWidth));
-  await page.screenshot({path: '../../.tmp/refinement-text-200.png', fullPage: true});
+  await page.screenshot({path: '../../.tmp/styles-text-200.png', fullPage: true});
   await page.getByRole('button', {name: 'Sign out'}).click();
   await expect(page.getByRole('heading', {name: 'Sign in to SOMA'})).toBeVisible();
   await page.getByLabel('Password', {exact: true}).fill('not the correct password');

@@ -1,13 +1,94 @@
-/* Foundation feedback styles. */
-.error-state{border-left:3px solid var(--destructive);background:var(--surface-raised);padding:16px;margin:16px 0}
-.error-state button{display:block;margin-top:12px}
-.modal-backdrop{position:fixed;inset:0;z-index:80;display:grid;place-items:center;background:#000a;padding:16px;overflow:hidden}
-.modal{max-width:680px;width:100%;max-height:calc(100dvh - 32px);overflow:auto;padding:24px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)}
-.modal h2{position:sticky;top:-24px;background:var(--surface);padding-block:12px;z-index:1}
-.modal [data-safe-focus]{margin-top:16px}
-.deliberate-hold{display:grid;gap:8px;justify-items:start;margin:12px 0}
-.deliberate-hold button{touch-action:none;user-select:none}
-.deliberate-hold progress{width:min(100%,320px);accent-color:var(--accent)}
-.deliberate-hold p{margin:0}
-.confirmation{min-width:0}
-[data-stale=true]{border-inline-start:3px solid var(--warning);padding-inline-start:8px}
+.error-state {
+  border-left: 3px solid var(--soma-destructive);
+  background: var(--soma-surface-raised);
+  padding: 16px;
+  margin: 16px 0;
+}
+
+.error-state button {
+  display: block;
+  margin-top: 12px;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  background: var(--soma-overlay);
+  padding: 16px;
+  overflow: hidden;
+}
+
+.modal {
+  max-width: 680px;
+  width: 100%;
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  padding: 24px;
+  background: var(--soma-surface);
+  border: 1px solid var(--soma-border);
+  border-radius: var(--soma-radius-control);
+}
+
+.modal h2 {
+  position: sticky;
+  top: -24px;
+  background: var(--soma-surface);
+  padding-block: 12px;
+  z-index: 1;
+}
+
+.modal [data-safe-focus] {
+  margin-top: 16px;
+}
+
+.deliberate-hold {
+  display: grid;
+  gap: var(--soma-space-2);
+  justify-items: start;
+  margin: 12px 0;
+}
+
+.deliberate-hold button {
+  touch-action: none;
+  user-select: none;
+}
+
+.deliberate-hold progress {
+  width: min(100%,320px);
+  accent-color: var(--soma-current);
+}
+
+.deliberate-hold p {
+  margin: 0;
+}
+
+.confirmation {
+  min-width: 0;
+}
+
+[data-stale=true] {
+  border-inline-start: 3px solid var(--soma-warning);
+  padding-inline-start: 8px;
+}
+
+@media (forced-colors:active) {
+  .error-state {
+    border-left-color: CanvasText;
+  }
+
+  .modal-backdrop {
+    background: Canvas;
+  }
+
+  .modal {
+    box-shadow: none;
+    border: 2px solid CanvasText;
+  }
+
+  .deliberate-hold progress {
+    forced-color-adjust: auto;
+  }
+}

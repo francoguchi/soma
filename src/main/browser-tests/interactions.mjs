@@ -64,7 +64,8 @@ try {
  await page.keyboard.press('Shift+Tab'); await expect(paneInvoke).toBeFocused();
  await expect(evidencePane).toHaveAttribute('data-pane-active','true');
  await activityPane.focus(); const listScroll=await listPane.evaluate(node=>node.scrollTop), evidenceScroll=await evidencePane.evaluate(node=>node.scrollTop);
- await activityPane.press('PageDown'); assert(await activityPane.evaluate(node=>node.scrollTop)>0);
+ await page.screenshot({path:'../../.tmp/styles-pane-focus.png',fullPage:true});
+ await activityPane.press('PageDown'); assert(await activityPane.evaluate(node=>node.scrollTop)>0,JSON.stringify(await activityPane.evaluate(node=>({height:node.clientHeight,scroll:node.scrollHeight,top:node.scrollTop,overflow:getComputedStyle(node).overflow,root:document.querySelector('.soma-shell').getBoundingClientRect().height}))));
  assert.equal(await listPane.evaluate(node=>node.scrollTop),listScroll); assert.equal(await evidencePane.evaluate(node=>node.scrollTop),evidenceScroll);
  await activityPane.press('Home'); assert.equal(await activityPane.evaluate(node=>node.scrollTop),0);
  const paneRow=page.getByRole('row').filter({has:page.getByText('Pane record 0',{exact:true})});
