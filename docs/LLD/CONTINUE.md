@@ -8,18 +8,18 @@ This is the single current-state entry point for humans and agents. Do not appen
 |---|---|
 | Implementation scope | `00 — Foundation` |
 | Implementation branch | `feat/00-foundation` |
-| Implementation goal | `IMP-00-01 — Foundation primitives and tooling` |
-| Implementation goal file | `docs/implementation/00/00.01.md` |
+| Implementation goal | `IMP-00-07 — Foundation shell and runtime convergence` |
+| Implementation goal file | `docs/implementation/00/00.07.md` |
 | Implementation migration ledger | `docs/LLD/00/migration.md` |
 | Queued next implementation | `01 — Identity / Reference` (`IMP-01-01..06`), after required Foundation checkpoints |
-| Design scope | `02 — Tickets Core` |
-| Design branch | `design/02-tickets-core` |
-| Design source | `SOMA Beta LLD-03 — Service Requests, RFCs, Device References, Ticket Relationships` |
-| Design migration ledger | `docs/LLD/02/migration.md` |
+| Design scope | `00 — Foundation convergence` |
+| Design branch | `design/00-foundation-convergence` |
+| Design source | live Foundation desktop/mobile review + accepted SOMA/init.Habits directional references |
+| Design migration ledger | `docs/LLD/00/migration.md` |
 | Overall migration map | `docs/LLD/MIGRATION.md` |
-| Mode | parallel design N+1 / implementation N |
-| Implementation note | accepted Scope-00 documentation reconciliation is now on `main`; preserve any local Codex edits while reconciling `docs/LLD/00/{backend,frontend,migration}.md` into `feat/00-foundation` before closing `IMP-00-01` |
-| Design blocker | none; scope 02 packet migration has started |
+| Mode | Foundation convergence checkpoint; Scope 02 design is paused, not discarded |
+| Implementation note | local `feat/00-foundation` may contain completed/unpushed Foundation work; reconcile the accepted docs surgically and preserve local implementation before starting 00.07 |
+| Design blocker | none; convergence docs/checks are being reconciled before resuming Scope 02 |
 | Certification | deferred until whole-application implementation and live testing |
 
 ## Resume
@@ -39,7 +39,7 @@ The intended handoff can be as small as:
 4. Implement, run the goal's focused checks plus directly affected tests, and fix failures.
 5. Update the goal's Run/Remaining/status, close its migration rows, then advance this file to the next implementation goal.
 
-Current next action: reconcile the accepted Scope-00 documentation corrections from `main` into the local `feat/00-foundation` worktree without overwriting implementation progress, then continue `IMP-00-01`.
+Current next action: reconcile current accepted Scope-00 documentation into the local `feat/00-foundation` worktree without overwriting completed work, then implement `IMP-00-07` as a convergence pass over the existing Foundation implementation.
 
 ### Design lane
 
@@ -49,13 +49,13 @@ Current next action: reconcile the accepted Scope-00 documentation corrections f
 4. Record every donor behavior/code slice as reused, rewritten, rejected, deferred, or new.
 5. Update the design scope backend/frontend/checks/contracts/migrations and create implementation goals only after ownership and behavior are clear.
 
-Current next action: reconcile Beta LLD-03 into scope `02 — Tickets Core` on `design/02-tickets-core`, beginning with identity/relationship/source-authority boundaries before allocating implementation goals.
+Current next action: finish and live-review the Foundation convergence contract/goal. Keep `design/02-tickets-core` frozen at its current checkpoint; resume it only after `IMP-00-07` is working.
 
 ## Do not
 
 Do not reconstruct project status by rereading Alpha/Beta or the whole repository. Do not copy Beta wholesale, preserve its old directory ownership, or treat compiled/static artifacts as authority.
 
-Do not merge implementation-in-progress from `feat/00-foundation` into the design branch merely to design scope 01. Scope 01 consumes accepted Foundation contracts from `main`; if implementation later proves a contract wrong, update the owning LLD and reconcile dependents.
+Do not merge implementation-in-progress from `feat/00-foundation` into design branches merely to inspect it. Foundation convergence updates the owning Scope-00 LLD first, then Codex reconciles those changes into its local implementation. Scope 02 remains frozen until the convergence checkpoint is live-reviewed.
 
 Do not create a branch/PR/certification packet per goal, run unrelated full suites, perform release packaging/signing, or block design on future implementation details. A `working` goal is a development checkpoint, not certification.
 
