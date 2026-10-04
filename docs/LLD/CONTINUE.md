@@ -39,7 +39,7 @@ The intended handoff can be as small as:
 4. Implement, run the goal's focused checks plus directly affected tests, and fix failures.
 5. Update the goal's Run/Remaining/status, close its migration rows, then advance this file to the next implementation goal.
 
-Current checkpoint: IMP-00-01..07 are working, with prior implementation/live evidence preserved in their goals and closed migration rows. Main reconciliation changes documentation only; 57 focused runtime/tooling checks, 50 Main tests, typecheck/build, contract sync and documentation impact checks passed before pushing PR #1. Do not begin IMP-01-01 in this pass.
+Current checkpoint: IMP-00-01..07 are working, with prior implementation/live evidence preserved in their goals and closed migration rows. Main reconciliation changes documentation only; 57 focused runtime/tooling checks, 50 Main tests, typecheck/build, contract sync and documentation impact checks passed before pushing PR #1. Fresh verification on 2026-10-04 confirmed current main is included, reran those checks successfully after rebuilding matching assets, and found PR #1 OPEN/MERGEABLE/CLEAN. Do not begin IMP-01-01 in this pass.
 
 ### Design lane
 

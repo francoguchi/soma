@@ -99,6 +99,8 @@ Fourth-refinement closure: R00.07-A now also covers the windowless detached host
 
 ## Cross-scope reconciliation
 
+PR #1 verification on 2026-10-04 confirms current main `5ccaef1` is included in Foundation `f52014d`; all completed donor dispositions and implementation evidence remain preserved. Fresh 57 runtime/tooling and 50 Main checks passed after rebuilding matching assets. No migration rows were reopened and IMP-01-01 remains unstarted.
+
 Scope-01 design review exposed three accepted Foundation clarifications:
 
 - narrowed `DEV.DB_RESET`, `STATIC.ASSETS`, and `CONTRACT.SOURCE` impact `code_paths` so scope 00 does not falsely claim future domain code;
