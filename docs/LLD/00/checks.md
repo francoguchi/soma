@@ -326,7 +326,7 @@ Verify the intended separator renders consistently across supported browser/Wind
 <a id="chk-capabilities"></a>
 ## CHK00.CAPABILITIES
 
-Compose a build with one real feature provider, one development capability, and one absent feature. Verify the registry advertises exactly those states, duplicate/conflicting registration fails composition, Main exposes available/development/unavailable states truthfully, and directly navigating to the unavailable feature produces an understandable unavailable surface rather than a stub request/500.
+Compose a build with one real feature provider, one development capability, and one absent future workspace owner. Verify the registry advertises only actually registered descriptors, duplicate/conflicting registration fails composition, and Foundation does not synthesize speculative `finance/products/sla/workflows/customers` entries. UI.WORKSPACE_REGISTRY still renders declared product workspaces unavailable when their owner capability is absent. Directly navigating to an unavailable workspace produces an understandable unavailable surface rather than a stub request/500.
 
 <a id="chk-page-collection"></a>
 ## CHK00.PAGE.COLLECTION
