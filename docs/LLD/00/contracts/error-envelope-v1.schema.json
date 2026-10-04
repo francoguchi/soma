@@ -14,7 +14,7 @@
   "properties": {
     "code": {
       "type": "string",
-      "pattern": "^[A-Z][A-Z0-9_.-]{1,95}$"
+      "pattern": "^[A-Z][A-Z0-9_.-]{1,95}(?![\\s\\S])"
     },
     "summary": {
       "type": "string",
@@ -39,7 +39,7 @@
     },
     "correlation_id": {
       "type": "string",
-      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}(?![\\s\\S])"
     },
     "fields": {
       "type": "array",
@@ -56,7 +56,7 @@
           },
           "code": {
             "type": "string",
-            "pattern": "^[A-Z][A-Z0-9_.-]{1,95}$"
+            "pattern": "^[A-Z][A-Z0-9_.-]{1,95}(?![\\s\\S])"
           },
           "summary": {
             "type": "string",

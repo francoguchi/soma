@@ -83,6 +83,12 @@
       "code_paths": ["src/core/soma/runtime/host.py", "src/core/soma/runtime/lifecycle.py"]
     },
     {
+      "id": "RUNTIME.CONTROL_OBSERVATION",
+      "anchor": "runtime-control-observation",
+      "depends_on": ["RUNTIME.TRUSTED_CONTROL", "TIME.MONOTONIC", "BUILD.IDENTITY"],
+      "code_paths": ["src/core/soma/runtime/observation.py", "tools/source_launcher.py"]
+    },
+    {
       "id": "CAPABILITY.REGISTRY",
       "anchor": "capability-registry",
       "depends_on": ["BUILD.IDENTITY"],
@@ -170,7 +176,7 @@
       "id": "DEV.DB_RESET",
       "anchor": "dev-db-reset",
       "depends_on": ["RUNTIME.INSTANCE", "MIGRATION.MANIFEST", "DEV.SEED"],
-      "code_paths": ["src/core/soma/foundation/persistence/", "src/core/soma/db/"]
+      "code_paths": ["src/core/soma/foundation/development/reset.py", "src/core/soma/db/migrations/manifest.json"]
     },
     {
       "id": "SERIALIZATION.STRICT_JSON",
@@ -217,7 +223,7 @@
       "id": "STATIC.ASSETS",
       "anchor": "static-assets",
       "depends_on": ["BUILD.IDENTITY", "FS.SAFE"],
-      "code_paths": ["src/core/soma/runtime/static_assets.py", "src/main/"]
+      "code_paths": ["src/core/soma/runtime/static_assets.py", "src/main/index.html", "src/main/vite.config.ts"]
     },
     {
       "id": "TEST.SEAMS",
@@ -245,7 +251,7 @@
     {
       "id": "CONTRACT.SOURCE",
       "anchor": "contract-source",
-      "code_paths": ["docs/LLD/00/contracts/", "src/core/soma/"]
+      "code_paths": ["docs/LLD/00/contracts/", "src/core/soma/transport/contracts/", "src/main/shared/api/generated/"]
     },
     {
       "id": "TOOLING.IMPACT",
@@ -435,27 +441,57 @@ Reuse provenance: Beta LLD-01/10/12 technology baselines.
 <a id="runtime-lifecycle"></a>
 ## RUNTIME.LIFECYCLE
 
-**Trigger/input:** The SOMA host process starts, progresses toward readiness, fails, or shuts down.
+**Trigger/input:** The already-running SOMA host process starts its owned bootstrap, becomes ready, fails, or shuts down.
 
-**Result:** Maintain one authoritative host state machine:
+**Result:** Maintain one **process-internal host lifecycle**. It does not represent controller discovery or the absence of a process:
 
-`STOPPED -> STARTING -> MIGRATING -> VERIFYING -> LISTENING_NOT_READY -> READY -> QUIESCING -> STOPPED`
+`BOOTSTRAPPING -> MIGRATING -> BINDING -> SERVING_NOT_READY -> READY -> QUIESCING -> EXITING`
 
-Any active startup/ready state may enter `FAILED` on unrecoverable host failure; retry/cleanup is explicit.
+Any pre-exit state may enter `FAILED` on unrecoverable host failure. A process that has exited has no host lifecycle state; external controllers represent that condition through RUNTIME.CONTROL_OBSERVATION.
 
 **Rules:**
-- `READY` means canonical instance ownership is held; live DEK/cipher verification succeeded; accepted migrations/schema/integrity checks succeeded; required foundation providers are composed; the retained loopback socket is serving; runtime control is valid; and required static/main bootstrap assets verify.
+- `BOOTSTRAPPING` covers process-local construction/config/key/provider preparation before migration authority begins.
+- `MIGRATING` owns required migration/schema preparation.
+- `BINDING` acquires/retains the literal-loopback socket and prepares control serving.
+- `SERVING_NOT_READY` may expose only explicitly allowed authenticated run-control/status routes while remaining unavailable for ordinary application operations.
+- `READY` means canonical instance ownership is held; live DEK/cipher verification succeeded; accepted migrations/schema/integrity checks succeeded; required Foundation providers are composed; the retained loopback socket is serving; runtime control is valid; and required static/Main bootstrap assets verify.
+- Readiness verification is an invariant/check performed during bootstrap/serving; `VERIFYING` is not a durable host state.
 - Only `READY` accepts ordinary application queries/mutations.
-- `LISTENING_NOT_READY` may expose only explicitly allowed authenticated control/status routes.
-- State transitions are one-way per startup/shutdown attempt except explicit failed-cleanup/retry.
+- `QUIESCING` rejects new ordinary mutation/job claims while bounded in-flight work drains.
+- `EXITING` is final process-local cleanup after quiescence; no transition returns to an earlier state in the same process.
 - State changes are observable through RUNTIME.HEALTH and tray/console presentation; they do not fabricate domain facts.
 - Host runtime owns one request executor (initial max 4 workers) and one background executor (initial max 2 workers); blocking DB/file/application work never blocks the ASGI event loop.
 
 **Failure:** Illegal transition or failed required readiness check enters `FAILED`, preserves sanitized diagnostics, and never publishes false READY.
 
-**Side effects:** runtime/process state only.
+**Side effects:** process-local runtime state only.
 
-Reuse provenance: Beta `LocalHostLifecycle`.
+Reuse provenance: Beta `LocalHostLifecycle`, corrected to separate process state from controller observation.
+
+<a id="runtime-control-observation"></a>
+## RUNTIME.CONTROL_OBSERVATION
+
+**Trigger/input:** A launcher/tray/control client inspects the canonical development instance before deciding whether a SOMA host is absent, reusable, opening, stoppable, or unsafe.
+
+**Result:** Produce one controller-side observation independent from the process-internal host lifecycle:
+
+`absent | candidate | verified_not_ready | verified_ready | stale | untrusted | unreachable`
+
+**Rules:**
+- `absent`: no candidate runtime registry/owned process is present after safe canonical inspection.
+- `candidate`: syntactically plausible registry/process material exists but has not completed fresh trust verification; no control/open action is authorized yet.
+- `verified_not_ready`: RUNTIME.TRUSTED_CONTROL succeeds for the exact current run but authenticated health reports a host lifecycle other than READY.
+- `verified_ready`: RUNTIME.TRUSTED_CONTROL succeeds and authenticated health reports READY.
+- `stale`: candidate artifacts refer to a dead/replaced/nonmatching prior process/run and are preserved/cleaned only under exact ownership rules.
+- `untrusted`: candidate material fails path/ACL/origin/secret/process-image/birth/protocol/identity proof.
+- `unreachable`: exact candidate identity is otherwise plausible but the authenticated direct health endpoint cannot be reached within the governed observation budget.
+- Controller observation never invents or drives host lifecycle transitions. It decides only what control/open/remediation action is safe.
+- `STOPPED` is presentation shorthand permitted for human-facing launcher text when observation is `absent`; it is not a host-process lifecycle state.
+- Observation is freshly recomputed before every Open/Stop/reuse decision and is never cached as authority across process/run changes.
+
+**Failure:** Ambiguous observation fails closed to a non-controllable state with bounded remediation evidence; no PID/port/name-only fallback is allowed.
+
+**Side effects:** safe inspection only, except exact-owned stale-artifact cleanup explicitly permitted by RUNTIME.TRUSTED_CONTROL.
 
 <a id="capability-registry"></a>
 ## CAPABILITY.REGISTRY
@@ -469,6 +505,8 @@ Reuse provenance: Beta `LocalHostLifecycle`.
 - Registry may distinguish `available`, `unavailable`, and `development` with an optional safe reason/remediation identifier.
 - Capability state does not alter domain truth and is not business authorization.
 - Main uses this registry to avoid fake routes/actions while iterative implementation is incomplete.
+- CAPABILITY.REGISTRY is **not** a navigation registry. Capability IDs/module names never become top-level workspace labels automatically; UI.WORKSPACE_REGISTRY owns product navigation.
+- Foundation composition never fabricates speculative domain capabilities solely to populate future navigation. In particular it must not invent `finance`, `products`, `sla`, `workflows`, `customers`, or similar placeholders without an owning scope contract. A missing owner capability is simply absent/unavailable to the workspace registry.
 - IDs are stable capability names owned by their scope; Foundation owns registry mechanics only.
 
 **Failure:** Duplicate/conflicting registrations fail composition; unknown capability consumers treat it as unavailable.
@@ -482,7 +520,7 @@ Reuse provenance: Beta `LocalHostLifecycle`.
 
 **Result:** Report truthful bounded technical state for the current run.
 
-**Run-control health includes:** protocol version, `run_id`, `data_instance_id`, host state, build identity, PID/process birth identity, current migration identity/schema state, integrity state, and startup UTC.
+**Run-control health includes:** protocol version, `run_id`, `data_instance_id`, process-internal `host_state`, build identity, PID/process birth identity, current migration identity/schema state, integrity state, and startup UTC. It never reports controller-only `absent|candidate|stale|untrusted|unreachable` as host states.
 
 **Browser diagnostics may additionally include:** capability registry, executor queue-depth categories, open connection/active transaction counts, durable jobs by technical state, last migration identity, and sanitized recent foundation error codes.
 
@@ -510,7 +548,7 @@ Reuse provenance: Beta `LocalHostLifecycle`.
 4. Close request/background executors after their governed budget.
 5. Checkpoint/close persistence resources as required without fabricating domain completion.
 6. Remove tray and exact-owned runtime registry/secret artifacts only after ownership is proven.
-7. Release canonical instance lock and enter `STOPPED`.
+7. Release canonical instance lock and enter `EXITING`; after process exit the external controller observes `absent`.
 
 **Rules:**
 - Graceful shutdown budget is initially 10 seconds for launcher/tray control.
@@ -800,7 +838,7 @@ Reuse provenance: Beta LLD-12 live-data key and DPAPI boundaries.
 - SOMA has one Local Administrator credential record in the current single-user product phase. Login requires no username.
 - Initial database state contains zero credential rows and reports `setup_required`; normal domain/application routes remain gated until first-run setup completes, while trusted runtime/diagnostic/setup routes remain available as explicitly allowed.
 - First-run setup requires password + confirmation. Validate at least 12 Unicode scalar values and at most 1024 UTF-8 bytes, with no trimming, Unicode normalization, case conversion, or hidden mutation. Confirmation requires exact UTF-8 byte equality.
-- Setup creates one stable technical `actor_id` and Argon2id PHC verifier using PLATFORM.BASELINE's accepted profile inside one TX.UOW. The raw password/confirmation never enters audit, diagnostics, correlation context, repr/debug text, browser storage, command replay payloads, or logs.
+- Setup creates one stable technical `actor_id` and Argon2id PHC verifier using PLATFORM.BASELINE's accepted profile inside one TX.UOW. Composition may register a same-UoW descriptive-profile participant; when scope 01 is assembled, `PROFILE.AUTH_PARTICIPANT` receives the existing UoW/parent receipt/actor_id and must return without committing. The raw password/confirmation never enters audit, diagnostics, correlation context, repr/debug text, browser storage, command replay payloads, or logs.
 - Login accepts password only, applies the current in-memory failure-delay gate before expensive hashing, verifies through the pinned Argon2 provider, and on success clears the failure counter and issues a current-run browser session.
 - After 5 consecutive failures, per-run login delay follows 1, 2, 4, then 8 seconds and remains capped at 8 seconds. Delay uses TIME.MONOTONIC, occurs outside database transactions, and creates no durable account lockout.
 - Public credential failure is uniform `AUTH_INVALID_CREDENTIALS`; malformed/unsupported persisted verifier shape is recorded only as bounded security diagnostic evidence and never reveals verifier details to the browser.
@@ -810,7 +848,7 @@ Reuse provenance: Beta LLD-12 live-data key and DPAPI boundaries.
 
 **Failure:** A second setup attempt, invalid setup password/confirmation, invalid credentials, unsupported verifier, persistence failure, or session-issuance failure returns a stable safe error and never creates a partial credential/session state.
 
-**Side effects:** First-run setup creates the singleton credential row; successful login/logout mutates only in-memory session state plus bounded authentication-throttle state.
+**Side effects:** First-run setup creates the singleton credential row and any required registered same-UoW setup-participant metadata; successful login/logout mutates only in-memory session state plus bounded authentication-throttle state.
 
 Reuse provenance: Beta `PasswordAuthenticationV1`, narrowed to minimal setup/login/logout foundation ownership.
 

@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:soma:00:auth-result:v1",
+  "title": "AuthResultV1",
+  "type": "object",
+  "properties": {
+    "run_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}(?![\\s\\S])",
+      "minLength": 36,
+      "maxLength": 36
+    },
+    "auth_state": {
+      "type": "string",
+      "enum": [
+        "setup_required",
+        "login_required",
+        "authenticated"
+      ]
+    },
+    "csrf_token": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 44,
+      "maxLength": 44
+    }
+  },
+  "required": [
+    "run_id",
+    "auth_state",
+    "csrf_token"
+  ],
+  "additionalProperties": false
+}

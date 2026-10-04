@@ -80,9 +80,39 @@
       "covers": ["DEV.SEED", "DEV.DB_RESET", "MIGRATION.MANIFEST"]
     },
     {
+      "id": "CHK00.RUNTIME.OBSERVATION",
+      "anchor": "chk-runtime-observation",
+      "covers": ["RUNTIME.CONTROL_OBSERVATION", "RUNTIME.TRUSTED_CONTROL", "RUNTIME.HEALTH"]
+    },
+    {
       "id": "CHK00.CAPABILITIES",
       "anchor": "chk-capabilities",
       "covers": ["CAPABILITY.REGISTRY", "UI.BOOTSTRAP", "UI.CAPABILITY_STATE"]
+    },
+    {
+      "id": "CHK00.UI.WORKSPACES",
+      "anchor": "chk-ui-workspaces",
+      "covers": ["UI.WORKSPACE_REGISTRY", "UI.CAPABILITY_STATE", "UI.ROUTING"]
+    },
+    {
+      "id": "CHK00.UI.VISUAL_GRAMMAR",
+      "anchor": "chk-ui-visual-grammar",
+      "covers": ["UI.VISUAL_GRAMMAR", "UI.SHELL", "UI.RESPONSIVE", "UI.BRAND", "UI.TOKENS"]
+    },
+    {
+      "id": "CHK00.UI.TEXT_INTEGRITY",
+      "anchor": "chk-ui-text-integrity",
+      "covers": ["UI.TEXT_INTEGRITY"]
+    },
+    {
+      "id": "CHK00.UI.PANE_FOCUS",
+      "anchor": "chk-ui-pane-focus",
+      "covers": ["UI.PANE_FOCUS", "UI.SELECTION", "UI.SCROLL"]
+    },
+    {
+      "id": "CHK00.UI.STATUS_STRIP",
+      "anchor": "chk-ui-status-strip",
+      "covers": ["UI.OPERATOR_STATUS_STRIP"]
     },
     {
       "id": "CHK00.PAGE.COLLECTION",
@@ -201,7 +231,7 @@ These are development checks, not release certification. Each scenario becomes e
 <a id="chk-runtime-lifecycle"></a>
 ## CHK00.RUNTIME.LIFECYCLE
 
-Start from no running instance and observe the exact startup sequence through STARTING, MIGRATING, VERIFYING, LISTENING_NOT_READY, and READY. Verify ordinary application routes reject before READY. Trigger graceful shutdown and verify QUIESCING rejects new mutations, stops new job claims, drains bounded work, removes exact-owned runtime/tray artifacts, releases the instance lock, and reaches STOPPED. Inject a required readiness failure and verify FAILED is truthful and never reported as READY.
+Start one real host process and observe the process-local startup sequence `BOOTSTRAPPING -> MIGRATING -> BINDING -> SERVING_NOT_READY -> READY`. Verify readiness verification does not fabricate a durable `VERIFYING` state, ordinary application routes reject before READY, and the process never reports controller-only absence/trust states as its own lifecycle. Trigger graceful shutdown and verify `QUIESCING -> EXITING` rejects new mutations, stops new job claims, drains bounded work, removes exact-owned runtime/tray artifacts and releases the instance lock before process exit. Inject a required readiness failure and verify FAILED is truthful and never reported as READY.
 
 <a id="chk-config-paths"></a>
 ## CHK00.CONFIG.PATHS
@@ -260,10 +290,75 @@ Run more registered durable work than the background worker bound, verify at mos
 
 Against only the designated development instance, execute reset -> migrations -> registered deterministic seed contributors -> startup. Repeat and verify useful synthetic identity is deterministic where declared and no Alpha/Beta/customer evidence is imported. Inject one seed-contributor failure and verify reset/reseed reports incomplete state rather than claiming seed success.
 
+<a id="chk-runtime-observation"></a>
+## CHK00.RUNTIME.OBSERVATION
+
+From the launcher/controller side, exercise each observation independently from the host lifecycle: no registry/process -> `absent`; plausible registry before trust -> `candidate`; trusted host before READY -> `verified_not_ready`; trusted READY host -> `verified_ready`; dead/replaced prior run -> `stale`; wrong ACL/origin/secret/process birth/image/protocol -> `untrusted`; plausible exact host with unreachable authenticated health -> `unreachable`.
+
+Verify only `verified_ready` authorizes ordinary Open/reuse, verified states use exact current-run trust, and no observation changes the host state machine. Human-facing launcher text may say “Stopped” for `absent`, but the authenticated host API never returns STOPPED as a process state.
+
+<a id="chk-ui-workspaces"></a>
+## CHK00.UI.WORKSPACES
+
+Render the shell with all product capabilities unavailable, then make selected capabilities available/development. Primary navigation must contain exactly, in order: **Overview, Tickets, Objectives, Inventory, Infrastructure, Settings**. Diagnostics remains a distinct System/Foundation destination.
+
+Assert that capability IDs or module names such as `customers`, `products`, `sla`, `workflows`, `finance`, or arbitrary registered test capabilities do **not** create primary workspace labels. In particular, the shell must never show invented top-level **Finance**, **Products**, **Service levels**, **Workflows**, or **Customers** entries unless UI.WORKSPACE_REGISTRY is deliberately revised.
+
+Direct navigation to unavailable declared workspaces remains understandable and sends no owner API request. Deep feature routes may exist without becoming primary navigation entries.
+
+<a id="chk-ui-visual-grammar"></a>
+## CHK00.UI.VISUAL_GRAMMAR
+
+Perform a Foundation shell convergence review at three representative widths: wide desktop, around the initial `1040 CSS px` split threshold, and phone/narrow width.
+
+At wide desktop verify:
+- operational hierarchy is primarily alignment, compact spacing, typography and thin pane separators rather than large rounded floating dashboard cards;
+- Diagnostics current-run/runtime/capability/log information reads as a dense operational console with compact rows and panes;
+- the working pane system owns/fills the available application height below top chrome and above the status strip without inventing fake content; facts remain top-aligned and pane-local scrolling owns overflow;
+- pane sizing may be intentionally asymmetric when information density differs; an equal four-card dashboard is not required;
+- navigation/status/data chrome uses the intended monospace hierarchy while long explanatory/help text remains readable;
+- page title, pane heading and compact label/value/evidence text are visibly distinct hierarchy levels;
+- Electric-blue-derived accent identifies the current interaction locus sparingly rather than decorating every heading;
+- normal controls are compact/flat enough to read as operational actions and large full-width CTA treatment is limited to genuine gates/consequential narrow actions;
+- no decorative whitespace occupies more visual attention than the facts/actions it separates.
+
+At narrow width verify:
+- the desktop grid is **recomposed**, not copied into one extremely long stack;
+- product navigation is a compact labelled tab/command strip with bounded horizontal/overflow behavior;
+- Diagnostics/workbench panes can be switched deliberately one-at-a-time while preserving access to all facts/actions;
+- selected pane, navigation state, working copies, warnings and focus survive threshold changes.
+
+Capture development screenshots under ignored scratch output for review; screenshots are evidence only and never runtime/design authority. Compare structure/density against the approved directional references without copying their branding/trade dress.
+
+<a id="chk-ui-pane-focus"></a>
+## CHK00.UI.PANE_FOCUS
+
+Build a synthetic three-pane shell with a selectable list, evidence pane and activity pane. Exercise pointer activation, Tab/Shift+Tab traversal, arrows/page/scroll commands, row selection, modal open/close and responsive pane switching.
+
+Verify exactly one logical pane owns pane-local keyboard/scroll commands at a time; active pane, DOM focus, row selection, opened record and hover remain distinguishable. Activating a pane must not create a record selection. Modal focus temporarily supersedes and then restores the surviving invoker pane. Crossing the responsive threshold preserves the logical active pane where possible and otherwise chooses a deterministic labelled fallback without losing filters/working copies.
+
+At least one non-color structural cue plus the restrained Electric-blue current-locus accent identifies the active pane under normal and forced-color/high-contrast presentation.
+
+<a id="chk-ui-status-strip"></a>
+## CHK00.UI.STATUS_STRIP
+
+Render the authenticated shell against healthy READY, pre-ready/degraded and partially unavailable provider states. Verify the persistent bottom strip presents bounded current run/readiness/schema/build/trust facts without becoming a second event log or navigation area.
+
+At wide width the strip remains one compact line. At phone/narrow width it preserves run identity + readiness and exposes secondary facts through a labelled overflow/detail affordance rather than wrapping into a tall footer. Exact canonical details remain available through Diagnostics.
+
+Assert no secrets, full tokens, unrestricted filesystem paths or domain data appear; actual degraded/failed conditions are distinguishable from normal READY state without relying on color alone.
+
+<a id="chk-ui-text-integrity"></a>
+## CHK00.UI.TEXT_INTEGRITY
+
+Build and load the local Main bundle with representative separators, SOMA brand text, dates and diagnostics footer/status strings. Assert UTF-8 source/transport rendering and fail on visible mojibake/replacement patterns including `Â·`, `Ã`, or `�` in governed shell fixtures.
+
+Verify the intended separator renders consistently across supported browser/Windows environments; when a glyph/font path is unavailable the presentation falls back to readable ASCII rather than mis-decoded text.
+
 <a id="chk-capabilities"></a>
 ## CHK00.CAPABILITIES
 
-Compose a build with one real feature provider, one development capability, and one absent feature. Verify the registry advertises exactly those states, duplicate/conflicting registration fails composition, Main exposes available/development/unavailable states truthfully, and directly navigating to the unavailable feature produces an understandable unavailable surface rather than a stub request/500.
+Compose a build with one real feature provider, one development capability, and one absent future workspace owner. Verify the registry advertises only actually registered descriptors, duplicate/conflicting registration fails composition, and Foundation does not synthesize speculative `finance/products/sla/workflows/customers` entries. UI.WORKSPACE_REGISTRY still renders declared product workspaces unavailable when their owner capability is absent. Directly navigating to an unavailable workspace produces an understandable unavailable surface rather than a stub request/500.
 
 <a id="chk-page-collection"></a>
 ## CHK00.PAGE.COLLECTION
@@ -293,7 +388,7 @@ Register a synthetic reversible owner action with exact preview/fingerprint and 
 <a id="chk-ui-diagnostics"></a>
 ## CHK00.UI.DIAGNOSTICS
 
-Open the System/Diagnostics surface on a healthy and partially failing host. Verify build/run/schema/capability/job/executor/connection/transaction/log/recent-safe-error state is visible, local time is readable, and canonical evidence remains inspectable where appropriate. Provider failure produces partial/unavailable panels without mutating jobs/migrations/domain state or exposing secrets/raw bodies.
+Open the System/Diagnostics surface on a healthy and partially failing host. Verify build/run/schema/capability/job/executor/connection/transaction/log state is visible, local time is readable, and canonical evidence remains inspectable where appropriate. Normal lifecycle transitions render as runtime/event chronology; warning/error codes remain a separate list and READY/TRAY_READY-style normal events never masquerade as errors. Capability rows correspond to actually registered descriptors; absent future workspace owners do not appear as synthetic capability entries. Repeated unavailable state remains concise while its full meaning is accessible. Provider failure produces partial/unavailable panels without mutating jobs/migrations/domain state or exposing secrets/raw bodies.
 
 <a id="chk-ui-appearance"></a>
 ## CHK00.UI.APPEARANCE
@@ -378,7 +473,7 @@ Create nested/sibling scroll panes and verify pointer, keyboard, touch, horizont
 <a id="chk-ui-reflow"></a>
 ## CHK00.UI.REFLOW
 
-Populate synthetic workbench state with filters, active/selected record, scroll positions, dirty working copy, and evidence pane. Cross the initial 1040 CSS px split threshold in both directions and verify equivalent capability/state survives.
+Populate synthetic workbench state with filters, active/selected record, active pane, scroll positions, dirty working copy, evidence pane, and operator status strip. Cross the initial 1040 CSS px split threshold in both directions and verify equivalent capability/state survives. Narrow composition must switch/recompose panes rather than merely append every desktop pane into one page-length vertical stack; status strip remains compact and active-pane identity remains understandable.
 
 <a id="chk-ui-hold"></a>
 ## CHK00.UI.HOLD

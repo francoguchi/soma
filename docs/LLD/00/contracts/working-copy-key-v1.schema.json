@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:soma:00:working-copy-key:v1",
+  "title": "WorkingCopyKeyV1",
+  "type": "object",
+  "properties": {
+    "contract_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "contract_version": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "target_type": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "target_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "scope_key": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "base_revision": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    }
+  },
+  "required": [
+    "contract_id",
+    "contract_version",
+    "target_type",
+    "target_id",
+    "scope_key",
+    "base_revision"
+  ],
+  "additionalProperties": false
+}

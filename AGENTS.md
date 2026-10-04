@@ -1,6 +1,6 @@
 # SOMA agent instructions
 
-Implement the current user request in runnable increments. `src/main` is the user plane; `src/core` is the system plane. Formal whole-application certification occurs only after implementation and live testing.
+Implement the current user request in runnable increments. `src/main` is the user plane; `src/core` is the system plane. Formal whole-application certification is deferred until required implementation and live testing are complete.
 
 ## Start
 
@@ -20,6 +20,8 @@ The user can revise design. Current LLD items define behavior; goals define the 
 - Keep business ownership inside its module; consume other modules through exported interfaces.
 - Application operations own transactions; repositories do not commit independently.
 - Use shared frontend interactions, API contracts, and time formatting.
+- Never invent top-level workspace labels from capability/module/domain names. `UI.WORKSPACE_REGISTRY` is the only primary-navigation authority; capability registration controls availability, not navigation naming.
+- Shared UI changes must preserve `UI.VISUAL_GRAMMAR`: dense pane-based operational presentation, restrained radii/padding, semantic tokens, and deliberate narrow recomposition. Generic dashboard-card styling is not the default.
 - Make internal choices that preserve stated behavior. Ask for a missing material product decision and continue independent work.
 - Record unfinished behavior in the goal; do not present a stub as a completed operation.
 - Reuse and revise existing code. For Beta donor code, process the current goal's rows in the scope migration ledger and record `REUSED`, `REWRITTEN`, `REJECTED`, or `DEFERRED` before marking the goal working. Never mark `REUSED` from file-copy success alone; compare the donor behavior to the current LLD and carry over/rewrite the focused regression evidence. Create abstractions/documents only when actual work requires them.

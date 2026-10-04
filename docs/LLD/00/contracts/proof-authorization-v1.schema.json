@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:soma:00:proof-authorization:v1",
+  "title": "ProofAuthorizationV1",
+  "type": "object",
+  "properties": {
+    "binding": {"$ref": "proof-binding-v1.schema.json"},
+    "proof_token": {"type": "string", "minLength": 44, "maxLength": 44, "pattern": "^[A-Za-z0-9_-]{43}=$"}
+  },
+  "required": ["binding", "proof_token"],
+  "additionalProperties": false
+}

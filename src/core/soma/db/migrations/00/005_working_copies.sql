@@ -1,0 +1,4 @@
+CREATE TABLE ui_working_copies (
+ working_copy_id TEXT PRIMARY KEY, contract_id TEXT NOT NULL, contract_version INTEGER NOT NULL CHECK(contract_version>=1), target_type TEXT NOT NULL, target_id TEXT NOT NULL, scope_key TEXT NOT NULL, base_revision TEXT NOT NULL, draft_json TEXT NOT NULL, draft_sha256 TEXT NOT NULL CHECK(length(draft_sha256)=64), draft_bytes INTEGER NOT NULL CHECK(draft_bytes>=0 AND draft_bytes<=262144), generation INTEGER NOT NULL CHECK(generation>=1), created_at_utc INTEGER NOT NULL CHECK(created_at_utc>=0), updated_at_utc INTEGER NOT NULL CHECK(updated_at_utc>=created_at_utc), expires_at_utc INTEGER NOT NULL CHECK(expires_at_utc>updated_at_utc), UNIQUE(contract_id,contract_version,target_type,target_id,scope_key)
+) STRICT;
+CREATE INDEX working_copies_expiry ON ui_working_copies(expires_at_utc,working_copy_id);

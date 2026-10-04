@@ -54,6 +54,14 @@ These are the current development migration allocations. Because the development
 
 Creates the minimum schema needed to identify applied migrations safely.
 
+### `instance_metadata`
+
+- `singleton INTEGER PRIMARY KEY CHECK(singleton = 1)`.
+- `data_instance_id TEXT NOT NULL UNIQUE` — canonical UUIDv4 matching the owned instance identity, persisted during bootstrap and retained across ordinary reopen.
+- `created_at_utc INTEGER NOT NULL` — canonical UTC whole seconds.
+
+The runner inserts this row in the bootstrap transaction. Persistence/snapshot verification requires exactly this singleton and rejects a mismatched instance. This is technical data identity, not an operator or domain identity.
+
 ### `schema_migrations`
 
 - `migration_id TEXT PRIMARY KEY` — exact owner migration ID such as `M00.001`.
@@ -177,7 +185,8 @@ Includes:
 - `contract_id TEXT NOT NULL`, `contract_version INTEGER NOT NULL`.
 - `target_type TEXT NOT NULL`, `target_id TEXT NOT NULL`, `scope_key TEXT NOT NULL`.
 - `base_revision TEXT NOT NULL`.
-- `draft_json TEXT NOT NULL`, `draft_sha256 TEXT NOT NULL`, `draft_bytes INTEGER NOT NULL`.
+- `draft_json TEXT NOT NULL`, `draft_sha256 TEXT NOT NULL`, `draft_bytes INTEGER NOT NULL` - canonical recovery envelope containing the closed owner draft and sorted registered dirty paths.
+- `generation INTEGER NOT NULL CHECK(generation >= 1)` - exact checkpoint concurrency identity; changed content increments it, identical content preserves it.
 - `created_at_utc INTEGER NOT NULL`, `updated_at_utc INTEGER NOT NULL`, `expires_at_utc INTEGER NOT NULL`.
 - Unique active identity: `(contract_id, contract_version, target_type, target_id, scope_key)`.
 

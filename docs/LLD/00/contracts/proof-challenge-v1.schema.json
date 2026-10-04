@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:soma:00:proof-challenge:v1",
+  "title": "ProofChallengeV1",
+  "type": "object",
+  "properties": {
+    "challenge_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}(?![\\s\\S])",
+      "minLength": 36,
+      "maxLength": 36
+    },
+    "expires_in_ms": {
+      "type": "integer",
+      "const": 15000,
+      "minimum": 15000,
+      "maximum": 15000
+    }
+  },
+  "required": [
+    "challenge_id",
+    "expires_in_ms"
+  ],
+  "additionalProperties": false
+}

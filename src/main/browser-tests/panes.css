@@ -1,0 +1,4 @@
+.pane-fixture{grid-template-columns:minmax(0,1fr)}
+.pane-fixture .main-scroll{grid-column:1/-1}.pane-fixture .panel:last-child{grid-column:1/-1}.pane-fixture .diagnostics-grid{grid-template-rows:minmax(0,1fr) minmax(0,.5fr)}
+.pane-fixture label{display:block;margin-bottom:10px}.pane-fixture input{display:block;width:100%;margin-top:5px}
+@media(max-width:1039px){.pane-fixture{grid-template-rows:48px minmax(0,1fr) 32px}.pane-fixture .diagnostics-grid{grid-template-rows:minmax(0,1fr)}}

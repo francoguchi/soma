@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:soma:00:proof-result:v1",
+  "title": "ProofResultV1",
+  "type": "object",
+  "properties": {
+    "proof_token": {
+      "type": "string",
+      "minLength": 44,
+      "maxLength": 44
+    },
+    "expires_in_ms": {
+      "type": "integer",
+      "const": 30000,
+      "minimum": 30000,
+      "maximum": 30000
+    }
+  },
+  "required": [
+    "proof_token",
+    "expires_in_ms"
+  ],
+  "additionalProperties": false
+}
