@@ -39,7 +39,7 @@ The intended handoff can be as small as:
 4. Implement, run the goal's focused checks plus directly affected tests, and fix failures.
 5. Update the goal's Run/Remaining/status, close its migration rows, then advance this file to the next implementation goal.
 
-Current checkpoint: Scope 00 is merged and working. Scope 01 design is approved; `IMP-01-01` is active and its pre-coding donor reconciliation is complete in `docs/LLD/01/migration.md`. The implementation pass must execute that map rather than rediscover ownership: add the pinned Unicode-17 runtime dependency, complete the already-accepted optional auth/profile same-UoW seam, support explicit NO_CHANGE without fake audit, use M01.001 for shared lifecycle evidence, keep SQL out of domain matching/review code, and migrate only the named R01.01 donor slices. Contacts, Dispatch, Settings, public Reference API routes and feature UI remain out of this increment.
+Current checkpoint: Scope 00 is merged and working. `IMP-01-01` is active. Pre-coding reconciliation has already migrated/relocated the low-risk R01.01-A donor slice (Unicode-17 asset, deterministic matching, current profile/Customer/Account-Code validators and persisted-profile adapter), pinned/packaged `unicodedata2==17.0.1`, and prepared the two Foundation integration seams needed by Scope 01: optional same-UoW Local Admin profile participation and explicit audit-free `changed=False` NO_CHANGE replay. The next implementation work is R01.01-B/C/D only: pure Account-Code review extraction + profile/Customer/audit application code, M01.001 + manifest/schema truth, then remaining focused regressions. Do not redo R01.01-A and do not begin Contacts, Dispatch, Settings, public Reference API routes or feature UI.
 
 ### Design lane
 
