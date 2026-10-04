@@ -39,7 +39,7 @@ The intended handoff can be as small as:
 4. Implement, run the goal's focused checks plus directly affected tests, and fix failures.
 5. Update the goal's Run/Remaining/status, close its migration rows, then advance this file to the next implementation goal.
 
-Current next action: reconcile the latest accepted Scope-00/`IMP-00-07` refinement into the local `feat/00-foundation` worktree without overwriting completed work, then finish the convergence pass: viewport-filling panes, active-pane focus language, compact controls/unavailable state, restrained current-locus accent, runtime-event vs warning separation, and the persistent operator status strip.
+Current next action: reconcile the latest Scope-00/`IMP-00-07` refinement into local `feat/00-foundation` without overwriting completed work. Fix the full-pane focus-outline regression, remove visible ACTIVE pane text, balance the odd Durable-jobs metric row, theme governed scrollbars, and restructure the current append-only `soma.css` into `UI.STYLE_LIBRARY` while preserving `soma.css` as the stable entry point. Then rerun the focused visual/interaction checks before resuming Scope 02.
 
 ### Design lane
 
