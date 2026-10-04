@@ -41,8 +41,10 @@ Initial target layout:
 ```text
 src/main/styles/
   soma.css
+  reset.css
   tokens.css
   base.css
+  components.css
   utilities.css
   primitives/
     actions.css
@@ -52,6 +54,7 @@ src/main/styles/
     feedback.css
     scrollbars.css
     status.css
+    shell.css
 ```
 
 Feature-local CSS may exist beside a feature only for genuinely feature-specific composition. It consumes library tokens/primitives and must not override shared component internals by selector accident.
