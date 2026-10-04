@@ -105,6 +105,16 @@
       "covers": ["UI.TEXT_INTEGRITY"]
     },
     {
+      "id": "CHK00.UI.PANE_FOCUS",
+      "anchor": "chk-ui-pane-focus",
+      "covers": ["UI.PANE_FOCUS", "UI.SELECTION", "UI.SCROLL"]
+    },
+    {
+      "id": "CHK00.UI.STATUS_STRIP",
+      "anchor": "chk-ui-status-strip",
+      "covers": ["UI.OPERATOR_STATUS_STRIP"]
+    },
+    {
       "id": "CHK00.PAGE.COLLECTION",
       "anchor": "chk-page-collection",
       "covers": ["QUERY.PAGE", "API.CLIENT"]
@@ -304,8 +314,12 @@ Perform a Foundation shell convergence review at three representative widths: wi
 At wide desktop verify:
 - operational hierarchy is primarily alignment, compact spacing, typography and thin pane separators rather than large rounded floating dashboard cards;
 - Diagnostics current-run/runtime/capability/log information reads as a dense operational console with compact rows and panes;
+- the working pane system owns/fills the available application height below top chrome and above the status strip without inventing fake content; facts remain top-aligned and pane-local scrolling owns overflow;
+- pane sizing may be intentionally asymmetric when information density differs; an equal four-card dashboard is not required;
 - navigation/status/data chrome uses the intended monospace hierarchy while long explanatory/help text remains readable;
-- normal controls are compact and large full-width CTA treatment is limited to genuine gates/consequential narrow actions;
+- page title, pane heading and compact label/value/evidence text are visibly distinct hierarchy levels;
+- Electric-blue-derived accent identifies the current interaction locus sparingly rather than decorating every heading;
+- normal controls are compact/flat enough to read as operational actions and large full-width CTA treatment is limited to genuine gates/consequential narrow actions;
 - no decorative whitespace occupies more visual attention than the facts/actions it separates.
 
 At narrow width verify:
@@ -315,6 +329,24 @@ At narrow width verify:
 - selected pane, navigation state, working copies, warnings and focus survive threshold changes.
 
 Capture development screenshots under ignored scratch output for review; screenshots are evidence only and never runtime/design authority. Compare structure/density against the approved directional references without copying their branding/trade dress.
+
+<a id="chk-ui-pane-focus"></a>
+## CHK00.UI.PANE_FOCUS
+
+Build a synthetic three-pane shell with a selectable list, evidence pane and activity pane. Exercise pointer activation, Tab/Shift+Tab traversal, arrows/page/scroll commands, row selection, modal open/close and responsive pane switching.
+
+Verify exactly one logical pane owns pane-local keyboard/scroll commands at a time; active pane, DOM focus, row selection, opened record and hover remain distinguishable. Activating a pane must not create a record selection. Modal focus temporarily supersedes and then restores the surviving invoker pane. Crossing the responsive threshold preserves the logical active pane where possible and otherwise chooses a deterministic labelled fallback without losing filters/working copies.
+
+At least one non-color structural cue plus the restrained Electric-blue current-locus accent identifies the active pane under normal and forced-color/high-contrast presentation.
+
+<a id="chk-ui-status-strip"></a>
+## CHK00.UI.STATUS_STRIP
+
+Render the authenticated shell against healthy READY, pre-ready/degraded and partially unavailable provider states. Verify the persistent bottom strip presents bounded current run/readiness/schema/build/trust facts without becoming a second event log or navigation area.
+
+At wide width the strip remains one compact line. At phone/narrow width it preserves run identity + readiness and exposes secondary facts through a labelled overflow/detail affordance rather than wrapping into a tall footer. Exact canonical details remain available through Diagnostics.
+
+Assert no secrets, full tokens, unrestricted filesystem paths or domain data appear; actual degraded/failed conditions are distinguishable from normal READY state without relying on color alone.
 
 <a id="chk-ui-text-integrity"></a>
 ## CHK00.UI.TEXT_INTEGRITY
@@ -356,7 +388,7 @@ Register a synthetic reversible owner action with exact preview/fingerprint and 
 <a id="chk-ui-diagnostics"></a>
 ## CHK00.UI.DIAGNOSTICS
 
-Open the System/Diagnostics surface on a healthy and partially failing host. Verify build/run/schema/capability/job/executor/connection/transaction/log state is visible, local time is readable, and canonical evidence remains inspectable where appropriate. Normal lifecycle transitions render as runtime/event evidence, while warnings/errors remain separately identifiable. Capability rows correspond to actually registered descriptors; absent future workspace owners do not appear as synthetic capability entries. Provider failure produces partial/unavailable panels without mutating jobs/migrations/domain state or exposing secrets/raw bodies.
+Open the System/Diagnostics surface on a healthy and partially failing host. Verify build/run/schema/capability/job/executor/connection/transaction/log state is visible, local time is readable, and canonical evidence remains inspectable where appropriate. Normal lifecycle transitions render as runtime/event chronology; warning/error codes remain a separate list and READY/TRAY_READY-style normal events never masquerade as errors. Capability rows correspond to actually registered descriptors; absent future workspace owners do not appear as synthetic capability entries. Repeated unavailable state remains concise while its full meaning is accessible. Provider failure produces partial/unavailable panels without mutating jobs/migrations/domain state or exposing secrets/raw bodies.
 
 <a id="chk-ui-appearance"></a>
 ## CHK00.UI.APPEARANCE
@@ -441,7 +473,7 @@ Create nested/sibling scroll panes and verify pointer, keyboard, touch, horizont
 <a id="chk-ui-reflow"></a>
 ## CHK00.UI.REFLOW
 
-Populate synthetic workbench state with filters, active/selected record, scroll positions, dirty working copy, and evidence pane. Cross the initial 1040 CSS px split threshold in both directions and verify equivalent capability/state survives. Narrow composition must switch/recompose panes rather than merely append every desktop pane into one page-length vertical stack.
+Populate synthetic workbench state with filters, active/selected record, active pane, scroll positions, dirty working copy, evidence pane, and operator status strip. Cross the initial 1040 CSS px split threshold in both directions and verify equivalent capability/state survives. Narrow composition must switch/recompose panes rather than merely append every desktop pane into one page-length vertical stack; status strip remains compact and active-pane identity remains understandable.
 
 <a id="chk-ui-hold"></a>
 ## CHK00.UI.HOLD
