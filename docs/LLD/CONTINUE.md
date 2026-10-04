@@ -17,8 +17,8 @@ This is the single current-state entry point for humans and agents. Do not appen
 | Design source | live Foundation desktop/mobile review + accepted SOMA/init.Habits directional references |
 | Design migration ledger | `docs/LLD/00/migration.md` |
 | Overall migration map | `docs/LLD/MIGRATION.md` |
-| Mode | Foundation implementation checkpoint complete; scope merge is the only remaining branch-hygiene step before `IMP-01-01` |
-| Implementation note | `IMP-00-01..07` are working and committed on `feat/00-foundation`; latest Foundation convergence is pushed at the current branch head and ready for scope merge into `main` |
+| Mode | Foundation implementation checkpoint complete; PR #1 reconciliation is the only remaining branch-hygiene step before `IMP-01-01` |
+| Implementation note | `IMP-00-01..07` are working and pushed. PR #1 (`feat/00-foundation` → `main`) is currently non-mergeable/dirty because `main` contains later accepted design/docs. Reconcile `main` into this branch surgically, preserve both implementation and accepted docs, rerun affected checks, then merge. |
 | Design blocker | none; IMP-00-07 passed focused checks and required live review; Scope 02 may resume when selected |
 | Certification | deferred until whole-application implementation and live testing |
 
@@ -39,7 +39,7 @@ The intended handoff can be as small as:
 4. Implement, run the goal's focused checks plus directly affected tests, and fix failures.
 5. Update the goal's Run/Remaining/status, close its migration rows, then advance this file to the next implementation goal.
 
-Current checkpoint: IMP-00-07 is working after 50 Main tests, strict build/typecheck, 35 focused runtime scenarios, 22 tooling checks and both encrypted-host Chrome workflows. Detached Run is windowless; Stop cleans only a revalidated exact-owned proven-dead stale registration and otherwise fails closed. The accepted semantic accents/cues, muted-green READY, active-title tint, natural odd-metric order and fixed pane header/scrolling body are implemented in the shared style library. Compiled layouts were reviewed at 1440/1040/1039/390px, forced colors, doubled text and 200% scrollbar surface zoom. The actual designated launcher passed READY/reuse/no-console-membership/graceful/idempotent stop and leaves the instance absent with an empty runtime directory; the development database was not reset. Next implementation is IMP-01-01 when selected; no future scope was started.
+Current checkpoint: IMP-00-07 is working and pushed; no Foundation behavior work remains. PR #1 is currently `dirty`, so the next action is branch reconciliation only: merge/reconcile current `main` into `feat/00-foundation`, resolve documentation conflicts in favor of the latest accepted baseline while preserving all Scope-00 implementation/evidence, rerun directly affected checks, and update PR #1. After it merges, start `IMP-01-01` from the merged `main`.
 
 ### Design lane
 
