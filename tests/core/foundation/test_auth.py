@@ -211,6 +211,68 @@ def test_setup_session_failure_leaves_credentials_unconfigured(host, monkeypatch
     assert host.browser.auth.state() == "setup_required"
 
 
+def test_setup_calls_same_uow_profile_participant_and_rolls_back_on_failure(runtime_config):
+    from soma.runtime.host import Host
+
+    calls = []
+
+    class Participant:
+        def __init__(self, *, fail=False):
+            self.fail = fail
+
+        def create_for_local_admin(
+            self, uow, *, parent_command_id, actor_id, display_name="Local Administrator"
+        ):
+            assert uow.connection.execute(
+                "SELECT command_id FROM command_receipts WHERE command_id=?",
+                (parent_command_id,),
+            ).fetchone() == (parent_command_id,)
+            assert uow.connection.execute(
+                "SELECT actor_id FROM local_admin_credentials WHERE actor_id=?",
+                (actor_id,),
+            ).fetchone() == (actor_id,)
+            calls.append((parent_command_id, actor_id, display_name))
+            if self.fail:
+                raise SomaError("PROFILE_PARTICIPANT_FAILED", "Synthetic participant failure.")
+            return actor_id
+
+    runtime = Host(runtime_config, tray=False, profile_participant=Participant())
+    runtime.start()
+    try:
+        runtime.browser.auth.setup("Foundation password 42", "Foundation password 42")
+        assert len(calls) == 1 and calls[0][2] == "Local Administrator"
+        assert runtime.browser.auth.state() == "login_required"
+    finally:
+        assert runtime.stop()
+
+    from soma.foundation.config import RuntimeConfig
+
+    failed_config = RuntimeConfig(
+        runtime_config.instance_root.parent / "participant-failure",
+        runtime_config.checkout_root,
+        "test",
+    )
+    runtime = Host(failed_config, tray=False, profile_participant=Participant(fail=True))
+    runtime.start()
+    try:
+        with pytest.raises(SomaError) as caught:
+            runtime.browser.auth.setup("Foundation password 42", "Foundation password 42")
+        assert caught.value.code == "PROFILE_PARTICIPANT_FAILED"
+        assert runtime.browser.auth.state() == "setup_required"
+        assert runtime.browser.sessions.entries == {}
+        connection = runtime.factory.open()
+        try:
+            assert connection.execute(
+                "SELECT count(*) FROM local_admin_credentials"
+            ).fetchone() == (0,)
+            assert connection.execute("SELECT count(*) FROM command_receipts").fetchone() == (0,)
+            assert connection.execute("SELECT count(*) FROM audit_events").fetchone() == (0,)
+        finally:
+            connection.close()
+    finally:
+        assert runtime.stop()
+
+
 def test_keyset_pages_larger_than_200_are_filter_bound_without_truncation():
     cursor = CursorCodec()
     rows = [(index // 3, index) for index in range(513)]
