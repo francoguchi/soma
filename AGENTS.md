@@ -22,6 +22,7 @@ The user can revise design. Current LLD items define behavior; goals define the 
 - Use shared frontend interactions, API contracts, and time formatting.
 - Never invent top-level workspace labels from capability/module/domain names. `UI.WORKSPACE_REGISTRY` is the only primary-navigation authority; capability registration controls availability, not navigation naming.
 - Shared UI changes must preserve `UI.VISUAL_GRAMMAR`: dense pane-based operational presentation, restrained radii/padding, semantic tokens, and deliberate narrow recomposition. Generic dashboard-card styling is not the default.
+- Treat `UI.STYLE_LIBRARY` as the only shared CSS foundation. Feature scopes consume its tokens/primitives; they do not add global button/body/input/shell/pane/scrollbar overrides or copy shared component CSS. Extend the library first when a reusable primitive is missing.
 - Make internal choices that preserve stated behavior. Ask for a missing material product decision and continue independent work.
 - Record unfinished behavior in the goal; do not present a stub as a completed operation.
 - Reuse and revise existing code. For Beta donor code, process the current goal's rows in the scope migration ledger and record `REUSED`, `REWRITTEN`, `REJECTED`, or `DEFERRED` before marking the goal working. Never mark `REUSED` from file-copy success alone; compare the donor behavior to the current LLD and carry over/rewrite the focused regression evidence. Create abstractions/documents only when actual work requires them.
