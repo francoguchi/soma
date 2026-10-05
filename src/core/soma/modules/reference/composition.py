@@ -1,5 +1,8 @@
 from dataclasses import dataclass
 
+from soma.modules.reference.application.dispatch import DispatchLocations
+from soma.modules.reference.application.lifecycle import ReferenceLifecycle
+from soma.modules.reference.domain.dependencies import ReferenceDependencyRegistry
 from soma.modules.reference.application.customer import Customers
 from soma.modules.reference.application.contact import Contacts
 from soma.modules.reference.adapters.communication import Communication
@@ -18,15 +21,23 @@ class Reference:
     customers: Customers
     contacts: Contacts
     communication: Communication
+    dispatch: DispatchLocations
+    lifecycle: ReferenceLifecycle
 
 
-def compose(factory):
+def compose(factory, *, dependency_validators=(), required_validator_ids=()):
+    dependencies = ReferenceDependencyRegistry()
+    for validator in dependency_validators:
+        dependencies.register(validator)
+    dependencies.finalize(required_validator_ids=required_validator_ids)
     writer = reference_audit_writer()
     assembled = Reference(
         Profile(factory, writer),
         Customers(factory, writer),
         Contacts(factory, writer),
         Communication(),
+        DispatchLocations(factory, writer),
+        ReferenceLifecycle(factory, writer, dependencies),
     )
     with ReadSnapshot(factory) as snapshot:
         require_persisted_matching_profile(snapshot.connection)

@@ -282,9 +282,64 @@
           ]
         ]
       ]
+    },
+    {
+      "reject": [
+        [
+          "UPDATE dispatch_locations SET dispatch_location_id=? WHERE dispatch_location_id=?",
+          [
+            "97979797-9797-4797-8797-979797979797",
+            "96969696-9696-4696-8696-969696969696"
+          ]
+        ],
+        [
+          "UPDATE dispatch_locations SET address_mode='site_derived',standalone_address_text=NULL WHERE dispatch_location_id=?",
+          [
+            "96969696-9696-4696-8696-969696969696"
+          ]
+        ],
+        [
+          "UPDATE dispatch_locations SET created_at_utc=1,updated_at_utc=1 WHERE dispatch_location_id=?",
+          [
+            "96969696-9696-4696-8696-969696969696"
+          ]
+        ],
+        [
+          "UPDATE dispatch_locations SET standalone_address_text='address' WHERE dispatch_location_id=?",
+          [
+            "97979797-9797-4797-8797-979797979797"
+          ]
+        ],
+        [
+          "DELETE FROM dispatch_locations WHERE dispatch_location_id=?",
+          [
+            "96969696-9696-4696-8696-969696969696"
+          ]
+        ],
+        [
+          "DELETE FROM dispatch_locations WHERE dispatch_location_id=?",
+          [
+            "97979797-9797-4797-8797-979797979797"
+          ]
+        ]
+      ],
+      "setup": [
+        [
+          "INSERT INTO dispatch_locations VALUES (?,'probe','probe','standalone','address','active',1,0,0)",
+          [
+            "96969696-9696-4696-8696-969696969696"
+          ]
+        ],
+        [
+          "INSERT INTO dispatch_locations VALUES (?,'probe','probe','site_derived',NULL,'active',1,0,0)",
+          [
+            "97979797-9797-4797-8797-979797979797"
+          ]
+        ]
+      ]
     }
   ],
-  "generation": 8,
+  "generation": 9,
   "lineage": [
     [
       "M00.001",
@@ -325,6 +380,11 @@
       "M01.002",
       "01",
       "00ba64c3c556d450252d69760d7be963b38afb1aa29d0ceb981e849942d01444"
+    ],
+    [
+      "M01.003",
+      "01",
+      "7208a9686e87e15b6242210f25d0bc98576acc1f85d6e5dac776893ede7e1aae"
     ]
   ],
   "shape": {
@@ -911,6 +971,48 @@
         ],
         "table": "customer_organizations"
       },
+      "idx_dispatch_active_name_match": {
+        "flags": [
+          0,
+          "c",
+          0
+        ],
+        "keys": [
+          [
+            0,
+            5,
+            "lifecycle_state",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            1,
+            2,
+            "name_match_key",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            2,
+            0,
+            "dispatch_location_id",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            3,
+            -1,
+            null,
+            0,
+            "BINARY",
+            0
+          ]
+        ],
+        "table": "dispatch_locations"
+      },
       "idx_reference_lifecycle_command": {
         "flags": [
           0,
@@ -1228,6 +1330,32 @@
           ]
         ],
         "table": "customer_organizations"
+      },
+      "sqlite_autoindex_dispatch_locations_1": {
+        "flags": [
+          1,
+          "pk",
+          0
+        ],
+        "keys": [
+          [
+            0,
+            0,
+            "dispatch_location_id",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            1,
+            -1,
+            null,
+            0,
+            "BINARY",
+            0
+          ]
+        ],
+        "table": "dispatch_locations"
       },
       "sqlite_autoindex_durable_jobs_1": {
         "flags": [
@@ -1717,6 +1845,12 @@
       ],
       [
         "index",
+        "idx_dispatch_active_name_match",
+        "dispatch_locations",
+        "6267f8b643e092c73610e2674e955d6b62524d7bc3673bd6428bfda89a49f82f"
+      ],
+      [
+        "index",
         "idx_reference_lifecycle_command",
         "reference_lifecycle_events",
         "242b23b9d5ba2153ec6e28b4334bbb273f2e208f2eb17c3c40b7adfe01875011"
@@ -1798,6 +1932,12 @@
         "customer_organizations",
         "customer_organizations",
         "b0ece3ed3da1f009dbbc140d7f2ce9e2643a11a7e6b25ad8e44c10421009184c"
+      ],
+      [
+        "table",
+        "dispatch_locations",
+        "dispatch_locations",
+        "785d9ebc44516d19c701dbb0d1d247c728406fc6f04e4c69d0905ac918509a6a"
       ],
       [
         "table",
@@ -1972,6 +2112,18 @@
         "reference_customer_organizations_update_guard",
         "customer_organizations",
         "a362aa06d8f76e3d5e5f4cb8fc31331f8cc2a5c7d2b7b039743b8b9dc9c3acdd"
+      ],
+      [
+        "trigger",
+        "reference_dispatch_locations_delete_forbidden",
+        "dispatch_locations",
+        "fb5451b5487dd2dc6cc534585901a5746d620312d71453775bd203c5928fe7ad"
+      ],
+      [
+        "trigger",
+        "reference_dispatch_locations_update_guard",
+        "dispatch_locations",
+        "aef6604ac38aab1e6651e81ac9d1ccdabde0aa09d2d0f9c3f6800f2cbcc955a8"
       ],
       [
         "trigger",
@@ -2851,6 +3003,98 @@
         "flags": [
           "table",
           7,
+          0,
+          1
+        ],
+        "foreign_keys": []
+      },
+      "dispatch_locations": {
+        "columns": [
+          [
+            0,
+            "dispatch_location_id",
+            "TEXT",
+            1,
+            null,
+            1,
+            0
+          ],
+          [
+            1,
+            "name",
+            "TEXT",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            2,
+            "name_match_key",
+            "TEXT",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            3,
+            "address_mode",
+            "TEXT",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            4,
+            "standalone_address_text",
+            "TEXT",
+            0,
+            null,
+            0,
+            0
+          ],
+          [
+            5,
+            "lifecycle_state",
+            "TEXT",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            6,
+            "revision",
+            "INTEGER",
+            1,
+            "1",
+            0,
+            0
+          ],
+          [
+            7,
+            "created_at_utc",
+            "INTEGER",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            8,
+            "updated_at_utc",
+            "INTEGER",
+            1,
+            null,
+            0,
+            0
+          ]
+        ],
+        "flags": [
+          "table",
+          9,
           0,
           1
         ],

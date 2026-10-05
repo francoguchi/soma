@@ -8,8 +8,8 @@ This is the single current-state entry point for humans and agents. Do not appen
 |---|---|
 | Implementation scope | `01 — Identity / Reference` |
 | Implementation branch | `feat/01-identity-reference` |
-| Implementation goal | `IMP-01-03 — Dispatch and governed lifecycle` |
-| Implementation goal file | `docs/implementation/01/01.03.md` |
+| Implementation goal | `IMP-01-04 — Typed settings store` |
+| Implementation goal file | `docs/implementation/01/01.04.md` |
 | Implementation migration ledger | `docs/LLD/01/migration.md` |
 | Queued next implementation | `02 — Tickets Core`, after Scope-02 design approval and required Scope-01 dependencies |
 | Design scope | `02 — Tickets Core` |
@@ -18,7 +18,7 @@ This is the single current-state entry point for humans and agents. Do not appen
 | Design migration ledger | `docs/LLD/02/migration.md` |
 | Overall migration map | `docs/LLD/MIGRATION.md` |
 | Mode | parallel design N+1 / implementation N |
-| Implementation note | IMP-01-02 is working with closed R01.02-A..C. Contact commands, communication lookup and M01.002 generation 8 are implemented and live-tested on `feat/01-identity-reference`. IMP-01-03 is queued next; no Dispatch/lifecycle command work has started. |
+| Implementation note | IMP-01-03 is working with closed R01.03-A..C. Dispatch, same-UoW Site participation, dependency guards/previews, lifecycle commands and M01.003 generation 9 are implemented and exercised on `feat/01-identity-reference`. IMP-01-04 is queued next; no Settings or later-goal implementation has started. |
 | Design blocker | none; Scope 02 design resumes from the merged Foundation baseline |
 | Certification | deferred until whole-application implementation and live testing |
 
@@ -39,7 +39,7 @@ The intended handoff can be as small as:
 4. Implement, run the goal's focused checks plus directly affected tests, and fix failures.
 5. Update the goal's Run/Remaining/status, close its migration rows, then advance this file to the next implementation goal.
 
-Current checkpoint: IMP-01-02 is working. Existing Foundation replay/preflight/UoW/audit, matching, Customer eligibility and lifecycle storage were reused for Contact commands, email channels, append-preserving affiliation and caller-snapshot communication lookup. Final 137 focused Reference/execution/persistence checks, assembled live Contact restart, Main build/typecheck, contracts/schema/Ruff/impact passed. Actual designated-instance trusted Stop/reset/detached source READY/Stop passed; it is stopped with a fresh generation-8 database requiring administrator setup. Generated identity/assets remain synchronized. Next read IMP-01-03 and only its Dispatch/lifecycle/dependency authorities and R01.03 donor rows. Do not begin Settings, generic query/API/UI orchestration or later goals.
+Current checkpoint: IMP-01-03 is working. Dispatch standalone commands and same-UoW Site participation, fail-closed Customer/Contact/Dispatch lifecycle guards, bounded signed blocker previews and generation-9 schema/protection probes are implemented. Final 165 affected Reference/execution/persistence tests and final 30 Dispatch/lifecycle tests (two additional cases), assembled live Dispatch restart/replay, Main build/typecheck, contracts/schema/Ruff/impact passed. Actual designated-instance trusted Stop/reset/detached source READY/Stop passed; it is stopped with a fresh generation-9 database requiring administrator setup. Generated identity/assets remain synchronized. Next read IMP-01-04 and only its typed-setting/dependency authorities and R01.04 donor rows. No later-goal implementation was started; do not begin generic query/API/UI orchestration or subsequent goals.
 
 ### Design lane
 

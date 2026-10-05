@@ -162,6 +162,8 @@ def generate(root=ROOT, *, check=False):
             value["append_only_probes"] += reference_probes()
         if any(entry.migration_id == "M01.002" for entry in manifest.entries):
             value["append_only_probes"] += contact_probes()
+        if any(entry.migration_id == "M01.003" for entry in manifest.entries):
+            value["append_only_probes"] += dispatch_probes()
     finally:
         connection.close()
     path = root / "src/core/soma/db/schema_manifest.json"
@@ -221,6 +223,45 @@ def contact_probes():
                     [customer, affiliation],
                 ],
                 ["DELETE FROM contact_affiliations WHERE contact_affiliation_id=?", [affiliation]],
+            ],
+        }
+    ]
+
+
+def dispatch_probes():
+    standalone = "96969696-9696-4696-8696-969696969696"
+    derived = "97979797-9797-4797-8797-979797979797"
+    return [
+        {
+            "setup": [
+                [
+                    "INSERT INTO dispatch_locations VALUES (?,'probe','probe','standalone','address','active',1,0,0)",
+                    [standalone],
+                ],
+                [
+                    "INSERT INTO dispatch_locations VALUES (?,'probe','probe','site_derived',NULL,'active',1,0,0)",
+                    [derived],
+                ],
+            ],
+            "reject": [
+                [
+                    "UPDATE dispatch_locations SET dispatch_location_id=? WHERE dispatch_location_id=?",
+                    [derived, standalone],
+                ],
+                [
+                    "UPDATE dispatch_locations SET address_mode='site_derived',standalone_address_text=NULL WHERE dispatch_location_id=?",
+                    [standalone],
+                ],
+                [
+                    "UPDATE dispatch_locations SET created_at_utc=1,updated_at_utc=1 WHERE dispatch_location_id=?",
+                    [standalone],
+                ],
+                [
+                    "UPDATE dispatch_locations SET standalone_address_text='address' WHERE dispatch_location_id=?",
+                    [derived],
+                ],
+                ["DELETE FROM dispatch_locations WHERE dispatch_location_id=?", [standalone]],
+                ["DELETE FROM dispatch_locations WHERE dispatch_location_id=?", [derived]],
             ],
         }
     ]

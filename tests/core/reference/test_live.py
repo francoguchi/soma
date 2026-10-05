@@ -79,6 +79,30 @@ def test_live_reference_composition_auth_setup_customer_workflow_restart(tmp_pat
                 snapshot, contact, "AUTO", "msg_recipient"
             )
             assert use.state == "USABLE" and use.value_text == "live@example.com"
+        dispatch_request = dict(
+            command_id=new_uuid4(),
+            name="Live synthetic Dispatch",
+            address_text="Synthetic address",
+            actor_id=actor,
+        )
+        dispatch_result = host.reference.dispatch.create_standalone(**dispatch_request)
+        lifecycle_request = dict(
+            command_id=new_uuid4(),
+            target_type="dispatch_location",
+            target_id=dispatch_result["target_id"],
+            base_revision=1,
+            reason_category="operator_archive",
+            actor_id=actor,
+        )
+        archived = host.reference.lifecycle.archive_reference(**lifecycle_request)
+        host.reference.lifecycle.reactivate_reference(
+            **(
+                lifecycle_request
+                | dict(
+                    command_id=new_uuid4(), base_revision=2, reason_category="operator_reactivate"
+                )
+            )
+        )
         assert host.state == "READY"
     finally:
         assert host.stop()
@@ -86,7 +110,16 @@ def test_live_reference_composition_auth_setup_customer_workflow_restart(tmp_pat
     restarted.start()
     try:
         assert restarted.reference.profile.get_singleton()["display_name"] == "Synthetic Operator"
-        assert restarted.manifest.generation == 8
+        assert restarted.manifest.generation == 9
+        assert restarted.reference.dispatch.create_standalone(**dispatch_request) == dispatch_result
+        assert restarted.reference.lifecycle.archive_reference(**lifecycle_request) == archived
+        preview = restarted.reference.lifecycle.preview(
+            operation="archive",
+            target_type="dispatch_location",
+            target_id=dispatch_result["target_id"],
+            base_revision=3,
+        )
+        assert preview.would_be_eligible
         with ReadSnapshot(restarted.reference.customers.factory) as snapshot:
             assert (
                 restarted.reference.communication.validate_contact(snapshot, contact, 2) == "ACTIVE"

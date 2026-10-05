@@ -174,6 +174,38 @@ def reference_audit_contracts() -> tuple[AuditContract, ...]:
         return False
 
     return (
+        AuditContract(
+            "reference.dispatch_location.created",
+            1,
+            "DispatchLocationAuditV1",
+            1,
+            _dispatch_created,
+            safe,
+        ),
+        AuditContract(
+            "reference.dispatch_location.descriptive_updated",
+            1,
+            "ReferenceDescriptiveAuditV1",
+            1,
+            _dispatch_updated,
+            safe,
+        ),
+        AuditContract(
+            "reference.archived",
+            1,
+            "ReferenceLifecycleAuditV1",
+            1,
+            _lifecycle_validator("archived"),
+            safe,
+        ),
+        AuditContract(
+            "reference.reactivated",
+            1,
+            "ReferenceLifecycleAuditV1",
+            1,
+            _lifecycle_validator("active"),
+            safe,
+        ),
         AuditContract("reference.contact.created", 1, "ContactAuditV1", 1, _contact_created, safe),
         AuditContract(
             "reference.contact.descriptive_updated",
@@ -360,3 +392,77 @@ def _affiliation_changed(value):
     _reason(value["reason_category"])
     if value["reason_category"] is None:
         raise ValidationError("Missing affiliation reason.")
+
+
+def _dispatch_created(value):
+    value = _dict(
+        value, {"dispatch_location_id", "address_mode", "new_revision", "lifecycle_event_id"}
+    )
+    require_uuid4(value["dispatch_location_id"])
+    require_uuid4(value["lifecycle_event_id"])
+    if (
+        value["address_mode"] not in {"standalone", "site_derived"}
+        or type(value["new_revision"]) is not int
+        or value["new_revision"] != 1
+    ):
+        raise ValidationError("Invalid Dispatch creation evidence.")
+
+
+def _dispatch_updated(value):
+    value = _dict(
+        value,
+        {
+            "target_type",
+            "target_id",
+            "prior_revision",
+            "new_revision",
+            "changed_fields",
+            "lifecycle_event_id",
+        },
+    )
+    require_uuid4(value["target_id"])
+    require_uuid4(value["lifecycle_event_id"])
+    if (
+        value["target_type"] != "dispatch_location"
+        or _revision(value["new_revision"]) != _revision(value["prior_revision"]) + 1
+    ):
+        raise ValidationError("Invalid Dispatch descriptive evidence.")
+    if value["changed_fields"] not in (
+        ["name"],
+        ["standalone_address_text"],
+        ["name", "standalone_address_text"],
+    ):
+        raise ValidationError("Invalid Dispatch changed fields.")
+
+
+def _lifecycle_validator(new_state):
+    def validate(value):
+        value = _dict(
+            value,
+            {
+                "target_type",
+                "target_id",
+                "prior_state",
+                "new_state",
+                "prior_revision",
+                "new_revision",
+                "lifecycle_event_id",
+                "reason_category",
+            },
+        )
+        require_uuid4(value["target_id"])
+        require_uuid4(value["lifecycle_event_id"])
+        if (
+            value["target_type"] not in {"customer_organization", "contact", "dispatch_location"}
+            or value["new_state"] != new_state
+            or value["prior_state"] != ("active" if new_state == "archived" else "archived")
+        ):
+            raise ValidationError("Invalid lifecycle state evidence.")
+        if _revision(value["new_revision"]) != _revision(value["prior_revision"]) + 1:
+            raise ValidationError("Invalid lifecycle revision evidence.")
+        from soma.modules.reference.domain.validation import validate_reason_category
+
+        if validate_reason_category(value["reason_category"]) is None:
+            raise ValidationError("Lifecycle reason is required.")
+
+    return validate

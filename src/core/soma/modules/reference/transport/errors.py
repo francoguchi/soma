@@ -3,7 +3,10 @@
 from soma.foundation.errors import SomaError, error_envelope
 
 ERRORS = {
-    "REFERENCE_ARCHIVED": ("Contact is inactive.", "refresh"),
+    "REFERENCE_ARCHIVED": ("Reference is archived.", "refresh"),
+    "ARCHIVE_BLOCKED": ("Reference archive is blocked.", "refresh"),
+    "REACTIVATION_BLOCKED": ("Reference reactivation is blocked.", "refresh"),
+    "DEPENDENCY_VALIDATION_FAILED": ("Dependency validation is unavailable.", "retry"),
     "CHANNEL_NOT_USABLE": ("Channel is inactive.", "refresh"),
     "CHANNEL_INVALID": ("Email channel is invalid.", "correct_input"),
     "CHANNEL_NOT_OWNED": ("Channel belongs to another Contact.", "refresh"),
