@@ -1,4 +1,5 @@
-.diagnostics-surface {
+.diagnostics-surface,
+.operational-surface {
   display: flex;
   flex-direction: column;
   flex: 1;

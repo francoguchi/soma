@@ -42,7 +42,7 @@ function valid(schema: Schema, value: unknown): boolean {
   return true;
 }
 export function assertContract<T>(name: string, value: unknown): T {
-  const schema = catalog[`urn:soma:00:${name}:v1`];
+  const schema = catalog[name.startsWith('urn:soma:') ? name : `urn:soma:00:${name}:v1`];
   if (!schema || !valid(schema, value)) throw new Error('Local API contract mismatch. Reload or rebuild SOMA.');
   return value as T;
 }

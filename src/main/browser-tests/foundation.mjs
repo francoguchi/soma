@@ -1,6 +1,9 @@
 // Real encrypted Foundation host: no Vite server, API mocks, or donor runtime.
 import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
 import {chromium, expect} from '@playwright/test';
+const migrations = JSON.parse(readFileSync(new URL('../../core/soma/db/migrations/manifest.json', import.meta.url), 'utf8'));
+const migrationId = migrations.migrations.at(-1).migration_id;
 const origin = process.argv[2];
 assert.match(origin, /^http:\/\/127\.0\.0\.1:[1-9][0-9]*$/u);
 const browser = await chromium.launch({headless: true, channel: 'chrome'});
@@ -24,7 +27,7 @@ try {
   assert.equal(await page.locator('.capability-list li').count(), 5);
   await expect(page.getByText('No warnings or errors.', {exact: true})).toBeVisible();
   await expect(page.getByRole('list', {name: 'Runtime chronology'})).toContainText('RUNTIME_READY');
-  await expect(page.locator('.status-secondary').getByText('schema M00.005', {exact: true})).toBeVisible();
+  await expect(page.locator('.status-secondary').getByText(`schema ${migrationId}`, {exact: true})).toBeVisible();
   await expect(page.getByRole('button', {name: 'Inventory - Not available in this build'})).toBeDisabled();
   assert.equal(await page.evaluate(() => document.documentElement.dataset.appearance), 'core-dark');
   const cookies = await context.cookies();
@@ -57,7 +60,7 @@ try {
     assert(await page.locator('.status-readiness').evaluate(node => getComputedStyle(node).color === getComputedStyle(document.documentElement).getPropertyValue('--soma-success').trim().replace(/^#([0-9a-f]{6})$/iu, (_, hex) => `rgb(${parseInt(hex.slice(0,2),16)}, ${parseInt(hex.slice(2,4),16)}, ${parseInt(hex.slice(4,6),16)})`)));
     if (!wide) {
       await page.getByLabel('Operator status details').click();
-      await expect(page.getByLabel('Secondary operator status')).toContainText('schema M00.005');
+      await expect(page.getByLabel('Secondary operator status')).toContainText(`schema ${migrationId}`);
       await page.getByLabel('Operator status details').click();
     }
     assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));

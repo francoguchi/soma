@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:soma:01:change-affiliation-request:v1",
+  "title": "ReferenceChangeAffiliationRequestV1",
+  "type": "object",
+  "properties": {
+    "command_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "base_revision": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "new_customer_org_id": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "reason_category": {
+      "type": "string",
+      "maxLength": 128
+    }
+  },
+  "required": [
+    "command_id",
+    "base_revision",
+    "new_customer_org_id",
+    "reason_category"
+  ],
+  "additionalProperties": false
+}

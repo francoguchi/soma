@@ -43,3 +43,15 @@ class StateResult:
 
     def fetchone(self):
         return self.__cursor.fetchone()
+
+
+def load_many(connection, keys):
+    if not keys:
+        return {}
+    placeholders = ",".join("?" for _ in keys)
+    rows = connection.execute(
+        "SELECT setting_key,contract_name,contract_version,value_json,revision FROM setting_values "
+        f"WHERE setting_key IN ({placeholders}) LIMIT 200",
+        keys,
+    ).fetchall()
+    return {row[0]: row[1:] for row in rows}

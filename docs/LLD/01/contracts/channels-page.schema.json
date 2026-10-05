@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:soma:01:channels-page:v1",
+  "title": "ReferenceChannelsPageV1",
+  "type": "object",
+  "properties": {
+    "items": {
+      "type": "array",
+      "maxItems": 200,
+      "items": {
+        "type": "object",
+        "properties": {
+          "contact_channel_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "contact_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "channel_kind": {
+            "const": "email",
+            "type": "string"
+          },
+          "value_text": {
+            "type": "string",
+            "maxLength": 2048
+          },
+          "match_key": {
+            "type": "string",
+            "maxLength": 2048
+          },
+          "lifecycle_state": {
+            "enum": [
+              "active",
+              "archived"
+            ],
+            "type": "string"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "created_at_utc": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "updated_at_utc": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "contact_channel_id",
+          "contact_id",
+          "channel_kind",
+          "value_text",
+          "match_key",
+          "lifecycle_state",
+          "revision",
+          "created_at_utc",
+          "updated_at_utc"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "continuation": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 6000
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "exact_count": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "as_of_utc_s": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    }
+  },
+  "required": [
+    "items",
+    "continuation",
+    "exact_count",
+    "as_of_utc_s"
+  ],
+  "additionalProperties": false
+}

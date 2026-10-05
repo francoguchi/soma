@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:soma:01:validate-channel-request:v1",
+  "title": "ReferenceValidateChannelRequestV1",
+  "type": "object",
+  "properties": {
+    "channel_or_auto": {
+      "type": "string",
+      "maxLength": 256
+    },
+    "purpose": {
+      "enum": [
+        "msg_recipient"
+      ],
+      "type": "string"
+    },
+    "limit": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 200
+    },
+    "after": {
+      "type": "string",
+      "maxLength": 6000
+    }
+  },
+  "required": [
+    "channel_or_auto",
+    "purpose"
+  ],
+  "additionalProperties": false
+}

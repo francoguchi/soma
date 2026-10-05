@@ -764,6 +764,8 @@ Reuse provenance: Beta LLD-10 shared workbench shell and responsive composition.
 
 Reuse provenance: Beta LLD-10 working-copy semantics.
 
+Recovery restore returns the server-verified `draft_sha256` alongside generation/freshness evidence. Main passes that exact checksum to the shared working-copy client; it does not manufacture a replacement checkpoint identity. Closed owner draft schemas and freshness callbacks remain supplied through composition.
+
 <a id="ui-confirmation"></a>
 ## UI.CONFIRMATION
 

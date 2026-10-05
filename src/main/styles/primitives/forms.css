@@ -177,3 +177,12 @@ fieldset {
     padding: 24px;
   }
 }
+
+.operational-form {display: grid; gap: var(--soma-space-3); min-width: 0;}
+.operational-form label {display: grid; gap: var(--soma-space-2); min-width: 0;}
+.operational-form :is(input,select,textarea) {width: 100%;}
+.action-strip {display: flex; flex-wrap: wrap; align-items: center; gap: var(--soma-space-2); margin-block: var(--soma-space-2);}
+.evidence-list {padding-inline-start: var(--soma-space-3); overflow-wrap: anywhere;}
+
+.form-field {display: grid; gap: var(--soma-space-2); min-width: 0;}
+.form-field :is(input,textarea) {width: 100%;}

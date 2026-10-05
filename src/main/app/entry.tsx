@@ -5,6 +5,10 @@ import type {AuthResultV1, BootstrapV1} from '../shared/api/generated/contracts'
 import {buildIdentity} from '../shared/build/identity';
 import {applyAppearance} from '../shared/appearance';
 import {ErrorState} from '../shared/components/ErrorState';
+import {Settings} from '../features/settings/Settings';
+import {useOwnerQuery} from '../features/reference/model';
+import type {ReferenceProfileDetailV1} from '../shared/api/generated/contracts';
+import {requestNavigation} from '../shared/interactions/use-working-intent';
 import {OperatorStatus} from './status/OperatorStatus';
 import {useDiagnostics} from '../features/system/useDiagnostics';
 import {Diagnostics} from '../features/system/Diagnostics';
@@ -38,7 +42,12 @@ export function Application() {
   const diagnostics = useDiagnostics(bootstrap?.auth_state === 'authenticated' ? bootstrap.run_id : null);
   const [actionError, setActionError] = useState<unknown>(null);
   const [path, setPath] = useState(location.pathname);
-  const main = useRef<HTMLElement>(null);
+  const main = useRef<HTMLElement>(null), shell = useRef<HTMLDivElement>(null);
+  const previousPath = useRef(path); previousPath.current = path;
+  const [profileRevision, setProfileRevision] = useState(0);
+  const hasReference = bootstrap?.auth_state === 'authenticated' && bootstrap.capabilities.some(item => item.id === 'reference.identity' && item.state === 'available');
+  const profile = useOwnerQuery<ReferenceProfileDetailV1 | null>(String(hasReference) + profileRevision, signal => hasReference ? api.request('/api/v1/local-user-profile', 'urn:soma:01:profile-detail:v1', {signal}) : Promise.resolve(null));
+  useEffect(() => {const update = () => setProfileRevision(v => v + 1); addEventListener('soma:profile-updated', update); return () => removeEventListener('soma:profile-updated', update);}, []);
   const context = useRef<ReturnState | null>(null);
   const navigation = useRef(new Navigation(() => context.current));
   useEffect(() => {applyAppearance();}, []);
@@ -54,7 +63,12 @@ export function Application() {
     return () => query.cancel();
   }, [revision]);
   useEffect(() => {
-    const pop = (event: PopStateEvent) => {setPath(location.pathname); context.current = (event.state as {context?: ReturnState} | null)?.context ?? null;};
+    const pop = (event: PopStateEvent) => {
+      const next = location.pathname, state = event.state as {context?: ReturnState; authorized?: boolean} | null;
+      const apply = () => {if (location.pathname !== next) history.pushState({context: state?.context ?? null}, '', next); setPath(next); context.current = state?.context ?? null;};
+      if (state?.authorized) apply();
+      else {const change = new CustomEvent('soma:navigate', {cancelable: true, detail: {flow: next, proceed: apply}}); if (dispatchEvent(change)) apply(); else history.pushState({context: context.current}, '', previousPath.current);}
+    };
     addEventListener('popstate', pop); return () => removeEventListener('popstate', pop);
   }, []);
   useEffect(() => {if (main.current) {main.current.scrollTop = context.current?.scrollTop ?? 0; main.current.focus();}}, [path, bootstrap?.auth_state]);
@@ -67,9 +81,9 @@ export function Application() {
   async function logout() {
     try {await api.request('/api/v1/auth/logout', 'auth-result', {method: 'POST', body: {}, requestContract: 'empty-request'}); api.csrf = null; reload();} catch (caught) {setError(caught);}
   }
-  return <div className="soma-shell"><a className="skip-link" href="#main-content">Skip to content</a><header className="shell-header"><div className="brand"><img src={mark} alt=""/><strong>SOMA</strong><span>LOCAL OPERATIONS</span></div><div className="shell-session"><span>Local Administrator</span><button onClick={() => {void logout();}}>Sign out</button></div></header><nav aria-label="Navigation" className="workspace-nav" data-scroll-owner="both"><div className="product-workspaces" data-scroll-owner="x" tabIndex={0} role="group" aria-label="Workspaces"><p className="eyebrow">Workspaces</p>{workspaces.map(item => {
+  return <div ref={shell} className="soma-shell"><a className="skip-link" href="#main-content">Skip to content</a><header className="shell-header"><div className="brand"><img src={mark} alt=""/><strong>SOMA</strong><span>LOCAL OPERATIONS</span></div><div className="shell-session"><span>{profile.value?.display_name ?? 'Local Administrator'}</span><button onClick={() => requestNavigation('sign-out', () => {void logout();})}>Sign out</button></div></header><nav aria-label="Navigation" className="workspace-nav" data-scroll-owner="both"><div className="product-workspaces" data-scroll-owner="x" tabIndex={0} role="group" aria-label="Workspaces"><p className="eyebrow">Workspaces</p>{workspaces.map(item => {
     const state = workspaceState(item.capability, bootstrap.capabilities);
-    return <button key={item.path} disabled={state === 'unavailable'} aria-label={state === 'unavailable' ? item.title + ' - Not available in this build' : item.title + (state === 'development' ? ' - Development' : '')} title={state === 'unavailable' ? 'Not available in this build' : item.title} aria-current={path === item.path ? 'page' : undefined} onClick={() => navigation.current.open(item.path)}><span>{item.title}</span>{state !== 'available' && <small aria-hidden="true">{state === 'development' ? 'dev' : '—'}</small>}</button>;
-  })}</div><div className="system-destinations" role="group" aria-label="System"><p className="eyebrow">System</p>{systemDestinations.map(item => <button key={item.path} disabled={workspaceState(item.capability, bootstrap.capabilities) === 'unavailable'} aria-current={path === item.path ? 'page' : undefined} onClick={() => navigation.current.open(item.path)}>{item.title}</button>)}</div><footer>Core Dark<br/>Foundation · {buildIdentity.application_version}</footer></nav><main id="main-content" ref={main} tabIndex={-1} className="main-scroll" data-scroll-owner="y" onScroll={() => {context.current = {filters: {}, activeId: null, selectedIds: [], pane: null, tab: null, scrollTop: main.current?.scrollTop ?? 0, focusToken: 'main-content'};}}>{!available ? <section><h1>{route?.title ?? 'Page not found'}</h1><p>Not available in this build.</p><button onClick={() => navigation.current.open('/system/diagnostics')}>Go to Diagnostics</button></section> : <Diagnostics {...diagnostics} actionError={actionError} setActionError={setActionError}/>}</main><OperatorStatus bootstrap={bootstrap} diagnostics={diagnostics.value} unavailable={diagnostics.error !== null}/></div>;
+    return <button key={item.path} disabled={state === 'unavailable'} aria-label={state === 'unavailable' ? item.title + ' - Not available in this build' : item.title + (state === 'development' ? ' - Development' : '')} title={state === 'unavailable' ? 'Not available in this build' : item.title} aria-current={(path === item.path || item.path === '/settings' && path.startsWith('/settings/')) ? 'page' : undefined} onClick={() => navigation.current.open(item.path)}><span>{item.title}</span>{state !== 'available' && <small aria-hidden="true">{state === 'development' ? 'dev' : '—'}</small>}</button>;
+  })}</div><div className="system-destinations" role="group" aria-label="System"><p className="eyebrow">System</p>{systemDestinations.map(item => <button key={item.path} disabled={workspaceState(item.capability, bootstrap.capabilities) === 'unavailable'} aria-current={path === item.path ? 'page' : undefined} onClick={() => navigation.current.open(item.path)}>{item.title}</button>)}</div><footer>Core Dark<br/>Foundation · {buildIdentity.application_version}</footer></nav><main id="main-content" ref={main} tabIndex={-1} className="main-scroll" data-scroll-owner="y" onScroll={() => {context.current = {filters: {}, activeId: null, selectedIds: [], pane: null, tab: null, scrollTop: main.current?.scrollTop ?? 0, focusToken: 'main-content'};}}>{!available ? <section><h1>{route?.title ?? 'Page not found'}</h1><p>Not available in this build.</p><button onClick={() => navigation.current.open('/system/diagnostics')}>Go to Diagnostics</button></section> : path.startsWith('/settings') ? <Settings path={path} navigate={next => navigation.current.open(next)} application={shell}/> : <Diagnostics {...diagnostics} actionError={actionError} setActionError={setActionError}/>}</main><OperatorStatus bootstrap={bootstrap} diagnostics={diagnostics.value} unavailable={diagnostics.error !== null}/></div>;
 }
 createRoot(document.getElementById('root')!).render(<Application/>);

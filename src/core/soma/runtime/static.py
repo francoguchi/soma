@@ -6,12 +6,23 @@ from soma.foundation.errors import SomaError
 from soma.foundation.filesystem import safe_path
 from soma.foundation.strict_json import loads_strict_bytes
 
-MAIN_ROUTES = frozenset({"/", "/system/diagnostics", "/tickets", "/objectives", "/inventory", "/infrastructure", "/settings"})
+MAIN_ROUTES = frozenset(
+    {
+        "/",
+        "/system/diagnostics",
+        "/tickets",
+        "/objectives",
+        "/inventory",
+        "/infrastructure",
+        "/settings",
+    }
+)
 CSP = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'"
 
 
 class StaticAssets:
-    def __init__(self, checkout):
+    def __init__(self, checkout, *, route_matchers=()):
+        self.route_matchers = tuple(route_matchers)
         self.root = checkout / "src/main/dist"
         try:
             manifest = loads_strict_bytes(
@@ -51,7 +62,7 @@ class StaticAssets:
             ) from None
 
     def resolve(self, path):
-        if path in MAIN_ROUTES:
+        if path in MAIN_ROUTES or any(match(path) for match in self.route_matchers):
             return self.assets["index.html"]
         if any(value in path for value in ("..", "\\", "%", "//", "\x00")) or path.startswith(
             "/api/"

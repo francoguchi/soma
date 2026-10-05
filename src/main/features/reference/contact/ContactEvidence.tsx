@@ -1,0 +1,37 @@
+import {useCallback, useState, type RefObject} from 'react';
+import type * as C from '../../../shared/api/generated/contracts';
+import {BoundedCollection} from '../../../shared/collections/BoundedCollection';
+import {api} from '../../../shared/api/client';
+import {Confirmation} from '../../../shared/components/Confirmation';
+import {dialogFallback} from '../../../shared/components/Modal';
+import {useWorkingIntent} from '../../../shared/interactions/use-working-intent';
+import {referenceApi as commands} from '../api';
+import {CustomerChooser, Field, page, useOwnerAction} from '../model';
+
+type Channel = C.ReferenceChannelsPageV1['items'][number];
+export function ContactEvidence({detail, application, refresh}: {detail: C.ReferenceContactDetailV1; application: RefObject<HTMLElement | null>; refresh: () => void}) {
+  const id = detail.reference_id;
+  const channelIntent = useWorkingIntent({email: '', channel_id: '', channel_revision: ''}, {contract_id: 'reference.edit.contact.channel', contract_version: 1, target_type: 'contact', target_id: id, scope_key: 'channel', base_revision: String(detail.revision)}, application);
+  const affiliationIntent = useWorkingIntent({customer_id: detail.current_affiliation?.customer_org_id ?? '', reason: ''}, {contract_id: 'reference.edit.contact.affiliation', contract_version: 1, target_type: 'contact', target_id: id, scope_key: 'affiliation', base_revision: String(detail.revision)}, application);
+  const email = channelIntent.draft.email, setEmail = (v: string) => channelIntent.edit('email', v);
+  const editing = channelIntent.draft.channel_id ? {contact_channel_id: channelIntent.draft.channel_id, revision: Number(channelIntent.draft.channel_revision)} : null;
+  const setEditing = (row: Channel | null) => {channelIntent.edit('channel_id', row?.contact_channel_id ?? ''); channelIntent.edit('channel_revision', row ? String(row.revision) : '');};
+  const customer = affiliationIntent.draft.customer_id, setCustomer = (v: string) => affiliationIntent.edit('customer_id', v);
+  const reason = affiliationIntent.draft.reason, setReason = (v: string) => affiliationIntent.edit('reason', v);
+  const [usable, setUsable] = useState<C.ReferenceChannelUseResultV1 | null>(null);
+  const action = useOwnerAction();
+  const load = useCallback(async (after: string | null, limit: number, signal: AbortSignal) => page(await api.request<C.ReferenceChannelsPageV1>('/api/v1/reference/contacts/' + id + '/channels?include_archived=true&count_exact=true&limit=' + limit + (after ? '&after=' + encodeURIComponent(after) : ''), 'urn:soma:01:channels-page:v1', {signal})), [id, detail.revision]);
+  const done = async () => {await channelIntent.accepted({email: '', channel_id: '', channel_revision: ''}); setUsable(null); refresh();};
+  const binding = {action_code: 'contact.channel.archive', target_type: 'contact', target_id: id, base_revision: String(detail.revision), preview_fingerprint: null, route: '/settings/reference-data/contact/' + id};
+  return <><section><h3>Channels · zero is valid</h3><BoundedCollection<Channel> pageSize={50} queryKey={id + ':' + detail.revision} load={load} emptyMessage="No channels. This Contact remains valid." render={(value, stale) => <ul className="evidence-list">{value.items.map(row => <li key={row.contact_channel_id}><strong>{row.value_text}</strong> · {row.lifecycle_state} · revision {row.revision}<div className="action-strip">
+    {row.lifecycle_state === 'active' && <><button disabled={stale || action.busy || detail.lifecycle_state !== 'active'} onClick={() => {setEditing(row); setEmail(row.value_text);}}>Edit channel</button><Confirmation tier="ordinary" label={'Archive channel ' + row.value_text} binding={binding} available={!stale && !action.busy && detail.lifecycle_state === 'active'} application={application} fallback={() => dialogFallback(application)} activate={() => action.run(JSON.stringify({id, channel: row.contact_channel_id, revision: row.revision, master: detail.revision}), command => commands.archiveChannel({id, channel_id: row.contact_channel_id}, {command_id: command, contact_base_revision: detail.revision, channel_base_revision: row.revision, reason_category: 'operator_archive'}), () => {setUsable(null); refresh();})}/></>}
+    <button disabled={stale || action.busy} onClick={() => {void action.run('validate:' + row.contact_channel_id, async () => {setUsable(await commands.validateChannel({id}, {channel_or_auto: row.contact_channel_id, purpose: 'msg_recipient'}));}, () => {});}}>Validate this channel</button>
+  </div></li>)}</ul>}/>
+    <form className="operational-form" onSubmit={e => {e.preventDefault(); void action.run(JSON.stringify({id, editing: editing?.contact_channel_id, email, revision: detail.revision}), command => editing ? commands.updateChannel({id, channel_id: editing.contact_channel_id}, {command_id: command, contact_base_revision: detail.revision, channel_base_revision: editing.revision, value_text: email}) : commands.addChannel({id}, {command_id: command, contact_base_revision: detail.revision, channel_kind: 'email', value_text: email}), done);}}>
+    <Field label={editing ? 'Corrected email' : 'New email'} value={email} change={setEmail} maximum={2048} required disabled={action.busy || action.pending || detail.lifecycle_state !== 'active'}/><button disabled={action.busy || action.pending || channelIntent.conflict || detail.lifecycle_state !== 'active'}>{editing ? 'Save channel correction' : 'Add email channel'}</button>{editing && <button type="button" onClick={() => {void channelIntent.discard();}}>Cancel channel correction</button>}</form>
+    <button disabled={action.busy} onClick={() => {void action.run('validate:auto:' + detail.revision, async () => {setUsable(await commands.validateChannel({id}, {channel_or_auto: 'AUTO', purpose: 'msg_recipient'}));}, () => {});}}>Check current channel usability</button>
+    {usable && <><p role="status">{usable.state} · {usable.usable_count} usable channels</p>{usable.state === 'MULTIPLE_USABLE' && <p>Choose a channel explicitly and validate that row. No channel has been chosen automatically.</p>}{usable.continuation && <p>More usable candidates exist beyond this bounded page. Continue through channel pages.</p>}{usable.value_text && <p>{usable.value_text}</p>}</>}
+  {channelIntent.recovery}</section><section><h3>Customer affiliation</h3><p>Current affiliation is preserved separately from another workflow's Customer context. Changing it is an explicit operation.</p><form className="operational-form" onSubmit={e => {e.preventDefault(); void action.run(JSON.stringify({id, customer, reason, revision: detail.revision}), command => commands.changeAffiliation({id}, {command_id: command, base_revision: detail.revision, new_customer_org_id: customer || null, reason_category: reason}), async () => {await affiliationIntent.accepted(); refresh();});}}>
+    <CustomerChooser label="Current / proposed Customer" value={customer} change={setCustomer} disabled={action.busy || action.pending || detail.lifecycle_state !== 'active'}/><Field label="Affiliation reason category" value={reason} change={setReason} maximum={128} required disabled={action.busy || action.pending}/><button disabled={action.busy || action.pending || affiliationIntent.conflict || detail.lifecycle_state !== 'active'}>Change affiliation explicitly</button>
+  </form>{affiliationIntent.recovery}</section>{action.feedback}</>;
+}

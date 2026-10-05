@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:soma:01:write-setting-request:v1",
+  "title": "ReferenceWriteSettingRequestV1",
+  "type": "object",
+  "properties": {
+    "command_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "semantic_owner": {
+      "type": "string",
+      "maxLength": 256
+    },
+    "contract_name": {
+      "type": "string",
+      "maxLength": 256
+    },
+    "contract_version": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "base_revision": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "value_json": {
+      "type": "string",
+      "maxLength": 16384
+    }
+  },
+  "required": [
+    "command_id",
+    "semantic_owner",
+    "contract_name",
+    "contract_version",
+    "base_revision",
+    "value_json"
+  ],
+  "additionalProperties": false
+}

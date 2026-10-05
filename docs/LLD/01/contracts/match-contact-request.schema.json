@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:soma:01:match-contact-request:v1",
+  "title": "ReferenceMatchContactRequestV1",
+  "type": "object",
+  "properties": {
+    "scope": {
+      "type": "string",
+      "maxLength": 256
+    },
+    "raw_name": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 1024
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "raw_email": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 2048
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "limit": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 200
+    },
+    "after": {
+      "type": "string",
+      "maxLength": 6000
+    }
+  },
+  "required": [
+    "scope"
+  ],
+  "additionalProperties": false
+}

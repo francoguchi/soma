@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:soma:01:match-customer-request:v1",
+  "title": "ReferenceMatchCustomerRequestV1",
+  "type": "object",
+  "properties": {
+    "raw_name": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 1024
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "raw_account_code": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 512
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "limit": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 200
+    },
+    "after": {
+      "type": "string",
+      "maxLength": 6000
+    }
+  },
+  "required": [],
+  "additionalProperties": false
+}

@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:soma:01:identities-request:v1",
+  "title": "ReferenceIdentitiesRequestV1",
+  "type": "object",
+  "properties": {
+    "reference_type": {
+      "type": "string",
+      "enum": [
+        "customer_organization",
+        "contact",
+        "dispatch_location"
+      ]
+    },
+    "ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+      },
+      "maxItems": 200,
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "reference_type",
+    "ids"
+  ],
+  "additionalProperties": false
+}

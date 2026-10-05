@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:soma:01:add-channel-request:v1",
+  "title": "ReferenceAddChannelRequestV1",
+  "type": "object",
+  "properties": {
+    "command_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "contact_base_revision": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "channel_kind": {
+      "const": "email",
+      "type": "string"
+    },
+    "value_text": {
+      "type": "string",
+      "maxLength": 2048
+    }
+  },
+  "required": [
+    "command_id",
+    "contact_base_revision",
+    "channel_kind",
+    "value_text"
+  ],
+  "additionalProperties": false
+}

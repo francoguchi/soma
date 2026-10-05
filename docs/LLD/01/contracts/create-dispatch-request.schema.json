@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:soma:01:create-dispatch-request:v1",
+  "title": "ReferenceCreateDispatchRequestV1",
+  "type": "object",
+  "properties": {
+    "command_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "name": {
+      "type": "string",
+      "maxLength": 1024
+    },
+    "address_text": {
+      "type": "string",
+      "maxLength": 8192
+    }
+  },
+  "required": [
+    "command_id",
+    "name",
+    "address_text"
+  ],
+  "additionalProperties": false
+}

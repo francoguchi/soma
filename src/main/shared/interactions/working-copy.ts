@@ -25,6 +25,7 @@ export class WorkingCopyClient<T> {
   }
   memory(): T | null {return this.draft === null ? null : structuredClone(this.draft);}
   hasUnsavedIntent(): boolean {return this.draft !== null;}
+  checkpointIdentity(): {id: string; generation: number} | null {return this.workingCopyId === null ? null : {id: this.workingCopyId, generation: this.generation};}
   private validateCheckpoint(result: RecoveryCheckpoint): void {
     if (!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/u.test(result.workingCopyId)
         || !Number.isSafeInteger(result.generation) || result.generation < 1 || !/^[0-9a-f]{64}$/u.test(result.contentHash)) throw new Error('Invalid recovery result');

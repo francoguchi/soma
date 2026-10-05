@@ -52,6 +52,12 @@
       "type": "integer",
       "minimum": 0,
       "maximum": 9007199254740991
+    },
+    "draft_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "minLength": 64,
+      "maxLength": 64
     }
   },
   "required": [
@@ -63,7 +69,8 @@
     "current_revision",
     "conflict",
     "updated_at_utc_s",
-    "expires_at_utc_s"
+    "expires_at_utc_s",
+    "draft_sha256"
   ],
   "additionalProperties": false
 }

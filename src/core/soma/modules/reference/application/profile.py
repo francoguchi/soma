@@ -35,7 +35,10 @@ class Profile:
 
     def get_singleton(self):
         with ReadSnapshot(self.factory) as snapshot:
-            row = store.singleton(snapshot.connection)
+            return self.get(snapshot)
+
+    def get(self, snapshot):
+        row = store.singleton(snapshot.connection)
         return (
             None
             if row is None

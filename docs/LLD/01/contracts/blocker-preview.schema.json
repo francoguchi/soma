@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:soma:01:blocker-preview:v1",
+  "title": "ReferenceBlockerPreviewV1",
+  "type": "object",
+  "properties": {
+    "target_type": {
+      "enum": [
+        "customer_organization",
+        "contact",
+        "dispatch_location"
+      ],
+      "type": "string"
+    },
+    "target_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "operation": {
+      "enum": [
+        "archive",
+        "reactivate"
+      ],
+      "type": "string"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "exact_blocker_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "blockers": {
+      "type": "array",
+      "maxItems": 200,
+      "items": {
+        "type": "object",
+        "properties": {
+          "validator_id": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "blocker_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "reason_code": {
+            "type": "string",
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "validator_id",
+          "blocker_id",
+          "reason_code"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "continuation": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 6000
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "would_be_eligible": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "target_type",
+    "target_id",
+    "operation",
+    "revision",
+    "exact_blocker_count",
+    "blockers",
+    "continuation",
+    "would_be_eligible"
+  ],
+  "additionalProperties": false
+}

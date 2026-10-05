@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from soma.modules.reference.application.queries import ReferenceQueries
 from soma.foundation.appearance import setting_registration
 from soma.modules.reference.application.settings import Settings
 from soma.modules.reference.domain.settings import SettingDefinition, SettingDefinitionRegistry
@@ -27,10 +28,21 @@ class Reference:
     dispatch: DispatchLocations
     lifecycle: ReferenceLifecycle
     settings: Settings
+    queries: ReferenceQueries
+
+    def recovery_contracts(self):
+        from soma.modules.reference.application.recovery import contracts
+
+        return contracts(self)
 
 
 def compose(
-    factory, *, dependency_validators=(), required_validator_ids=(), setting_definitions=()
+    factory,
+    *,
+    dependency_validators=(),
+    required_validator_ids=(),
+    setting_definitions=(),
+    site_address_provider=None,
 ):
     settings = SettingDefinitionRegistry()
     settings.register(SettingDefinition(**setting_registration()))
@@ -50,6 +62,7 @@ def compose(
         DispatchLocations(factory, writer),
         ReferenceLifecycle(factory, writer, dependencies),
         Settings(factory, writer, settings),
+        ReferenceQueries(site_address_provider=site_address_provider),
     )
     with ReadSnapshot(factory) as snapshot:
         require_persisted_matching_profile(snapshot.connection)

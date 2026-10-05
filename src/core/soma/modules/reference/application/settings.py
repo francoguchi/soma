@@ -60,6 +60,22 @@ class Settings:
     def definitions_for_owner(self, owner):
         return self.registry.all_for_owner(owner)
 
+    def presentation_definitions(self):
+        definitions = self.registry.all_definitions()
+        if len(definitions) > 200:
+            raise ValidationError("Settings presentation exceeds its bound.")
+        return dict(
+            items=[
+                dict(
+                    setting_key=d.setting_key,
+                    semantic_owner=d.semantic_owner,
+                    contract_name=d.contract_name,
+                    contract_version=d.current_version,
+                )
+                for d in definitions
+            ]
+        )
+
     @staticmethod
     def _parse(definition, row):
         if tuple(row[:2]) != (definition.contract_name, definition.current_version):
@@ -335,3 +351,30 @@ class Settings:
             preflight=preflight,
             prepare=prepare,
         )
+
+    def list_for_owner(self, snapshot, owner):
+        definitions = self.definitions_for_owner(owner)
+        if len(definitions) > 200:
+            raise ValidationError("Setting owner definition list exceeds its bound.")
+        keys = tuple(definition.setting_key for definition in definitions)
+        rows = store.load_many(snapshot.connection, keys)
+        result = []
+        for definition in definitions:
+            row = rows.get(definition.setting_key)
+            value = (
+                definition.validate_value(definition.default_provider())
+                if row is None
+                else self._parse(definition, row)
+            )
+            result.append(
+                SettingValue(
+                    definition.setting_key,
+                    definition.semantic_owner,
+                    definition.contract_name,
+                    definition.current_version,
+                    value,
+                    None if row is None else row[3],
+                    "DEFAULT" if row is None else "PERSISTED",
+                )
+            )
+        return tuple(result)

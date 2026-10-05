@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:soma:01:customer-detail:v1",
+  "title": "ReferenceCustomerDetailV1",
+  "type": "object",
+  "properties": {
+    "reference_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "reference_type": {
+      "enum": [
+        "customer_organization",
+        "contact",
+        "dispatch_location"
+      ],
+      "type": "string"
+    },
+    "name": {
+      "type": "string",
+      "maxLength": 1024
+    },
+    "name_match_key": {
+      "type": "string",
+      "maxLength": 2048
+    },
+    "lifecycle_state": {
+      "enum": [
+        "active",
+        "archived"
+      ],
+      "type": "string"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "created_at_utc": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "updated_at_utc": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "current_account_code": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "customer_org_identifier_id": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+            },
+            "value_text": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "match_key": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          },
+          "required": [
+            "customer_org_identifier_id",
+            "value_text",
+            "match_key"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "reference_id",
+    "reference_type",
+    "name",
+    "name_match_key",
+    "lifecycle_state",
+    "revision",
+    "created_at_utc",
+    "updated_at_utc",
+    "current_account_code"
+  ],
+  "additionalProperties": false
+}

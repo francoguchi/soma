@@ -8,8 +8,8 @@ This is the single current-state entry point for humans and agents. Do not appen
 |---|---|
 | Implementation scope | `01 — Identity / Reference` |
 | Implementation branch | `feat/01-identity-reference` |
-| Implementation goal | `IMP-01-05 — Reference queries, providers and API` |
-| Implementation goal file | `docs/implementation/01/01.05.md` |
+| Implementation goal | `IMP-01-06 — Reference and Settings workspaces` |
+| Implementation goal file | `docs/implementation/01/01.06.md` |
 | Implementation migration ledger | `docs/LLD/01/migration.md` |
 | Queued next implementation | `02 — Tickets Core`, after Scope-02 design approval and required Scope-01 dependencies |
 | Design scope | `02 — Tickets Core` |
@@ -18,7 +18,7 @@ This is the single current-state entry point for humans and agents. Do not appen
 | Design migration ledger | `docs/LLD/02/migration.md` |
 | Overall migration map | `docs/LLD/MIGRATION.md` |
 | Mode | parallel design N+1 / implementation N |
-| Implementation note | IMP-01-04 is working with closed R01.04-A..C. Closed typed ordinary-nonsecret settings, pure defaults, replayable writes/exact upgrades, Foundation appearance registration and M01.004 generation 10 are implemented and exercised on `feat/01-identity-reference`. IMP-01-05 is queued next; no generic query/API/UI orchestration has started. |
+| Implementation note | IMP-01-06 is working; R01.06-A..B are closed. Settings-owned Reference, Profile and registered Preferences surfaces are implemented and exercised. Scope-01 implementation is at its final goal checkpoint; no later goal is allocated or started. |
 | Design blocker | none; Scope 02 design resumes from the merged Foundation baseline |
 | Certification | deferred until whole-application implementation and live testing |
 
@@ -39,7 +39,7 @@ The intended handoff can be as small as:
 4. Implement, run the goal's focused checks plus directly affected tests, and fix failures.
 5. Update the goal's Run/Remaining/status, close its migration rows, then advance this file to the next implementation goal.
 
-Current checkpoint: IMP-01-04 is working. Closed owner-defined Settings registration, strict bounded contracts, no-write defaults, revision/absence and read-only owner state checks, receipt-only NO_CHANGE, exact replayable upgrades and generation-10 schema/protection probes are implemented. Foundation owns appearance semantics and supplies registration through the generic provider. All 204 affected Reference/execution/persistence tests (203 plus the assembled live Settings restart/replay check), Main build/typecheck, contracts/schema/Ruff/diff/impact passed. Actual designated-instance trusted Stop/reset/detached source READY/Stop passed; it remains stopped with a fresh generation-10 database requiring administrator setup and no default setting rows. Generated identity/assets are synchronized. Next read IMP-01-05 and only its query/provider/API/dependency authorities and R01.05 donor rows. No later-goal implementation was started; do not begin Reference/Settings workspaces or subsequent goals.
+Current checkpoint: IMP-01-06 is working. All 203 affected Reference/recovery/runtime/browser checks passed across the focused run and corrected shared-browser rerun; all 60 Main tests, typecheck/build, contracts/Ruff/diff/impact passed. Real authenticated Chrome exercised Customer/Contact/Dispatch, conflict review, explicit ambiguity and bounded paging/history, lifecycle, Profile/registered Preferences, recovery/stale intent and responsive/forced-color panes. Schema remains generation 10 / M01.004; no reset was required and the canonical instance remains stopped. Generated identity/assets are synchronized. Scope-01 implementation ends at this checkpoint. Do not broaden into Scope-02 implementation; its design approval and goal allocation remain separate.
 
 ### Design lane
 

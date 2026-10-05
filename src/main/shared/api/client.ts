@@ -3,20 +3,22 @@ import {assertContract} from './validate';
 export class ApiError extends Error {
   constructor(readonly detail: ErrorEnvelopeV1) {super(detail.summary);}
 }
+export class ApiInputError extends Error {}
 export class ApiClient {
   runId: string | null = null;
   csrf: string | null = null;
-  async request<T>(path: string, contract: string, options: {method?: 'GET' | 'POST'; body?: unknown; requestContract?: string; signal?: AbortSignal} = {}): Promise<T> {
-    if (!path.startsWith('/api/v1/') || /[#\\]/u.test(path)) throw new Error('Unregistered API destination.');
+  async request<T>(path: string, contract: string, options: {method?: 'GET' | 'POST' | 'PUT' | 'PATCH'; body?: unknown; requestContract?: string; signal?: AbortSignal} = {}): Promise<T> {
+    if (!path.startsWith('/api/v1/') || /[#\\]/u.test(path)) throw new ApiInputError('Unregistered API destination.');
     const method = options.method ?? 'GET';
     const headers: Record<string, string> = {'X-Correlation-ID': crypto.randomUUID()};
     if (this.runId) headers['X-SOMA-Run'] = this.runId;
     if (method !== 'GET') {
-      if (!this.runId) throw new Error('Reload SOMA before continuing.');
+      if (!this.runId) throw new ApiInputError('Reload SOMA before continuing.');
       headers['Content-Type'] = 'application/json';
       if (this.csrf) headers['X-SOMA-CSRF'] = this.csrf;
-      if (!options.requestContract) throw new Error('Missing command contract.');
-      assertContract(options.requestContract, options.body);
+      if (!options.requestContract) throw new ApiInputError('Missing command contract.');
+      try {assertContract(options.requestContract, options.body);}
+      catch {throw new ApiInputError('Request fields violate their accepted contract. Correct the input.');}
     }
     const init: RequestInit = {method, headers, credentials: 'same-origin', cache: 'no-store', redirect: 'error'};
     if (options.signal) init.signal = options.signal;

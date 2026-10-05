@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:soma:01:archive-preview-request:v1",
+  "title": "ReferenceArchivePreviewRequestV1",
+  "type": "object",
+  "properties": {
+    "base_revision": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "limit": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 200
+    },
+    "after": {
+      "type": "string",
+      "maxLength": 6000
+    }
+  },
+  "required": [
+    "base_revision"
+  ],
+  "additionalProperties": false
+}

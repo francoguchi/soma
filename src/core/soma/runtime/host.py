@@ -105,7 +105,12 @@ class Host:
 
                 self.reference = reference(self.factory)
                 self.profile_participant = self.reference.profile
-            self.static = StaticAssets(self.config.checkout_root)
+            route_matchers = ()
+            if self.with_reference:
+                from soma.modules.reference.transport.routes import main_route
+
+                route_matchers = (main_route,)
+            self.static = StaticAssets(self.config.checkout_root, route_matchers=route_matchers)
             self.requests = BoundedExecutor(4)
             self.jobs = JobWorkers(
                 Coordinator(self.factory, self.job_contracts),
@@ -252,6 +257,8 @@ class Host:
                                 request,
                                 max_bytes=2097152
                                 if request.url.path == "/api/v1/working-copies/checkpoint"
+                                else 16384
+                                if request.url.path.startswith("/api/v1/settings/")
                                 else 8192,
                             )
                             if request.method != "GET"
@@ -289,7 +296,7 @@ class Host:
                     )
 
         return Starlette(
-            routes=[Route("/{path:path}", route, methods=["GET", "POST", "PUT", "DELETE"])]
+            routes=[Route("/{path:path}", route, methods=["GET", "POST", "PUT", "PATCH", "DELETE"])]
         )
 
     def stop(self, *, budget=10):

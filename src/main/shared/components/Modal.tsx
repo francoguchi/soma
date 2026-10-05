@@ -1,6 +1,9 @@
 import {useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode, type RefObject} from 'react';
 import {createPortal} from 'react-dom';
 const focusable = 'button:not(:disabled),a[href],input:not(:disabled),select:not(:disabled),textarea:not(:disabled),[tabindex="0"]';
+export function dialogFallback(application: RefObject<HTMLElement | null>): HTMLElement | null {
+  return application.current?.querySelector<HTMLElement>('[data-pane-active=true]:not([hidden])') ?? application.current?.querySelector<HTMLElement>('main') ?? null;
+}
 export function Modal({title, application, fallback, close, children, dismissible = true}: {title: string; application: RefObject<HTMLElement | null>; fallback: () => HTMLElement | null; close: () => void; children: (isolated: boolean) => ReactNode; dismissible?: boolean}) {
   const id = useId(), node = useRef<HTMLDivElement>(null), invoker = useRef(document.activeElement);
   const [isolated, setIsolated] = useState(false);

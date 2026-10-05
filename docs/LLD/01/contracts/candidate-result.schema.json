@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:soma:01:candidate-result:v1",
+  "title": "ReferenceCandidateResultV1",
+  "type": "object",
+  "properties": {
+    "state": {
+      "enum": [
+        "UNRESOLVED",
+        "UNIQUE_CANDIDATE",
+        "AMBIGUOUS"
+      ],
+      "type": "string"
+    },
+    "explanation": {
+      "type": "string",
+      "maxLength": 128
+    },
+    "candidate_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    },
+    "candidate_ids": {
+      "type": "array",
+      "maxItems": 200,
+      "items": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+      }
+    },
+    "continuation": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 6000
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "matching_profile_id": {
+      "const": "UNICODE_MATCH_V1",
+      "type": "string"
+    },
+    "normalized_keys": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 2048
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "account_code": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 2048
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "email": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 2048
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "scope": {
+      "type": "string",
+      "maxLength": 256
+    }
+  },
+  "required": [
+    "state",
+    "explanation",
+    "candidate_count",
+    "candidate_ids",
+    "continuation",
+    "matching_profile_id",
+    "normalized_keys",
+    "scope"
+  ],
+  "additionalProperties": false
+}

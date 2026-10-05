@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:soma:01:setting-value:v1",
+  "title": "ReferenceSettingValueV1",
+  "type": "object",
+  "properties": {
+    "setting_key": {
+      "type": "string",
+      "maxLength": 256
+    },
+    "semantic_owner": {
+      "type": "string",
+      "maxLength": 256
+    },
+    "contract_name": {
+      "type": "string",
+      "maxLength": 256
+    },
+    "contract_version": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "value_json": {
+      "type": "string",
+      "maxLength": 524288
+    },
+    "revision": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "source": {
+      "enum": [
+        "DEFAULT",
+        "PERSISTED"
+      ],
+      "type": "string"
+    },
+    "outcome": {
+      "enum": [
+        "APPLIED",
+        "NO_CHANGE"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "setting_key",
+    "semantic_owner",
+    "contract_name",
+    "contract_version",
+    "value_json",
+    "revision",
+    "source"
+  ],
+  "additionalProperties": false
+}

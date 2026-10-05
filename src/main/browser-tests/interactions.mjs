@@ -63,11 +63,12 @@ try {
  await expect(activityPane).toHaveAttribute('data-pane-active','true');
  await page.keyboard.press('Shift+Tab'); await expect(paneInvoke).toBeFocused();
  await expect(evidencePane).toHaveAttribute('data-pane-active','true');
- await activityPane.focus(); const listScroll=await listPane.evaluate(node=>node.scrollTop), evidenceScroll=await evidencePane.evaluate(node=>node.scrollTop);
+ const listBody=listPane.locator('[data-pane-body]'), evidenceBody=evidencePane.locator('[data-pane-body]'), activityBody=activityPane.locator('[data-pane-body]');
+ await activityPane.focus(); const listScroll=await listBody.evaluate(node=>node.scrollTop), evidenceScroll=await evidenceBody.evaluate(node=>node.scrollTop);
  await page.screenshot({path:'../../.tmp/styles-pane-focus.png',fullPage:true});
- await activityPane.press('PageDown'); assert(await activityPane.evaluate(node=>node.scrollTop)>0,JSON.stringify(await activityPane.evaluate(node=>({height:node.clientHeight,scroll:node.scrollHeight,top:node.scrollTop,overflow:getComputedStyle(node).overflow,root:document.querySelector('.soma-shell').getBoundingClientRect().height}))));
- assert.equal(await listPane.evaluate(node=>node.scrollTop),listScroll); assert.equal(await evidencePane.evaluate(node=>node.scrollTop),evidenceScroll);
- await activityPane.press('Home'); assert.equal(await activityPane.evaluate(node=>node.scrollTop),0);
+ await activityPane.press('PageDown'); assert(await activityBody.evaluate(node=>node.scrollTop)>0,JSON.stringify(await activityBody.evaluate(node=>({height:node.clientHeight,scroll:node.scrollHeight,top:node.scrollTop,overflow:getComputedStyle(node).overflow,root:document.querySelector('.soma-shell').getBoundingClientRect().height}))));
+ assert.equal(await listBody.evaluate(node=>node.scrollTop),listScroll); assert.equal(await evidenceBody.evaluate(node=>node.scrollTop),evidenceScroll);
+ await activityPane.press('Home'); assert.equal(await activityBody.evaluate(node=>node.scrollTop),0);
  const paneRow=page.getByRole('row').filter({has:page.getByText('Pane record 0',{exact:true})});
  await paneRow.getByText('Pane record 0',{exact:true}).click(); await expect(listPane).toHaveAttribute('data-pane-active','true');
  await expect(page.locator('#pane-selection')).toHaveText('Selected pane-0 / Opened none');

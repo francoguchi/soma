@@ -128,3 +128,13 @@ Settings UI is generated/composed from registered semantic definitions rather th
 Validation/errors remain setting-owner specific. Secret-classified definitions never expose raw values through the ordinary Settings surface.
 
 Scope 01 provides the registry/store presentation substrate; later domain scopes contribute their own registered definitions and may supply feature-specific Settings panels when generic rendering would be misleading.
+
+## Composition boundaries
+
+The Settings routes are `/settings/profile`, `/settings/preferences`, and `/settings/reference-data/{customer_organization|contact|dispatch_location}[/{id|new}]`; contextual routes never add primary workspace labels. Core supplies the same closed route grammar to Foundation static serving. Settings capability availability comes from the actual composed Reference/Settings owner.
+
+The shared console's explicit workbench variation presents Records, Reference work, and Context/history. Opening or creating a reference requests the work pane; narrow pane switching retains the same DOM/state. Collection query keys identify filters/type, so refreshing data does not reset a page. Reference collection/matching/selection/scroll state stays mounted across Profile/Preferences visits; inactive working surfaces do not intercept another surface's navigation.
+
+Reference registers closed Foundation recovery contracts for metadata, Account Code intent, channel correction, affiliation intent, and lifecycle reason; Profile and ordinary settings use their respective owner contracts. New-reference draft identities identify recovery only and never allocate accepted domain identity. Review fingerprints are not restored as authority. A changed base revision retains input but requires explicit review before submission; successful partial operations acknowledge only their declared fields. Unknown-response retries retain the exact captured command/body, while local request-validation failure permits correction without a network send.
+
+Profile and registered definition read contracts supply descriptive/semantic presentation metadata only. The Foundation appearance panel owns its enum and current rendering availability; Settings never supplies an arbitrary JSON/key editor. Candidate/history labels use one bounded identity batch per page. Channel values remain text; more than one usable channel still requires explicit row choice and fresh server validation.

@@ -183,3 +183,7 @@ class SettingDefinitionRegistry:
             for key in sorted(self._definitions)
             if self._definitions[key].semantic_owner == owner
         )
+
+    def all_definitions(self):
+        self.require_finalized()
+        return tuple(self._definitions[key] for key in sorted(self._definitions))

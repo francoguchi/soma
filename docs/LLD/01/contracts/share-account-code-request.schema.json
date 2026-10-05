@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:soma:01:share-account-code-request:v1",
+  "title": "ReferenceShareAccountCodeRequestV1",
+  "type": "object",
+  "properties": {
+    "command_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "base_revision": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "account_code": {
+      "type": "string",
+      "maxLength": 512
+    },
+    "review_snapshot_hash": {
+      "type": "string",
+      "maxLength": 64
+    },
+    "reason_category": {
+      "type": "string",
+      "maxLength": 128
+    },
+    "review_context_id": {
+      "anyOf": [
+        {
+          "type": "string",
+          "maxLength": 256
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "command_id",
+    "base_revision",
+    "account_code",
+    "review_snapshot_hash",
+    "reason_category"
+  ],
+  "additionalProperties": false
+}

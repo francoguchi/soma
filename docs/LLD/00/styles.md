@@ -174,3 +174,5 @@ A reusable operational pane has two structural regions: a non-scrolling pane hea
 **Failure:** If custom scrollbar styling is unsupported, the browser/OS native scrollbar remains usable. Unsupported theming is acceptable; invisible/low-contrast or feature-inconsistent scrolling is not.
 
 **Side effects:** presentation only.
+
+The implemented library also exposes `operational-surface`, `operational-form`, `form-field`, `action-strip`, and bounded evidence-list composition. `ConsolePanes` accepts an explicit `workbench` track variation, switcher label and owner focus request; the Diagnostics default remains unchanged. These shared variations retain fixed pane headers, governed body scrolling and narrow recomposition. Feature surfaces consume them without global control/pane CSS overrides.

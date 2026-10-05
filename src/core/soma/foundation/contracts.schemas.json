@@ -1024,6 +1024,12 @@
         "minLength": 2,
         "type": "string"
       },
+      "draft_sha256": {
+        "maxLength": 64,
+        "minLength": 64,
+        "pattern": "^[0-9a-f]{64}$",
+        "type": "string"
+      },
       "expires_at_utc_s": {
         "maximum": 9007199254740991,
         "minimum": 0,
@@ -1055,7 +1061,8 @@
       "current_revision",
       "conflict",
       "updated_at_utc_s",
-      "expires_at_utc_s"
+      "expires_at_utc_s",
+      "draft_sha256"
     ],
     "title": "WorkingCopyRestoreV1",
     "type": "object"
@@ -1110,6 +1117,2310 @@
       "outcome"
     ],
     "title": "WorkingCopyResultV1",
+    "type": "object"
+  },
+  "urn:soma:01:account-code-history-request:v1": {
+    "$id": "urn:soma:01:account-code-history-request:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "after": {
+        "maxLength": 6000,
+        "type": "string"
+      },
+      "count_exact": {
+        "type": "boolean"
+      },
+      "limit": {
+        "maximum": 200,
+        "minimum": 1,
+        "type": "integer"
+      }
+    },
+    "required": [],
+    "title": "ReferenceAccountCodeHistoryRequestV1",
+    "type": "object"
+  },
+  "urn:soma:01:account-code-page:v1": {
+    "$id": "urn:soma:01:account-code-page:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "as_of_utc_s": {
+        "maximum": 9007199254740991,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "continuation": {
+        "anyOf": [
+          {
+            "maxLength": 6000,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "exact_count": {
+        "anyOf": [
+          {
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "items": {
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "created_at_utc": {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "created_command_id": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            "customer_org_id": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            "customer_org_identifier_id": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            "identifier_type": {
+              "const": "customer_account_code",
+              "type": "string"
+            },
+            "lifecycle_state": {
+              "enum": [
+                "active",
+                "superseded"
+              ],
+              "type": "string"
+            },
+            "match_key": {
+              "maxLength": 2048,
+              "type": "string"
+            },
+            "superseded_at_utc": {
+              "anyOf": [
+                {
+                  "maximum": 9007199254740991,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "superseded_command_id": {
+              "anyOf": [
+                {
+                  "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "value_text": {
+              "maxLength": 512,
+              "type": "string"
+            }
+          },
+          "required": [
+            "customer_org_identifier_id",
+            "customer_org_id",
+            "identifier_type",
+            "value_text",
+            "match_key",
+            "lifecycle_state",
+            "created_at_utc",
+            "created_command_id",
+            "superseded_at_utc",
+            "superseded_command_id"
+          ],
+          "type": "object"
+        },
+        "maxItems": 200,
+        "type": "array"
+      }
+    },
+    "required": [
+      "items",
+      "continuation",
+      "exact_count",
+      "as_of_utc_s"
+    ],
+    "title": "ReferenceAccountCodePageV1",
+    "type": "object"
+  },
+  "urn:soma:01:add-channel-request:v1": {
+    "$id": "urn:soma:01:add-channel-request:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "channel_kind": {
+        "const": "email",
+        "type": "string"
+      },
+      "command_id": {
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+        "type": "string"
+      },
+      "contact_base_revision": {
+        "maximum": 9007199254740991,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "value_text": {
+        "maxLength": 2048,
+        "type": "string"
+      }
+    },
+    "required": [
+      "command_id",
+      "contact_base_revision",
+      "channel_kind",
+      "value_text"
+    ],
+    "title": "ReferenceAddChannelRequestV1",
+    "type": "object"
+  },
+  "urn:soma:01:affiliation-history-request:v1": {
+    "$id": "urn:soma:01:affiliation-history-request:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "after": {
+        "maxLength": 6000,
+        "type": "string"
+      },
+      "count_exact": {
+        "type": "boolean"
+      },
+      "limit": {
+        "maximum": 200,
+        "minimum": 1,
+        "type": "integer"
+      }
+    },
+    "required": [],
+    "title": "ReferenceAffiliationHistoryRequestV1",
+    "type": "object"
+  },
+  "urn:soma:01:affiliation-page:v1": {
+    "$id": "urn:soma:01:affiliation-page:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "as_of_utc_s": {
+        "maximum": 9007199254740991,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "continuation": {
+        "anyOf": [
+          {
+            "maxLength": 6000,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "exact_count": {
+        "anyOf": [
+          {
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "items": {
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "closed_at_utc": {
+              "anyOf": [
+                {
+                  "maximum": 9007199254740991,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "closed_command_id": {
+              "anyOf": [
+                {
+                  "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "contact_affiliation_id": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            "contact_id": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            "customer_org_id": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            "is_current": {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "opened_at_utc": {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "opened_command_id": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            }
+          },
+          "required": [
+            "contact_affiliation_id",
+            "contact_id",
+            "customer_org_id",
+            "is_current",
+            "opened_at_utc",
+            "closed_at_utc",
+            "opened_command_id",
+            "closed_command_id"
+          ],
+          "type": "object"
+        },
+        "maxItems": 200,
+        "type": "array"
+      }
+    },
+    "required": [
+      "items",
+      "continuation",
+      "exact_count",
+      "as_of_utc_s"
+    ],
+    "title": "ReferenceAffiliationPageV1",
+    "type": "object"
+  },
+  "urn:soma:01:archive-channel-request:v1": {
+    "$id": "urn:soma:01:archive-channel-request:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "channel_base_revision": {
+        "maximum": 9007199254740991,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "command_id": {
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+        "type": "string"
+      },
+      "contact_base_revision": {
+        "maximum": 9007199254740991,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "reason_category": {
+        "maxLength": 128,
+        "type": "string"
+      }
+    },
+    "required": [
+      "command_id",
+      "contact_base_revision",
+      "channel_base_revision",
+      "reason_category"
+    ],
+    "title": "ReferenceArchiveChannelRequestV1",
+    "type": "object"
+  },
+  "urn:soma:01:archive-preview-request:v1": {
+    "$id": "urn:soma:01:archive-preview-request:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "after": {
+        "maxLength": 6000,
+        "type": "string"
+      },
+      "base_revision": {
+        "maximum": 9007199254740991,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "limit": {
+        "maximum": 200,
+        "minimum": 1,
+        "type": "integer"
+      }
+    },
+    "required": [
+      "base_revision"
+    ],
+    "title": "ReferenceArchivePreviewRequestV1",
+    "type": "object"
+  },
+  "urn:soma:01:archive-request:v1": {
+    "$id": "urn:soma:01:archive-request:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "base_revision": {
+        "maximum": 9007199254740991,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "command_id": {
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+        "type": "string"
+      },
+      "reason_category": {
+        "maxLength": 128,
+        "type": "string"
+      }
+    },
+    "required": [
+      "base_revision",
+      "command_id",
+      "reason_category"
+    ],
+    "title": "ReferenceArchiveRequestV1",
+    "type": "object"
+  },
+  "urn:soma:01:blocker-preview:v1": {
+    "$id": "urn:soma:01:blocker-preview:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "blockers": {
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "blocker_id": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            "reason_code": {
+              "maxLength": 128,
+              "type": "string"
+            },
+            "validator_id": {
+              "maxLength": 128,
+              "type": "string"
+            }
+          },
+          "required": [
+            "validator_id",
+            "blocker_id",
+            "reason_code"
+          ],
+          "type": "object"
+        },
+        "maxItems": 200,
+        "type": "array"
+      },
+      "continuation": {
+        "anyOf": [
+          {
+            "maxLength": 6000,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "exact_blocker_count": {
+        "maximum": 9007199254740991,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "operation": {
+        "enum": [
+          "archive",
+          "reactivate"
+        ],
+        "type": "string"
+      },
+      "revision": {
+        "maximum": 9007199254740991,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "target_id": {
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+        "type": "string"
+      },
+      "target_type": {
+        "enum": [
+          "customer_organization",
+          "contact",
+          "dispatch_location"
+        ],
+        "type": "string"
+      },
+      "would_be_eligible": {
+        "type": "boolean"
+      }
+    },
+    "required": [
+      "target_type",
+      "target_id",
+      "operation",
+      "revision",
+      "exact_blocker_count",
+      "blockers",
+      "continuation",
+      "would_be_eligible"
+    ],
+    "title": "ReferenceBlockerPreviewV1",
+    "type": "object"
+  },
+  "urn:soma:01:candidate-result:v1": {
+    "$id": "urn:soma:01:candidate-result:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "candidate_count": {
+        "maximum": 9007199254740991,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "candidate_ids": {
+        "items": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "type": "string"
+        },
+        "maxItems": 200,
+        "type": "array"
+      },
+      "continuation": {
+        "anyOf": [
+          {
+            "maxLength": 6000,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "explanation": {
+        "maxLength": 128,
+        "type": "string"
+      },
+      "matching_profile_id": {
+        "const": "UNICODE_MATCH_V1",
+        "type": "string"
+      },
+      "normalized_keys": {
+        "additionalProperties": false,
+        "properties": {
+          "account_code": {
+            "anyOf": [
+              {
+                "maxLength": 2048,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "email": {
+            "anyOf": [
+              {
+                "maxLength": 2048,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 2048,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "scope": {
+        "maxLength": 256,
+        "type": "string"
+      },
+      "state": {
+        "enum": [
+          "UNRESOLVED",
+          "UNIQUE_CANDIDATE",
+          "AMBIGUOUS"
+        ],
+        "type": "string"
+      }
+    },
+    "required": [
+      "state",
+      "explanation",
+      "candidate_count",
+      "candidate_ids",
+      "continuation",
+      "matching_profile_id",
+      "normalized_keys",
+      "scope"
+    ],
+    "title": "ReferenceCandidateResultV1",
+    "type": "object"
+  },
+  "urn:soma:01:change-affiliation-request:v1": {
+    "$id": "urn:soma:01:change-affiliation-request:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "base_revision": {
+        "maximum": 9007199254740991,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "command_id": {
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+        "type": "string"
+      },
+      "new_customer_org_id": {
+        "anyOf": [
+          {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "reason_category": {
+        "maxLength": 128,
+        "type": "string"
+      }
+    },
+    "required": [
+      "command_id",
+      "base_revision",
+      "new_customer_org_id",
+      "reason_category"
+    ],
+    "title": "ReferenceChangeAffiliationRequestV1",
+    "type": "object"
+  },
+  "urn:soma:01:channel-use-result:v1": {
+    "$id": "urn:soma:01:channel-use-result:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "candidate_channel_ids": {
+        "items": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "type": "string"
+        },
+        "maxItems": 200,
+        "type": "array"
+      },
+      "channel_kind": {
+        "const": "email",
+        "type": "string"
+      },
+      "contact_channel_id": {
+        "anyOf": [
+          {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "contact_id": {
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+        "type": "string"
+      },
+      "continuation": {
+        "anyOf": [
+          {
+            "maxLength": 6000,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "state": {
+        "enum": [
+          "MISSING",
+          "ARCHIVED",
+          "INVALID",
+          "USABLE",
+          "MULTIPLE_USABLE"
+        ],
+        "type": "string"
+      },
+      "usable_count": {
+        "maximum": 9007199254740991,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "value_text": {
+        "anyOf": [
+          {
+            "maxLength": 2048,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      }
+    },
+    "required": [
+      "state",
+      "contact_id",
+      "contact_channel_id",
+      "channel_kind",
+      "value_text",
+      "usable_count",
+      "candidate_channel_ids",
+      "continuation"
+    ],
+    "title": "ReferenceChannelUseResultV1",
+    "type": "object"
+  },
+  "urn:soma:01:channels-page:v1": {
+    "$id": "urn:soma:01:channels-page:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "as_of_utc_s": {
+        "maximum": 9007199254740991,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "continuation": {
+        "anyOf": [
+          {
+            "maxLength": 6000,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "exact_count": {
+        "anyOf": [
+          {
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "items": {
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "channel_kind": {
+              "const": "email",
+              "type": "string"
+            },
+            "contact_channel_id": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            "contact_id": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            "created_at_utc": {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "lifecycle_state": {
+              "enum": [
+                "active",
+                "archived"
+              ],
+              "type": "string"
+            },
+            "match_key": {
+              "maxLength": 2048,
+              "type": "string"
+            },
+            "revision": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "updated_at_utc": {
+              "maximum": 9007199254740991,
+              "minimum": 0,
+              "type": "integer"
+            },
+            "value_text": {
+              "maxLength": 2048,
+              "type": "string"
+            }
+          },
+          "required": [
+            "contact_channel_id",
+            "contact_id",
+            "channel_kind",
+            "value_text",
+            "match_key",
+            "lifecycle_state",
+            "revision",
+            "created_at_utc",
+            "updated_at_utc"
+          ],
+          "type": "object"
+        },
+        "maxItems": 200,
+        "type": "array"
+      }
+    },
+    "required": [
+      "items",
+      "continuation",
+      "exact_count",
+      "as_of_utc_s"
+    ],
+    "title": "ReferenceChannelsPageV1",
+    "type": "object"
+  },
+  "urn:soma:01:contact-detail:v1": {
+    "$id": "urn:soma:01:contact-detail:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "created_at_utc": {
+        "maximum": 9007199254740991,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "current_affiliation": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "contact_affiliation_id": {
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+                "type": "string"
+              },
+              "customer_org_id": {
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "contact_affiliation_id",
+              "customer_org_id"
+            ],
+            "type": "object"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "lifecycle_state": {
+        "enum": [
+          "active",
+          "archived"
+        ],
+        "type": "string"
+      },
+      "name": {
+        "maxLength": 1024,
+        "type": "string"
+      },
+      "name_match_key": {
+        "maxLength": 2048,
+        "type": "string"
+      },
+      "reference_id": {
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+        "type": "string"
+      },
+      "reference_type": {
+        "enum": [
+          "customer_organization",
+          "contact",
+          "dispatch_location"
+        ],
+        "type": "string"
+      },
+      "revision": {
+        "maximum": 9007199254740991,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "updated_at_utc": {
+        "maximum": 9007199254740991,
+        "minimum": 0,
+        "type": "integer"
+      }
+    },
+    "required": [
+      "reference_id",
+      "reference_type",
+      "name",
+      "name_match_key",
+      "lifecycle_state",
+      "revision",
+      "created_at_utc",
+      "updated_at_utc",
+      "current_affiliation"
+    ],
+    "title": "ReferenceContactDetailV1",
+    "type": "object"
+  },
+  "urn:soma:01:create-contact-request:v1": {
+    "$id": "urn:soma:01:create-contact-request:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "command_id": {
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+        "type": "string"
+      },
+      "initial_customer_org_id": {
+        "anyOf": [
+          {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "initial_email": {
+        "anyOf": [
+          {
+            "maxLength": 2048,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "name": {
+        "maxLength": 1024,
+        "type": "string"
+      }
+    },
+    "required": [
+      "command_id",
+      "name"
+    ],
+    "title": "ReferenceCreateContactRequestV1",
+    "type": "object"
+  },
+  "urn:soma:01:create-customer-request:v1": {
+    "$id": "urn:soma:01:create-customer-request:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "account_code": {
+        "anyOf": [
+          {
+            "maxLength": 512,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "command_id": {
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+        "type": "string"
+      },
+      "name": {
+        "maxLength": 1024,
+        "type": "string"
+      }
+    },
+    "required": [
+      "command_id",
+      "name"
+    ],
+    "title": "ReferenceCreateCustomerRequestV1",
+    "type": "object"
+  },
+  "urn:soma:01:create-dispatch-request:v1": {
+    "$id": "urn:soma:01:create-dispatch-request:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "address_text": {
+        "maxLength": 8192,
+        "type": "string"
+      },
+      "command_id": {
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+        "type": "string"
+      },
+      "name": {
+        "maxLength": 1024,
+        "type": "string"
+      }
+    },
+    "required": [
+      "command_id",
+      "name",
+      "address_text"
+    ],
+    "title": "ReferenceCreateDispatchRequestV1",
+    "type": "object"
+  },
+  "urn:soma:01:customer-detail:v1": {
+    "$id": "urn:soma:01:customer-detail:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "created_at_utc": {
+        "maximum": 9007199254740991,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "current_account_code": {
+        "anyOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "customer_org_identifier_id": {
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+                "type": "string"
+              },
+              "match_key": {
+                "maxLength": 2048,
+                "type": "string"
+              },
+              "value_text": {
+                "maxLength": 512,
+                "type": "string"
+              }
+            },
+            "required": [
+              "customer_org_identifier_id",
+              "value_text",
+              "match_key"
+            ],
+            "type": "object"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "lifecycle_state": {
+        "enum": [
+          "active",
+          "archived"
+        ],
+        "type": "string"
+      },
+      "name": {
+        "maxLength": 1024,
+        "type": "string"
+      },
+      "name_match_key": {
+        "maxLength": 2048,
+        "type": "string"
+      },
+      "reference_id": {
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+        "type": "string"
+      },
+      "reference_type": {
+        "enum": [
+          "customer_organization",
+          "contact",
+          "dispatch_location"
+        ],
+        "type": "string"
+      },
+      "revision": {
+        "maximum": 9007199254740991,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "updated_at_utc": {
+        "maximum": 9007199254740991,
+        "minimum": 0,
+        "type": "integer"
+      }
+    },
+    "required": [
+      "reference_id",
+      "reference_type",
+      "name",
+      "name_match_key",
+      "lifecycle_state",
+      "revision",
+      "created_at_utc",
+      "updated_at_utc",
+      "current_account_code"
+    ],
+    "title": "ReferenceCustomerDetailV1",
+    "type": "object"
+  },
+  "urn:soma:01:detail-contact-request:v1": {
+    "$id": "urn:soma:01:detail-contact-request:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {},
+    "required": [],
+    "title": "ReferenceDetailContactRequestV1",
+    "type": "object"
+  },
+  "urn:soma:01:detail-customer-request:v1": {
+    "$id": "urn:soma:01:detail-customer-request:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {},
+    "required": [],
+    "title": "ReferenceDetailCustomerRequestV1",
+    "type": "object"
+  },
+  "urn:soma:01:detail-dispatch-request:v1": {
+    "$id": "urn:soma:01:detail-dispatch-request:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {},
+    "required": [],
+    "title": "ReferenceDetailDispatchRequestV1",
+    "type": "object"
+  },
+  "urn:soma:01:dispatch-detail:v1": {
+    "$id": "urn:soma:01:dispatch-detail:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "address_mode": {
+        "enum": [
+          "standalone",
+          "site_derived"
+        ],
+        "type": "string"
+      },
+      "created_at_utc": {
+        "maximum": 9007199254740991,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "current_address": {
+        "additionalProperties": false,
+        "properties": {
+          "address_text": {
+            "anyOf": [
+              {
+                "maxLength": 8192,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "site_id": {
+            "anyOf": [
+              {
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source": {
+            "enum": [
+              "STANDALONE",
+              "SITE"
+            ],
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "AVAILABLE",
+              "UNAVAILABLE"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "source",
+          "state",
+          "address_text",
+          "site_id"
+        ],
+        "type": "object"
+      },
+      "lifecycle_state": {
+        "enum": [
+          "active",
+          "archived"
+        ],
+        "type": "string"
+      },
+      "name": {
+        "maxLength": 1024,
+        "type": "string"
+      },
+      "name_match_key": {
+        "maxLength": 2048,
+        "type": "string"
+      },
+      "reference_id": {
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+        "type": "string"
+      },
+      "reference_type": {
+        "enum": [
+          "customer_organization",
+          "contact",
+          "dispatch_location"
+        ],
+        "type": "string"
+      },
+      "revision": {
+        "maximum": 9007199254740991,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "standalone_address_text": {
+        "anyOf": [
+          {
+            "maxLength": 8192,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "updated_at_utc": {
+        "maximum": 9007199254740991,
+        "minimum": 0,
+        "type": "integer"
+      }
+    },
+    "required": [
+      "reference_id",
+      "reference_type",
+      "name",
+      "name_match_key",
+      "lifecycle_state",
+      "revision",
+      "created_at_utc",
+      "updated_at_utc",
+      "address_mode",
+      "standalone_address_text",
+      "current_address"
+    ],
+    "title": "ReferenceDispatchDetailV1",
+    "type": "object"
+  },
+  "urn:soma:01:empty-request:v1": {
+    "$id": "urn:soma:01:empty-request:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {},
+    "required": [],
+    "title": "ReferenceEmptyRequestV1",
+    "type": "object"
+  },
+  "urn:soma:01:get-setting-request:v1": {
+    "$id": "urn:soma:01:get-setting-request:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {},
+    "required": [],
+    "title": "ReferenceGetSettingRequestV1",
+    "type": "object"
+  },
+  "urn:soma:01:identities-request:v1": {
+    "$id": "urn:soma:01:identities-request:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "ids": {
+        "items": {
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+          "type": "string"
+        },
+        "maxItems": 200,
+        "type": "array",
+        "uniqueItems": true
+      },
+      "reference_type": {
+        "enum": [
+          "customer_organization",
+          "contact",
+          "dispatch_location"
+        ],
+        "type": "string"
+      }
+    },
+    "required": [
+      "reference_type",
+      "ids"
+    ],
+    "title": "ReferenceIdentitiesRequestV1",
+    "type": "object"
+  },
+  "urn:soma:01:identities-result:v1": {
+    "$id": "urn:soma:01:identities-result:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "items": {
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "lifecycle_state": {
+              "enum": [
+                "active",
+                "archived"
+              ],
+              "type": "string"
+            },
+            "name": {
+              "maxLength": 1024,
+              "type": "string"
+            },
+            "reference_id": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            "revision": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "reference_id",
+            "name",
+            "lifecycle_state",
+            "revision"
+          ],
+          "type": "object"
+        },
+        "maxItems": 200,
+        "type": "array"
+      }
+    },
+    "required": [
+      "items"
+    ],
+    "title": "ReferenceIdentitiesResultV1",
+    "type": "object"
+  },
+  "urn:soma:01:list-channels-request:v1": {
+    "$id": "urn:soma:01:list-channels-request:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "after": {
+        "maxLength": 6000,
+        "type": "string"
+      },
+      "count_exact": {
+        "type": "boolean"
+      },
+      "include_archived": {
+        "type": "boolean"
+      },
+      "limit": {
+        "maximum": 200,
+        "minimum": 1,
+        "type": "integer"
+      }
+    },
+    "required": [],
+    "title": "ReferenceListChannelsRequestV1",
+    "type": "object"
+  },
+  "urn:soma:01:list-contact-request:v1": {
+    "$id": "urn:soma:01:list-contact-request:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "after": {
+        "maxLength": 6000,
+        "type": "string"
+      },
+      "count_exact": {
+        "type": "boolean"
+      },
+      "limit": {
+        "maximum": 200,
+        "minimum": 1,
+        "type": "integer"
+      }
+    },
+    "required": [],
+    "title": "ReferenceListContactRequestV1",
+    "type": "object"
+  },
+  "urn:soma:01:list-customer-request:v1": {
+    "$id": "urn:soma:01:list-customer-request:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "after": {
+        "maxLength": 6000,
+        "type": "string"
+      },
+      "count_exact": {
+        "type": "boolean"
+      },
+      "limit": {
+        "maximum": 200,
+        "minimum": 1,
+        "type": "integer"
+      }
+    },
+    "required": [],
+    "title": "ReferenceListCustomerRequestV1",
+    "type": "object"
+  },
+  "urn:soma:01:list-dispatch-request:v1": {
+    "$id": "urn:soma:01:list-dispatch-request:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "after": {
+        "maxLength": 6000,
+        "type": "string"
+      },
+      "count_exact": {
+        "type": "boolean"
+      },
+      "limit": {
+        "maximum": 200,
+        "minimum": 1,
+        "type": "integer"
+      }
+    },
+    "required": [],
+    "title": "ReferenceListDispatchRequestV1",
+    "type": "object"
+  },
+  "urn:soma:01:match-contact-request:v1": {
+    "$id": "urn:soma:01:match-contact-request:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "after": {
+        "maxLength": 6000,
+        "type": "string"
+      },
+      "limit": {
+        "maximum": 200,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "raw_email": {
+        "anyOf": [
+          {
+            "maxLength": 2048,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "raw_name": {
+        "anyOf": [
+          {
+            "maxLength": 1024,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "scope": {
+        "maxLength": 256,
+        "type": "string"
+      }
+    },
+    "required": [
+      "scope"
+    ],
+    "title": "ReferenceMatchContactRequestV1",
+    "type": "object"
+  },
+  "urn:soma:01:match-customer-request:v1": {
+    "$id": "urn:soma:01:match-customer-request:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "after": {
+        "maxLength": 6000,
+        "type": "string"
+      },
+      "limit": {
+        "maximum": 200,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "raw_account_code": {
+        "anyOf": [
+          {
+            "maxLength": 512,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "raw_name": {
+        "anyOf": [
+          {
+            "maxLength": 1024,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      }
+    },
+    "required": [],
+    "title": "ReferenceMatchCustomerRequestV1",
+    "type": "object"
+  },
+  "urn:soma:01:mutation-result:v1": {
+    "$id": "urn:soma:01:mutation-result:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "outcome": {
+        "enum": [
+          "APPLIED",
+          "NO_CHANGE"
+        ],
+        "type": "string"
+      },
+      "result_refs": {
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            "type": {
+              "enum": [
+                "customer_organization",
+                "contact",
+                "dispatch_location",
+                "local_user_profile",
+                "contact_channel"
+              ],
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "id"
+          ],
+          "type": "object"
+        },
+        "maxItems": 200,
+        "type": "array"
+      },
+      "revision": {
+        "maximum": 9007199254740991,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "target_id": {
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+        "type": "string"
+      }
+    },
+    "required": [
+      "outcome",
+      "target_id",
+      "revision",
+      "result_refs"
+    ],
+    "title": "ReferenceApiMutationResultV1",
+    "type": "object"
+  },
+  "urn:soma:01:profile-detail:v1": {
+    "$id": "urn:soma:01:profile-detail:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "display_name": {
+        "maxLength": 512,
+        "type": "string"
+      },
+      "local_user_profile_id": {
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+        "type": "string"
+      },
+      "revision": {
+        "maximum": 9007199254740991,
+        "minimum": 1,
+        "type": "integer"
+      }
+    },
+    "required": [
+      "local_user_profile_id",
+      "display_name",
+      "revision"
+    ],
+    "title": "ReferenceProfileDetailV1",
+    "type": "object"
+  },
+  "urn:soma:01:reactivate-request:v1": {
+    "$id": "urn:soma:01:reactivate-request:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "base_revision": {
+        "maximum": 9007199254740991,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "command_id": {
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+        "type": "string"
+      },
+      "reason_category": {
+        "maxLength": 128,
+        "type": "string"
+      }
+    },
+    "required": [
+      "base_revision",
+      "command_id",
+      "reason_category"
+    ],
+    "title": "ReferenceReactivateRequestV1",
+    "type": "object"
+  },
+  "urn:soma:01:reassign-account-code-request:v1": {
+    "$id": "urn:soma:01:reassign-account-code-request:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "account_code": {
+        "maxLength": 512,
+        "type": "string"
+      },
+      "command_id": {
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+        "type": "string"
+      },
+      "from_base_revision": {
+        "maximum": 9007199254740991,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "from_customer_org_id": {
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+        "type": "string"
+      },
+      "reason_category": {
+        "maxLength": 128,
+        "type": "string"
+      },
+      "review_context_id": {
+        "anyOf": [
+          {
+            "maxLength": 256,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "review_snapshot_hash": {
+        "maxLength": 64,
+        "type": "string"
+      },
+      "to_base_revision": {
+        "maximum": 9007199254740991,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "to_customer_org_id": {
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+        "type": "string"
+      }
+    },
+    "required": [
+      "command_id",
+      "from_customer_org_id",
+      "from_base_revision",
+      "to_customer_org_id",
+      "to_base_revision",
+      "account_code",
+      "review_snapshot_hash",
+      "reason_category"
+    ],
+    "title": "ReferenceReassignAccountCodeRequestV1",
+    "type": "object"
+  },
+  "urn:soma:01:reference-page:v1": {
+    "$id": "urn:soma:01:reference-page:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "as_of_utc_s": {
+        "maximum": 9007199254740991,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "continuation": {
+        "anyOf": [
+          {
+            "maxLength": 6000,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "exact_count": {
+        "anyOf": [
+          {
+            "maximum": 9007199254740991,
+            "minimum": 0,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "items": {
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "lifecycle_state": {
+              "enum": [
+                "active",
+                "archived"
+              ],
+              "type": "string"
+            },
+            "name": {
+              "maxLength": 1024,
+              "type": "string"
+            },
+            "name_match_key": {
+              "maxLength": 2048,
+              "type": "string"
+            },
+            "reference_id": {
+              "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+              "type": "string"
+            },
+            "revision": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "reference_id",
+            "name",
+            "name_match_key",
+            "lifecycle_state",
+            "revision"
+          ],
+          "type": "object"
+        },
+        "maxItems": 200,
+        "type": "array"
+      }
+    },
+    "required": [
+      "items",
+      "continuation",
+      "exact_count",
+      "as_of_utc_s"
+    ],
+    "title": "ReferencePageTransportV1",
+    "type": "object"
+  },
+  "urn:soma:01:review-account-code-request:v1": {
+    "$id": "urn:soma:01:review-account-code-request:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "from_customer_org_id": {
+        "anyOf": [
+          {
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "proposed_action": {
+        "enum": [
+          "CONFIRM_SHARED_CLAIM",
+          "REASSIGN_CLAIM"
+        ],
+        "type": "string"
+      },
+      "raw_account_code": {
+        "maxLength": 512,
+        "type": "string"
+      },
+      "target_customer_org_id": {
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+        "type": "string"
+      }
+    },
+    "required": [
+      "raw_account_code",
+      "proposed_action",
+      "target_customer_org_id"
+    ],
+    "title": "ReferenceReviewAccountCodeRequestV1",
+    "type": "object"
+  },
+  "urn:soma:01:review-result:v1": {
+    "$id": "urn:soma:01:review-result:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "claimant_count": {
+        "maximum": 9007199254740991,
+        "minimum": 0,
+        "type": "integer"
+      },
+      "review_snapshot_hash": {
+        "pattern": "^[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "source_revision": {
+        "anyOf": [
+          {
+            "maximum": 9007199254740991,
+            "minimum": 1,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "target_revision": {
+        "maximum": 9007199254740991,
+        "minimum": 1,
+        "type": "integer"
+      }
+    },
+    "required": [
+      "review_snapshot_hash",
+      "claimant_count",
+      "target_revision",
+      "source_revision"
+    ],
+    "title": "ReferenceReviewResultV1",
+    "type": "object"
+  },
+  "urn:soma:01:set-account-code-request:v1": {
+    "$id": "urn:soma:01:set-account-code-request:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "account_code": {
+        "maxLength": 512,
+        "type": "string"
+      },
+      "base_revision": {
+        "maximum": 9007199254740991,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "command_id": {
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+        "type": "string"
+      },
+      "reason_category": {
+        "anyOf": [
+          {
+            "maxLength": 128,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      }
+    },
+    "required": [
+      "command_id",
+      "base_revision",
+      "account_code"
+    ],
+    "title": "ReferenceSetAccountCodeRequestV1",
+    "type": "object"
+  },
+  "urn:soma:01:setting-value:v1": {
+    "$id": "urn:soma:01:setting-value:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "contract_name": {
+        "maxLength": 256,
+        "type": "string"
+      },
+      "contract_version": {
+        "maximum": 9007199254740991,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "outcome": {
+        "enum": [
+          "APPLIED",
+          "NO_CHANGE"
+        ],
+        "type": "string"
+      },
+      "revision": {
+        "anyOf": [
+          {
+            "maximum": 9007199254740991,
+            "minimum": 1,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "semantic_owner": {
+        "maxLength": 256,
+        "type": "string"
+      },
+      "setting_key": {
+        "maxLength": 256,
+        "type": "string"
+      },
+      "source": {
+        "enum": [
+          "DEFAULT",
+          "PERSISTED"
+        ],
+        "type": "string"
+      },
+      "value_json": {
+        "maxLength": 524288,
+        "type": "string"
+      }
+    },
+    "required": [
+      "setting_key",
+      "semantic_owner",
+      "contract_name",
+      "contract_version",
+      "value_json",
+      "revision",
+      "source"
+    ],
+    "title": "ReferenceSettingValueV1",
+    "type": "object"
+  },
+  "urn:soma:01:settings-definitions:v1": {
+    "$id": "urn:soma:01:settings-definitions:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "items": {
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "contract_name": {
+              "maxLength": 256,
+              "type": "string"
+            },
+            "contract_version": {
+              "maximum": 9007199254740991,
+              "minimum": 1,
+              "type": "integer"
+            },
+            "semantic_owner": {
+              "maxLength": 256,
+              "type": "string"
+            },
+            "setting_key": {
+              "maxLength": 256,
+              "type": "string"
+            }
+          },
+          "required": [
+            "setting_key",
+            "semantic_owner",
+            "contract_name",
+            "contract_version"
+          ],
+          "type": "object"
+        },
+        "maxItems": 200,
+        "type": "array"
+      }
+    },
+    "required": [
+      "items"
+    ],
+    "title": "ReferenceSettingsDefinitionsV1",
+    "type": "object"
+  },
+  "urn:soma:01:share-account-code-request:v1": {
+    "$id": "urn:soma:01:share-account-code-request:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "account_code": {
+        "maxLength": 512,
+        "type": "string"
+      },
+      "base_revision": {
+        "maximum": 9007199254740991,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "command_id": {
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+        "type": "string"
+      },
+      "reason_category": {
+        "maxLength": 128,
+        "type": "string"
+      },
+      "review_context_id": {
+        "anyOf": [
+          {
+            "maxLength": 256,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "review_snapshot_hash": {
+        "maxLength": 64,
+        "type": "string"
+      }
+    },
+    "required": [
+      "command_id",
+      "base_revision",
+      "account_code",
+      "review_snapshot_hash",
+      "reason_category"
+    ],
+    "title": "ReferenceShareAccountCodeRequestV1",
+    "type": "object"
+  },
+  "urn:soma:01:update-channel-request:v1": {
+    "$id": "urn:soma:01:update-channel-request:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "channel_base_revision": {
+        "maximum": 9007199254740991,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "command_id": {
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+        "type": "string"
+      },
+      "contact_base_revision": {
+        "maximum": 9007199254740991,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "value_text": {
+        "maxLength": 2048,
+        "type": "string"
+      }
+    },
+    "required": [
+      "command_id",
+      "contact_base_revision",
+      "channel_base_revision",
+      "value_text"
+    ],
+    "title": "ReferenceUpdateChannelRequestV1",
+    "type": "object"
+  },
+  "urn:soma:01:update-contact-request:v1": {
+    "$id": "urn:soma:01:update-contact-request:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "base_revision": {
+        "maximum": 9007199254740991,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "command_id": {
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+        "type": "string"
+      },
+      "name": {
+        "maxLength": 1024,
+        "type": "string"
+      }
+    },
+    "required": [
+      "command_id",
+      "base_revision",
+      "name"
+    ],
+    "title": "ReferenceUpdateContactRequestV1",
+    "type": "object"
+  },
+  "urn:soma:01:update-customer-request:v1": {
+    "$id": "urn:soma:01:update-customer-request:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "base_revision": {
+        "maximum": 9007199254740991,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "command_id": {
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+        "type": "string"
+      },
+      "name": {
+        "maxLength": 1024,
+        "type": "string"
+      }
+    },
+    "required": [
+      "command_id",
+      "base_revision",
+      "name"
+    ],
+    "title": "ReferenceUpdateCustomerRequestV1",
+    "type": "object"
+  },
+  "urn:soma:01:update-dispatch-request:v1": {
+    "$id": "urn:soma:01:update-dispatch-request:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "address_text": {
+        "anyOf": [
+          {
+            "maxLength": 8192,
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "base_revision": {
+        "maximum": 9007199254740991,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "command_id": {
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+        "type": "string"
+      },
+      "name": {
+        "maxLength": 1024,
+        "type": "string"
+      }
+    },
+    "required": [
+      "command_id",
+      "base_revision",
+      "name"
+    ],
+    "title": "ReferenceUpdateDispatchRequestV1",
+    "type": "object"
+  },
+  "urn:soma:01:update-profile-request:v1": {
+    "$id": "urn:soma:01:update-profile-request:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "base_revision": {
+        "maximum": 9007199254740991,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "command_id": {
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+        "type": "string"
+      },
+      "display_name": {
+        "maxLength": 512,
+        "type": "string"
+      }
+    },
+    "required": [
+      "command_id",
+      "base_revision",
+      "display_name"
+    ],
+    "title": "ReferenceUpdateProfileRequestV1",
+    "type": "object"
+  },
+  "urn:soma:01:validate-channel-request:v1": {
+    "$id": "urn:soma:01:validate-channel-request:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "after": {
+        "maxLength": 6000,
+        "type": "string"
+      },
+      "channel_or_auto": {
+        "maxLength": 256,
+        "type": "string"
+      },
+      "limit": {
+        "maximum": 200,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "purpose": {
+        "enum": [
+          "msg_recipient"
+        ],
+        "type": "string"
+      }
+    },
+    "required": [
+      "channel_or_auto",
+      "purpose"
+    ],
+    "title": "ReferenceValidateChannelRequestV1",
+    "type": "object"
+  },
+  "urn:soma:01:write-setting-request:v1": {
+    "$id": "urn:soma:01:write-setting-request:v1",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "additionalProperties": false,
+    "properties": {
+      "base_revision": {
+        "anyOf": [
+          {
+            "maximum": 9007199254740991,
+            "minimum": 1,
+            "type": "integer"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "command_id": {
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+        "type": "string"
+      },
+      "contract_name": {
+        "maxLength": 256,
+        "type": "string"
+      },
+      "contract_version": {
+        "maximum": 9007199254740991,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "semantic_owner": {
+        "maxLength": 256,
+        "type": "string"
+      },
+      "value_json": {
+        "maxLength": 16384,
+        "type": "string"
+      }
+    },
+    "required": [
+      "command_id",
+      "semantic_owner",
+      "contract_name",
+      "contract_version",
+      "base_revision",
+      "value_json"
+    ],
+    "title": "ReferenceWriteSettingRequestV1",
     "type": "object"
   }
 }

@@ -27,7 +27,10 @@ class Browser:
             profile_participant=host.profile_participant,
         )
         self.proofs = DeliberateProofs(host.run_id, host.proof_actions)
-        self.copies = WorkingCopies(host.factory, host.copy_contracts)
+        copy_contracts = host.copy_contracts
+        if getattr(host, "reference", None) is not None:
+            copy_contracts = (*copy_contracts, *host.reference.recovery_contracts())
+        self.copies = WorkingCopies(host.factory, copy_contracts)
         registry = CapabilityRegistry()
         for name, provider in (
             ("foundation.runtime", host),
@@ -36,6 +39,15 @@ class Browser:
         ):
             registry.register(name, "available", provider=provider)
         self.registry = registry
+        self.reference_transport = None
+        if getattr(host, "reference", None) is not None:
+            from soma.modules.reference.transport.routes import ReferenceTransport
+
+            self.reference_transport = ReferenceTransport(
+                host.reference, host.factory, self.sessions
+            )
+            registry.register("reference.identity", "available", provider=host.reference)
+            registry.register("settings", "available", provider=host.reference.settings)
         registry.register("foundation.working_copies", "available", provider=self.copies)
         registry.register("foundation.confirmation", "available", provider=self.proofs)
 
@@ -82,6 +94,10 @@ class Browser:
 
     def handle(self, request, raw):
         path = request.url.path
+        if self.reference_transport is not None and path.startswith(
+            ("/api/v1/reference/", "/api/v1/settings/", "/api/v1/local-user-profile")
+        ):
+            return self.reference_transport.handle(request, raw)
         if path.startswith("/api/v1/confirmation/") and request.method == "POST":
             context = self.sessions.validate(request, mutation=True)
             body = loads_strict_bytes(raw, max_bytes=8192)

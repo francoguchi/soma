@@ -342,6 +342,7 @@ class WorkingCopies:
                 "working_copy_id": row["working_copy_id"],
                 "generation": row["generation"],
                 "draft": value["draft"],
+                "draft_sha256": row["draft_sha256"],
                 "dirty_paths": value["dirty_paths"],
                 "base_revision": row["base_revision"],
                 "current_revision": current,

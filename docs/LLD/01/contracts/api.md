@@ -45,6 +45,7 @@ Scope 01 exposes authenticated local API contracts beneath `/api/v1`. Machine-re
 - `POST /reference/customer-organizations/{id}/customer-account-code/confirm-shared-claim` — reviewed shared claim.
 - `POST /reference/customer-account-code/reassign` — reviewed reassignment.
 - `GET /reference/customer-organizations/{id}/customer-account-code/history` — paginated preserved claim history.
+- `POST /reference/identities` - pure bounded identity labels/revisions for one closed reference type, at most 200 distinct UUIDs, using one owner query per page.
 - `POST /reference/match/customer-organization` — pure candidate query.
 
 UI labels these records **Customer** while route/domain naming remains explicit.
@@ -73,6 +74,8 @@ Site-derived address edits are not accepted by the Dispatch PATCH and must route
 
 ### Profile and settings operations
 
+- `GET /local-user-profile` - current descriptive singleton metadata only.
+- `GET /settings/registry/definitions` - at most 200 closed registered ordinary-nonsecret definition descriptors; no arbitrary key enumeration or secret values.
 - `PATCH /local-user-profile/display-name` — descriptive metadata only; no credential operation.
 - `GET /settings/{setting_key}` — effective DEFAULT/PERSISTED typed value.
 - `PUT /settings/{setting_key}` — explicit typed setting write.
@@ -84,3 +87,9 @@ The ordinary settings API cannot enumerate arbitrary unknown keys or store secre
 Mutation results distinguish `APPLIED|NO_CHANGE` with immutable target identity/revision and bounded typed result references. Candidate, blocker, history and channel outputs retain exact semantic count/state plus continuation where omission could otherwise change meaning.
 
 All failures use `REF.ERRORS` through Foundation `ERROR.CONTRACT`; raw internal/provider/database text never crosses transport.
+
+### Shared wire bindings
+
+The closed `*.schema.json` files in this directory generate both Core validators and Main types through Foundation's contract generator. Reference queries return signed Foundation continuations; active/history pages include `as_of_utc_s` and optional exact counts. Mutation `result_refs` contain bounded `{type, id}` identities derived from the accepted result, including historical replay.
+
+Generic setting requests/responses carry the owner-typed JSON value as bounded `value_json`. Core strictly parses it and applies the registered owner's contract before writing; reads serialize the effective typed value without materializing defaults. This preserves closed shared transport schemas without assigning arbitrary setting semantics to Reference.

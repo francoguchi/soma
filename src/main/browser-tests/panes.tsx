@@ -20,7 +20,7 @@ function Fixture() {
   const diagnostics = useDiagnostics(bootstrap?.run_id ?? null);
   useEffect(() => {
     void api.request<BootstrapV1>('/api/v1/bootstrap', 'bootstrap').then(value => {api.acceptBootstrap(value); setBootstrap(value);});
-    return installScrollOwnership(document.documentElement, () => main.current?.querySelector<HTMLElement>('[data-pane-active=true]') ?? main.current);
+    return installScrollOwnership(document.documentElement, () => main.current?.querySelector<HTMLElement>('[data-pane-active=true]:not([hidden]) [data-pane-body]') ?? main.current);
   }, []);
   return <div ref={root} className="soma-shell pane-fixture"><header className="shell-header"><strong>SOMA / Pane focus fixture</strong></header><main ref={main} className="main-scroll"><section className="diagnostics-surface"><header className="surface-header"><div><h1 tabIndex={-1}>Synthetic pane inspection</h1><p id="pane-selection">Selected {selection.selected_id ?? 'none'} / Opened {opened}</p></div></header><ConsolePanes panes={[
     {id: 'list', title: 'Operational list', content: <><label>Pane filter <input defaultValue="Preserve filter"/></label><SelectableCollection rows={Array.from({length: 20}, (_, i) => ({id: 'pane-' + i, label: 'Pane record ' + i, eligible: true, route: {type: 'probe', id: 'pane-' + i}}))} selection={selection} change={setSelection} open={row => setOpened(row.id)}/></>},

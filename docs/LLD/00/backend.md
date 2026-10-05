@@ -691,7 +691,7 @@ Reuse provenance: Beta `AuditWriter`.
 **Rules:**
 - Production-format runtime serves only locally built/packaged assets whose manifest/hash set matches BUILD.IDENTITY.
 - Source development may rebuild assets explicitly during setup/build; normal runtime does not invoke npm/Vite.
-- SPA fallback is allowed only for registered Main application routes; API/static-missing paths do not silently return HTML.
+- SPA fallback is allowed only for registered Main application routes; API/static-missing paths do not silently return HTML. Assembled feature owners may supply closed route matchers; absent owners contribute no matcher, and Foundation does not invent feature routes or a wildcard fallback.
 - Static responses use safe content types/headers and a Content Security Policy compatible with no remote code/style/font dependency and no unsafe eval.
 - Asset verification is a readiness prerequisite when the user plane is required by the assembled build.
 
