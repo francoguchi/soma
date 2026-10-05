@@ -145,7 +145,7 @@ def test_exact_schema_strict_fk_indexes_profile_identity_and_immutable_history(r
                 "reference_lifecycle_events",
             )
         )
-        assert not {"contacts", "dispatch_locations", "setting_values"} & tables.keys()
+        assert not {"dispatch_locations", "setting_values"} & tables.keys()
         rejected = (
             ("UPDATE local_user_profiles SET local_user_profile_id=?", (new_uuid4(),)),
             ("DELETE FROM local_user_profiles", ()),

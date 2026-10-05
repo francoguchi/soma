@@ -8,6 +8,7 @@ from pathlib import Path
 
 from soma.foundation.config import RuntimeConfig
 from soma.foundation.identity import new_uuid4
+from soma.foundation.persistence.read_snapshot import ReadSnapshot
 from soma.runtime.host import Host
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -57,6 +58,27 @@ def test_live_reference_composition_auth_setup_customer_workflow_restart(tmp_pat
             base_revision=1,
             display_name="Synthetic Operator",
         )
+        contacts = host.reference.contacts
+        contact = contacts.create_contact(
+            command_id=new_uuid4(),
+            name="Live synthetic Contact",
+            initial_email="live@example.com",
+            initial_customer_org_id=identity,
+            actor_id=actor,
+        )["target_id"]
+        contacts.change_contact_affiliation(
+            command_id=new_uuid4(),
+            contact_id=contact,
+            base_revision=1,
+            new_customer_org_id=None,
+            reason_category="role_changed",
+            actor_id=actor,
+        )
+        with ReadSnapshot(host.reference.customers.factory) as snapshot:
+            use = host.reference.communication.validate_channel_for_use(
+                snapshot, contact, "AUTO", "msg_recipient"
+            )
+            assert use.state == "USABLE" and use.value_text == "live@example.com"
         assert host.state == "READY"
     finally:
         assert host.stop()
@@ -64,6 +86,18 @@ def test_live_reference_composition_auth_setup_customer_workflow_restart(tmp_pat
     restarted.start()
     try:
         assert restarted.reference.profile.get_singleton()["display_name"] == "Synthetic Operator"
-        assert restarted.manifest.generation == 7
+        assert restarted.manifest.generation == 8
+        with ReadSnapshot(restarted.reference.customers.factory) as snapshot:
+            assert (
+                restarted.reference.communication.validate_contact(snapshot, contact, 2) == "ACTIVE"
+            )
+            assert (
+                restarted.reference.communication.match_email_candidates(
+                    snapshot, "LIVE@example.com"
+                )
+                .candidates[0]
+                .contact_id
+                == contact
+            )
     finally:
         assert restarted.stop()

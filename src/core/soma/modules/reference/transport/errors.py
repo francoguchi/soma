@@ -3,6 +3,10 @@
 from soma.foundation.errors import SomaError, error_envelope
 
 ERRORS = {
+    "REFERENCE_ARCHIVED": ("Contact is inactive.", "refresh"),
+    "CHANNEL_NOT_USABLE": ("Channel is inactive.", "refresh"),
+    "CHANNEL_INVALID": ("Email channel is invalid.", "correct_input"),
+    "CHANNEL_NOT_OWNED": ("Channel belongs to another Contact.", "refresh"),
     "CUSTOMER_ORG_INACTIVE": ("Customer is inactive.", "refresh"),
     "ACCOUNT_CODE_CONFLICT_REVIEW": ("Account Code requires conflict review.", "refresh"),
     "ACCOUNT_CODE_SOURCE_NOT_OWNER": ("Source no longer owns the Account Code.", "refresh"),

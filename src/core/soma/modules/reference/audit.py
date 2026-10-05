@@ -77,7 +77,7 @@ def _customer_created(value):
     _reason(value["reason_category"])
 
 
-def _customer_descriptive_updated(value):
+def _descriptive_updated(value, target_type):
     value = _dict(
         value,
         {
@@ -89,13 +89,21 @@ def _customer_descriptive_updated(value):
             "lifecycle_event_id",
         },
     )
-    if value["target_type"] != "customer_organization":
-        raise ValidationError("Invalid Customer descriptive target.")
+    if value["target_type"] != target_type:
+        raise ValidationError("Invalid Reference descriptive target.")
     require_uuid4(value["target_id"])
     require_uuid4(value["lifecycle_event_id"])
     prior = _revision(value["prior_revision"])
-    if value["new_revision"] != prior + 1 or value["changed_fields"] != ["name"]:
+    if _revision(value["new_revision"]) != prior + 1 or value["changed_fields"] != ["name"]:
         raise ValidationError("Invalid Customer descriptive update evidence.")
+
+
+def _customer_descriptive_updated(value):
+    _descriptive_updated(value, "customer_organization")
+
+
+def _contact_descriptive_updated(value):
+    _descriptive_updated(value, "contact")
 
 
 def _account_code_set(value):
@@ -164,7 +172,49 @@ def _review_validator(expected_action):
 def reference_audit_contracts() -> tuple[AuditContract, ...]:
     def safe(value):
         return False
+
     return (
+        AuditContract("reference.contact.created", 1, "ContactAuditV1", 1, _contact_created, safe),
+        AuditContract(
+            "reference.contact.descriptive_updated",
+            1,
+            "ReferenceDescriptiveAuditV1",
+            1,
+            _contact_descriptive_updated,
+            safe,
+        ),
+        AuditContract(
+            "reference.contact_channel.added",
+            1,
+            "ContactChannelAuditV1",
+            1,
+            _channel_validator("ADD"),
+            safe,
+        ),
+        AuditContract(
+            "reference.contact_channel.updated",
+            1,
+            "ContactChannelAuditV1",
+            1,
+            _channel_validator("UPDATE"),
+            safe,
+        ),
+        AuditContract(
+            "reference.contact_channel.archived",
+            1,
+            "ContactChannelArchiveAuditV1",
+            1,
+            _channel_validator("ARCHIVE"),
+            safe,
+        ),
+        AuditContract(
+            "reference.contact_affiliation.changed",
+            1,
+            "ContactAffiliationAuditV1",
+            1,
+            _affiliation_changed,
+            safe,
+        ),
         AuditContract(
             "local_user_profile.created",
             1,
@@ -226,3 +276,87 @@ def reference_audit_contracts() -> tuple[AuditContract, ...]:
 
 def reference_audit_writer() -> AuditWriter:
     return AuditWriter(reference_audit_contracts())
+
+
+def _contact_created(value):
+    value = _dict(
+        value, {"contact_id", "new_revision", "initial_channel_id", "initial_affiliation_id"}
+    )
+    require_uuid4(value["contact_id"])
+    _optional_uuid(value["initial_channel_id"])
+    _optional_uuid(value["initial_affiliation_id"])
+    if type(value["new_revision"]) is not int or value["new_revision"] != 1:
+        raise ValidationError("Invalid Contact creation revision.")
+
+
+def _channel_validator(action):
+    def validate(value):
+        keys = {
+            "contact_id",
+            "contact_channel_id",
+            "prior_channel_revision",
+            "new_channel_revision",
+            "prior_contact_revision",
+            "new_contact_revision",
+        }
+        value = _dict(
+            value,
+            keys
+            | ({"reason_category"} if action == "ARCHIVE" else {"channel_kind", "change_kind"}),
+        )
+        require_uuid4(value["contact_id"])
+        require_uuid4(value["contact_channel_id"])
+        prior_contact = _revision(value["prior_contact_revision"])
+        if _revision(value["new_contact_revision"]) != prior_contact + 1:
+            raise ValidationError("Invalid Contact channel owner revision.")
+        prior = value["prior_channel_revision"]
+        new = _revision(value["new_channel_revision"])
+        if action == "ADD":
+            if prior is not None or new != 1:
+                raise ValidationError("Invalid channel creation revision.")
+        elif new != _revision(prior) + 1:
+            raise ValidationError("Invalid channel revision transition.")
+        if action == "ARCHIVE":
+            _reason(value["reason_category"])
+            if value["reason_category"] is None:
+                raise ValidationError("Missing channel archive reason.")
+        elif value["channel_kind"] != "email" or value["change_kind"] != action:
+            raise ValidationError("Invalid channel classification.")
+
+    return validate
+
+
+def _affiliation_changed(value):
+    value = _dict(
+        value,
+        {
+            "contact_id",
+            "prior_affiliation_id",
+            "new_affiliation_id",
+            "prior_customer_org_id",
+            "new_customer_org_id",
+            "prior_contact_revision",
+            "new_contact_revision",
+            "reason_category",
+        },
+    )
+    require_uuid4(value["contact_id"])
+    for key in (
+        "prior_affiliation_id",
+        "new_affiliation_id",
+        "prior_customer_org_id",
+        "new_customer_org_id",
+    ):
+        _optional_uuid(value[key])
+    for prefix in ("prior", "new"):
+        if (value[prefix + "_affiliation_id"] is None) != (
+            value[prefix + "_customer_org_id"] is None
+        ):
+            raise ValidationError("Invalid affiliation relationship evidence.")
+    if value["prior_customer_org_id"] == value["new_customer_org_id"]:
+        raise ValidationError("Unchanged affiliation cannot append audit.")
+    if _revision(value["new_contact_revision"]) != _revision(value["prior_contact_revision"]) + 1:
+        raise ValidationError("Invalid affiliation revision transition.")
+    _reason(value["reason_category"])
+    if value["reason_category"] is None:
+        raise ValidationError("Missing affiliation reason.")

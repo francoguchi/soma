@@ -160,6 +160,8 @@ def generate(root=ROOT, *, check=False):
         }
         if any(entry.migration_id == "M01.001" for entry in manifest.entries):
             value["append_only_probes"] += reference_probes()
+        if any(entry.migration_id == "M01.002" for entry in manifest.entries):
+            value["append_only_probes"] += contact_probes()
     finally:
         connection.close()
     path = root / "src/core/soma/db/schema_manifest.json"
@@ -169,6 +171,59 @@ def generate(root=ROOT, *, check=False):
             raise ValueError("Committed schema manifest differs from accepted migrations")
     else:
         path.write_text(content, encoding="utf-8", newline="\n")
+
+
+def contact_probes():
+    command = "91919191-9191-4191-8191-919191919191"
+    customer = "92929292-9292-4292-8292-929292929292"
+    contact = "93939393-9393-4393-8393-939393939393"
+    channel = "94949494-9494-4494-8494-949494949494"
+    affiliation = "95959595-9595-4595-8595-959595959595"
+    return [
+        {
+            "setup": [
+                [
+                    "INSERT INTO command_receipts VALUES (?,?,?,?,?)",
+                    [command, "reference.probe", "0" * 64, None, 0],
+                ],
+                [
+                    "INSERT INTO customer_organizations VALUES (?,'probe','probe','active',1,0,0)",
+                    [customer],
+                ],
+                ["INSERT INTO contacts VALUES (?,'probe','probe','active',1,0,0)", [contact]],
+                [
+                    "INSERT INTO contact_channels VALUES (?,?,'email','probe@example.com','probe@example.com','active',1,0,0)",
+                    [channel, contact],
+                ],
+                [
+                    "INSERT INTO contact_affiliations VALUES (?,?,?,1,0,NULL,?,NULL)",
+                    [affiliation, contact, customer, command],
+                ],
+                [
+                    "UPDATE contact_channels SET lifecycle_state='archived',revision=2 WHERE contact_channel_id=?",
+                    [channel],
+                ],
+                [
+                    "UPDATE contact_affiliations SET is_current=0,closed_at_utc=0,closed_command_id=? WHERE contact_affiliation_id=?",
+                    [command, affiliation],
+                ],
+            ],
+            "reject": [
+                ["UPDATE contacts SET contact_id=? WHERE contact_id=?", [customer, contact]],
+                ["DELETE FROM contacts WHERE contact_id=?", [contact]],
+                [
+                    "UPDATE contact_channels SET value_text='changed',revision=3 WHERE contact_channel_id=?",
+                    [channel],
+                ],
+                ["DELETE FROM contact_channels WHERE contact_channel_id=?", [channel]],
+                [
+                    "UPDATE contact_affiliations SET customer_org_id=? WHERE contact_affiliation_id=?",
+                    [customer, affiliation],
+                ],
+                ["DELETE FROM contact_affiliations WHERE contact_affiliation_id=?", [affiliation]],
+            ],
+        }
+    ]
 
 
 if __name__ == "__main__":

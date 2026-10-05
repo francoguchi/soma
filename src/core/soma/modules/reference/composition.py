@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 
 from soma.modules.reference.application.customer import Customers
+from soma.modules.reference.application.contact import Contacts
+from soma.modules.reference.adapters.communication import Communication
 from soma.modules.reference.application.profile import Profile
 from soma.modules.reference.audit import reference_audit_writer
 from soma.modules.reference.adapters.persistence.matching_profile import (
@@ -14,11 +16,18 @@ from soma.foundation.errors import SomaError
 class Reference:
     profile: Profile
     customers: Customers
+    contacts: Contacts
+    communication: Communication
 
 
 def compose(factory):
     writer = reference_audit_writer()
-    assembled = Reference(Profile(factory, writer), Customers(factory, writer))
+    assembled = Reference(
+        Profile(factory, writer),
+        Customers(factory, writer),
+        Contacts(factory, writer),
+        Communication(),
+    )
     with ReadSnapshot(factory) as snapshot:
         require_persisted_matching_profile(snapshot.connection)
         credential = snapshot.connection.execute(

@@ -8,8 +8,8 @@ This is the single current-state entry point for humans and agents. Do not appen
 |---|---|
 | Implementation scope | `01 — Identity / Reference` |
 | Implementation branch | `feat/01-identity-reference` |
-| Implementation goal | `IMP-01-02 — Contacts and communication identity` |
-| Implementation goal file | `docs/implementation/01/01.02.md` |
+| Implementation goal | `IMP-01-03 — Dispatch and governed lifecycle` |
+| Implementation goal file | `docs/implementation/01/01.03.md` |
 | Implementation migration ledger | `docs/LLD/01/migration.md` |
 | Queued next implementation | `02 — Tickets Core`, after Scope-02 design approval and required Scope-01 dependencies |
 | Design scope | `02 — Tickets Core` |
@@ -18,7 +18,7 @@ This is the single current-state entry point for humans and agents. Do not appen
 | Design migration ledger | `docs/LLD/02/migration.md` |
 | Overall migration map | `docs/LLD/MIGRATION.md` |
 | Mode | parallel design N+1 / implementation N |
-| Implementation note | IMP-01-01 is working with closed R01.01-A..D. Profile/Customer application and M01.001 are implemented and live-tested on `feat/01-identity-reference`. IMP-01-02 is queued next; no Contact work has started. |
+| Implementation note | IMP-01-02 is working with closed R01.02-A..C. Contact commands, communication lookup and M01.002 generation 8 are implemented and live-tested on `feat/01-identity-reference`. IMP-01-03 is queued next; no Dispatch/lifecycle command work has started. |
 | Design blocker | none; Scope 02 design resumes from the merged Foundation baseline |
 | Certification | deferred until whole-application implementation and live testing |
 
@@ -39,7 +39,7 @@ The intended handoff can be as small as:
 4. Implement, run the goal's focused checks plus directly affected tests, and fix failures.
 5. Update the goal's Run/Remaining/status, close its migration rows, then advance this file to the next implementation goal.
 
-Current checkpoint: IMP-01-01 is working. Existing matching/review/audit/Foundation seams were reused and completed with Profile/Customer applications, bounded persistence adapters, same-UoW assembled setup and M01.001/schema generation 7. Final 69 focused Reference/command/bootstrap and separate 78 persistence/auth/tooling checks, Main build/typecheck, contracts/schema/Ruff/impact passed. Actual designated-instance trusted Stop/reset/source READY/Stop passed; it is stopped with a fresh database requiring first-run administrator setup. Generated identity/assets remain synchronized. Next read IMP-01-02 and only its Contact/channel/affiliation authorities and R01.02 donor rows. Do not begin generic matching/query/API/UI orchestration, Dispatch or Settings.
+Current checkpoint: IMP-01-02 is working. Existing Foundation replay/preflight/UoW/audit, matching, Customer eligibility and lifecycle storage were reused for Contact commands, email channels, append-preserving affiliation and caller-snapshot communication lookup. Final 137 focused Reference/execution/persistence checks, assembled live Contact restart, Main build/typecheck, contracts/schema/Ruff/impact passed. Actual designated-instance trusted Stop/reset/detached source READY/Stop passed; it is stopped with a fresh generation-8 database requiring administrator setup. Generated identity/assets remain synchronized. Next read IMP-01-03 and only its Dispatch/lifecycle/dependency authorities and R01.03 donor rows. Do not begin Settings, generic query/API/UI orchestration or later goals.
 
 ### Design lane
 

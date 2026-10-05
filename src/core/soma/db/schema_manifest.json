@@ -187,9 +187,104 @@
           ]
         ]
       ]
+    },
+    {
+      "reject": [
+        [
+          "UPDATE contacts SET contact_id=? WHERE contact_id=?",
+          [
+            "92929292-9292-4292-8292-929292929292",
+            "93939393-9393-4393-8393-939393939393"
+          ]
+        ],
+        [
+          "DELETE FROM contacts WHERE contact_id=?",
+          [
+            "93939393-9393-4393-8393-939393939393"
+          ]
+        ],
+        [
+          "UPDATE contact_channels SET value_text='changed',revision=3 WHERE contact_channel_id=?",
+          [
+            "94949494-9494-4494-8494-949494949494"
+          ]
+        ],
+        [
+          "DELETE FROM contact_channels WHERE contact_channel_id=?",
+          [
+            "94949494-9494-4494-8494-949494949494"
+          ]
+        ],
+        [
+          "UPDATE contact_affiliations SET customer_org_id=? WHERE contact_affiliation_id=?",
+          [
+            "92929292-9292-4292-8292-929292929292",
+            "95959595-9595-4595-8595-959595959595"
+          ]
+        ],
+        [
+          "DELETE FROM contact_affiliations WHERE contact_affiliation_id=?",
+          [
+            "95959595-9595-4595-8595-959595959595"
+          ]
+        ]
+      ],
+      "setup": [
+        [
+          "INSERT INTO command_receipts VALUES (?,?,?,?,?)",
+          [
+            "91919191-9191-4191-8191-919191919191",
+            "reference.probe",
+            "0000000000000000000000000000000000000000000000000000000000000000",
+            null,
+            0
+          ]
+        ],
+        [
+          "INSERT INTO customer_organizations VALUES (?,'probe','probe','active',1,0,0)",
+          [
+            "92929292-9292-4292-8292-929292929292"
+          ]
+        ],
+        [
+          "INSERT INTO contacts VALUES (?,'probe','probe','active',1,0,0)",
+          [
+            "93939393-9393-4393-8393-939393939393"
+          ]
+        ],
+        [
+          "INSERT INTO contact_channels VALUES (?,?,'email','probe@example.com','probe@example.com','active',1,0,0)",
+          [
+            "94949494-9494-4494-8494-949494949494",
+            "93939393-9393-4393-8393-939393939393"
+          ]
+        ],
+        [
+          "INSERT INTO contact_affiliations VALUES (?,?,?,1,0,NULL,?,NULL)",
+          [
+            "95959595-9595-4595-8595-959595959595",
+            "93939393-9393-4393-8393-939393939393",
+            "92929292-9292-4292-8292-929292929292",
+            "91919191-9191-4191-8191-919191919191"
+          ]
+        ],
+        [
+          "UPDATE contact_channels SET lifecycle_state='archived',revision=2 WHERE contact_channel_id=?",
+          [
+            "94949494-9494-4494-8494-949494949494"
+          ]
+        ],
+        [
+          "UPDATE contact_affiliations SET is_current=0,closed_at_utc=0,closed_command_id=? WHERE contact_affiliation_id=?",
+          [
+            "91919191-9191-4191-8191-919191919191",
+            "95959595-9595-4595-8595-959595959595"
+          ]
+        ]
+      ]
     }
   ],
-  "generation": 7,
+  "generation": 8,
   "lineage": [
     [
       "M00.001",
@@ -225,6 +320,11 @@
       "M01.001",
       "01",
       "5df3ef5fa84101e8f0f0de398f9949a5bd75f5e304f4bc9e68919a3ba515c3a1"
+    ],
+    [
+      "M01.002",
+      "01",
+      "00ba64c3c556d450252d69760d7be963b38afb1aa29d0ceb981e849942d01444"
     ]
   ],
   "shape": {
@@ -338,6 +438,292 @@
           ]
         ],
         "table": "durable_jobs"
+      },
+      "idx_contact_affiliation_closed_command": {
+        "flags": [
+          0,
+          "c",
+          1
+        ],
+        "keys": [
+          [
+            0,
+            7,
+            "closed_command_id",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            1,
+            -1,
+            null,
+            0,
+            "BINARY",
+            0
+          ]
+        ],
+        "table": "contact_affiliations"
+      },
+      "idx_contact_affiliation_customer_current": {
+        "flags": [
+          0,
+          "c",
+          0
+        ],
+        "keys": [
+          [
+            0,
+            2,
+            "customer_org_id",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            1,
+            3,
+            "is_current",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            2,
+            1,
+            "contact_id",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            3,
+            -1,
+            null,
+            0,
+            "BINARY",
+            0
+          ]
+        ],
+        "table": "contact_affiliations"
+      },
+      "idx_contact_affiliation_history": {
+        "flags": [
+          0,
+          "c",
+          0
+        ],
+        "keys": [
+          [
+            0,
+            1,
+            "contact_id",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            1,
+            4,
+            "opened_at_utc",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            2,
+            0,
+            "contact_affiliation_id",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            3,
+            -1,
+            null,
+            0,
+            "BINARY",
+            0
+          ]
+        ],
+        "table": "contact_affiliations"
+      },
+      "idx_contact_affiliation_opened_command": {
+        "flags": [
+          0,
+          "c",
+          0
+        ],
+        "keys": [
+          [
+            0,
+            6,
+            "opened_command_id",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            1,
+            -1,
+            null,
+            0,
+            "BINARY",
+            0
+          ]
+        ],
+        "table": "contact_affiliations"
+      },
+      "idx_contact_channels_contact": {
+        "flags": [
+          0,
+          "c",
+          0
+        ],
+        "keys": [
+          [
+            0,
+            1,
+            "contact_id",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            1,
+            5,
+            "lifecycle_state",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            2,
+            2,
+            "channel_kind",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            3,
+            7,
+            "created_at_utc",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            4,
+            0,
+            "contact_channel_id",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            5,
+            -1,
+            null,
+            0,
+            "BINARY",
+            0
+          ]
+        ],
+        "table": "contact_channels"
+      },
+      "idx_contact_channels_match": {
+        "flags": [
+          0,
+          "c",
+          0
+        ],
+        "keys": [
+          [
+            0,
+            2,
+            "channel_kind",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            1,
+            5,
+            "lifecycle_state",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            2,
+            4,
+            "match_key",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            3,
+            1,
+            "contact_id",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            4,
+            -1,
+            null,
+            0,
+            "BINARY",
+            0
+          ]
+        ],
+        "table": "contact_channels"
+      },
+      "idx_contacts_active_name_match": {
+        "flags": [
+          0,
+          "c",
+          0
+        ],
+        "keys": [
+          [
+            0,
+            3,
+            "lifecycle_state",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            1,
+            2,
+            "name_match_key",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            2,
+            0,
+            "contact_id",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            3,
+            -1,
+            null,
+            0,
+            "BINARY",
+            0
+          ]
+        ],
+        "table": "contacts"
       },
       "idx_customer_active_identifier_value": {
         "flags": [
@@ -713,6 +1099,84 @@
         ],
         "table": "command_receipts"
       },
+      "sqlite_autoindex_contact_affiliations_1": {
+        "flags": [
+          1,
+          "pk",
+          0
+        ],
+        "keys": [
+          [
+            0,
+            0,
+            "contact_affiliation_id",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            1,
+            -1,
+            null,
+            0,
+            "BINARY",
+            0
+          ]
+        ],
+        "table": "contact_affiliations"
+      },
+      "sqlite_autoindex_contact_channels_1": {
+        "flags": [
+          1,
+          "pk",
+          0
+        ],
+        "keys": [
+          [
+            0,
+            0,
+            "contact_channel_id",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            1,
+            -1,
+            null,
+            0,
+            "BINARY",
+            0
+          ]
+        ],
+        "table": "contact_channels"
+      },
+      "sqlite_autoindex_contacts_1": {
+        "flags": [
+          1,
+          "pk",
+          0
+        ],
+        "keys": [
+          [
+            0,
+            0,
+            "contact_id",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            1,
+            -1,
+            null,
+            0,
+            "BINARY",
+            0
+          ]
+        ],
+        "table": "contacts"
+      },
       "sqlite_autoindex_customer_org_identifiers_1": {
         "flags": [
           1,
@@ -1065,6 +1529,32 @@
         ],
         "table": "ui_working_copies"
       },
+      "uq_contact_current_affiliation": {
+        "flags": [
+          1,
+          "c",
+          1
+        ],
+        "keys": [
+          [
+            0,
+            1,
+            "contact_id",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            1,
+            -1,
+            null,
+            0,
+            "BINARY",
+            0
+          ]
+        ],
+        "table": "contact_affiliations"
+      },
       "uq_customer_org_active_identifier_type": {
         "flags": [
           1,
@@ -1155,6 +1645,48 @@
       ],
       [
         "index",
+        "idx_contact_affiliation_closed_command",
+        "contact_affiliations",
+        "733922efc1213355d18c9457159b811f9953eda829cb8ca0ea9e784a1a50f653"
+      ],
+      [
+        "index",
+        "idx_contact_affiliation_customer_current",
+        "contact_affiliations",
+        "33d9423bc5deb84d3d15220b408ef270d438523489b4ea984360ee1ed9851418"
+      ],
+      [
+        "index",
+        "idx_contact_affiliation_history",
+        "contact_affiliations",
+        "e2cf71e036b3856dad0b9397793cc2a8ac5ed4f74e56a675f9f3fba9d704b0f9"
+      ],
+      [
+        "index",
+        "idx_contact_affiliation_opened_command",
+        "contact_affiliations",
+        "aea93bbd83a152781464951b5c1a803d55c23540f75c321cfebea98158ea7ed2"
+      ],
+      [
+        "index",
+        "idx_contact_channels_contact",
+        "contact_channels",
+        "c3b4ee63cc719346a7da6334e18b3f2fdb4f75aa37dfd77ba49590edcd3205b4"
+      ],
+      [
+        "index",
+        "idx_contact_channels_match",
+        "contact_channels",
+        "14738b09c359399570dbe97995d7784795219ee356473ab83294ebb376600a98"
+      ],
+      [
+        "index",
+        "idx_contacts_active_name_match",
+        "contacts",
+        "820a38c6a00e79ba9f034cf10845ac4754a799c60eae67a8c3e0f963b172e3ea"
+      ],
+      [
+        "index",
         "idx_customer_active_identifier_value",
         "customer_org_identifiers",
         "62e682794c78bbd540e9aa1ddba8bce5a0a1173925e79098679fd4c12198c353"
@@ -1197,6 +1729,12 @@
       ],
       [
         "index",
+        "uq_contact_current_affiliation",
+        "contact_affiliations",
+        "da384fba710facdcba1ef323a3f0a7f1924637e35d189c89d92d8cd3bde94c43"
+      ],
+      [
+        "index",
         "uq_customer_org_active_identifier_type",
         "customer_org_identifiers",
         "9b70a8afb420ff250588f72bb615d7abb8e03c1e952416a0fd6b98f99bf6696f"
@@ -1230,6 +1768,24 @@
         "command_receipts",
         "command_receipts",
         "21477b4613f5125156c4715e1b740e82d73eceab6e71c7505cbe1893b1bc3ad7"
+      ],
+      [
+        "table",
+        "contact_affiliations",
+        "contact_affiliations",
+        "71e1fb0cdfdddc2f602254ae47a7da0f7339f12dccc4618efe1e754d2d917cd0"
+      ],
+      [
+        "table",
+        "contact_channels",
+        "contact_channels",
+        "7a164f8f248e657a0530672c28006f887948db7166c89bb84bd419c286739981"
+      ],
+      [
+        "table",
+        "contacts",
+        "contacts",
+        "ffd1d62c5895dbb5496992bc79d21426844a057bb595ce1d49fca765d1917b2f"
       ],
       [
         "table",
@@ -1323,6 +1879,30 @@
       ],
       [
         "trigger",
+        "contact_affiliation_history_delete_forbidden",
+        "contact_affiliations",
+        "427cb6c0b5992fbee51dde6c52b1b007d9015b5901af943fc5bb5fc66b0b8334"
+      ],
+      [
+        "trigger",
+        "contact_affiliation_history_update_guard",
+        "contact_affiliations",
+        "38ff0b3ad8bbca657f64b33ed3b3a936a16a4f5f5f39f0ea292cddc2e5b813d2"
+      ],
+      [
+        "trigger",
+        "contact_channels_delete_forbidden",
+        "contact_channels",
+        "92b4a84c3eaffa9a8cf50bee5f7b9381f12d7ddd5486ce82be29f6cfe4d3f7d0"
+      ],
+      [
+        "trigger",
+        "contact_channels_update_guard",
+        "contact_channels",
+        "720c1eaafeedb71edab9b1792933055530fdbf0d39b7572c81f10301715fb1cb"
+      ],
+      [
+        "trigger",
         "customer_identifier_history_delete_forbidden",
         "customer_org_identifiers",
         "7909167cf16455bbe5020916ba1443407aa69485d8242b32dbcc179105fada38"
@@ -1368,6 +1948,18 @@
         "local_user_profile_update_guard",
         "local_user_profiles",
         "042635d5e75b612d5a63c772f4882bdad338de169b406b515b1b1e338feabca9"
+      ],
+      [
+        "trigger",
+        "reference_contacts_delete_forbidden",
+        "contacts",
+        "8477e9c3008fc8c6ea88da47dfd8fb99b9223f3402025cef9af887d471f5a704"
+      ],
+      [
+        "trigger",
+        "reference_contacts_update_guard",
+        "contacts",
+        "b2e43e35c1bed122fee6ac94c929fdc6de780e2f330af0ea67c26d1c215a5dc3"
       ],
       [
         "trigger",
@@ -1752,6 +2344,307 @@
         "flags": [
           "table",
           5,
+          0,
+          1
+        ],
+        "foreign_keys": []
+      },
+      "contact_affiliations": {
+        "columns": [
+          [
+            0,
+            "contact_affiliation_id",
+            "TEXT",
+            1,
+            null,
+            1,
+            0
+          ],
+          [
+            1,
+            "contact_id",
+            "TEXT",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            2,
+            "customer_org_id",
+            "TEXT",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            3,
+            "is_current",
+            "INTEGER",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            4,
+            "opened_at_utc",
+            "INTEGER",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            5,
+            "closed_at_utc",
+            "INTEGER",
+            0,
+            null,
+            0,
+            0
+          ],
+          [
+            6,
+            "opened_command_id",
+            "TEXT",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            7,
+            "closed_command_id",
+            "TEXT",
+            0,
+            null,
+            0,
+            0
+          ]
+        ],
+        "flags": [
+          "table",
+          8,
+          0,
+          1
+        ],
+        "foreign_keys": [
+          [
+            0,
+            0,
+            "command_receipts",
+            "closed_command_id",
+            "command_id",
+            "RESTRICT",
+            "RESTRICT",
+            "NONE"
+          ],
+          [
+            1,
+            0,
+            "command_receipts",
+            "opened_command_id",
+            "command_id",
+            "RESTRICT",
+            "RESTRICT",
+            "NONE"
+          ],
+          [
+            2,
+            0,
+            "customer_organizations",
+            "customer_org_id",
+            "customer_org_id",
+            "RESTRICT",
+            "RESTRICT",
+            "NONE"
+          ],
+          [
+            3,
+            0,
+            "contacts",
+            "contact_id",
+            "contact_id",
+            "RESTRICT",
+            "RESTRICT",
+            "NONE"
+          ]
+        ]
+      },
+      "contact_channels": {
+        "columns": [
+          [
+            0,
+            "contact_channel_id",
+            "TEXT",
+            1,
+            null,
+            1,
+            0
+          ],
+          [
+            1,
+            "contact_id",
+            "TEXT",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            2,
+            "channel_kind",
+            "TEXT",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            3,
+            "value_text",
+            "TEXT",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            4,
+            "match_key",
+            "TEXT",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            5,
+            "lifecycle_state",
+            "TEXT",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            6,
+            "revision",
+            "INTEGER",
+            1,
+            "1",
+            0,
+            0
+          ],
+          [
+            7,
+            "created_at_utc",
+            "INTEGER",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            8,
+            "updated_at_utc",
+            "INTEGER",
+            1,
+            null,
+            0,
+            0
+          ]
+        ],
+        "flags": [
+          "table",
+          9,
+          0,
+          1
+        ],
+        "foreign_keys": [
+          [
+            0,
+            0,
+            "contacts",
+            "contact_id",
+            "contact_id",
+            "RESTRICT",
+            "RESTRICT",
+            "NONE"
+          ]
+        ]
+      },
+      "contacts": {
+        "columns": [
+          [
+            0,
+            "contact_id",
+            "TEXT",
+            1,
+            null,
+            1,
+            0
+          ],
+          [
+            1,
+            "name",
+            "TEXT",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            2,
+            "name_match_key",
+            "TEXT",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            3,
+            "lifecycle_state",
+            "TEXT",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            4,
+            "revision",
+            "INTEGER",
+            1,
+            "1",
+            0,
+            0
+          ],
+          [
+            5,
+            "created_at_utc",
+            "INTEGER",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            6,
+            "updated_at_utc",
+            "INTEGER",
+            1,
+            null,
+            0,
+            0
+          ]
+        ],
+        "flags": [
+          "table",
+          7,
           0,
           1
         ],
