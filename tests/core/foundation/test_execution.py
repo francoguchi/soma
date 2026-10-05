@@ -95,6 +95,24 @@ def test_explicit_no_change_commits_exact_result_without_audit(database):
     assert count(factory, "audit_events") == 0
 
 
+def test_null_exact_result_is_replayed_without_preflight_or_owner_execution(database):
+    _, _, factory, _ = database
+    command = new_uuid4()
+    b = CommandBoundary(factory, [ResultContract("NullV1", 1, lambda value: None)], AuditWriter([]))
+    assert b.execute(command, "null", {}, ("NullV1", 1), lambda uow: (None, [], False)) is None
+    assert (
+        b.execute(
+            command,
+            "null",
+            {},
+            ("NullV1", 1),
+            lambda uow: pytest.fail("owner ran on null replay"),
+            preflight=lambda: pytest.fail("preflight ran on null replay"),
+        )
+        is None
+    )
+
+
 @pytest.mark.parametrize(
     "outcome",
     [

@@ -59,6 +59,84 @@ def audit_probes():
     ]
 
 
+def reference_probes():
+    command = "83838383-8383-4383-8383-838383838383"
+    customer = "84848484-8484-4484-8484-848484848484"
+    claim = "85858585-8585-4585-8585-858585858585"
+    event = "86868686-8686-4686-8686-868686868686"
+    actor = "87878787-8787-4787-8787-878787878787"
+    return [
+        {
+            "observe": [
+                [
+                    "SELECT singleton_guard,matching_profile_id FROM reference_metadata",
+                    [],
+                    [[1, "UNICODE_MATCH_V1"]],
+                ]
+            ],
+            "setup": [
+                [
+                    "INSERT INTO command_receipts VALUES (?,?,?,?,?)",
+                    [command, "reference.probe", "0" * 64, None, 0],
+                ],
+                [
+                    "INSERT OR IGNORE INTO local_admin_credentials VALUES (1,?,'probe',1,0,0)",
+                    [actor],
+                ],
+                [
+                    "INSERT INTO local_user_profiles SELECT actor_id,1,'probe',1,0,0 FROM local_admin_credentials WHERE NOT EXISTS(SELECT 1 FROM local_user_profiles)",
+                    [],
+                ],
+                [
+                    "INSERT INTO customer_organizations VALUES (?,'probe','probe','active',1,0,0)",
+                    [customer],
+                ],
+                [
+                    "INSERT INTO customer_org_identifiers VALUES (?,?,'customer_account_code','probe','probe','active',0,NULL,?,NULL)",
+                    [claim, customer, command],
+                ],
+                [
+                    "INSERT INTO reference_lifecycle_events VALUES (?,'customer_organization',?,'created',0,?,NULL)",
+                    [event, customer, command],
+                ],
+                [
+                    "UPDATE customer_org_identifiers SET lifecycle_state='superseded',superseded_at_utc=0,superseded_command_id=? WHERE customer_org_identifier_id=?",
+                    [command, claim],
+                ],
+            ],
+            "reject": [
+                ["DELETE FROM reference_metadata", []],
+                [
+                    "UPDATE local_user_profiles SET local_user_profile_id=? WHERE singleton_guard=1",
+                    [customer],
+                ],
+                ["DELETE FROM local_user_profiles", []],
+                [
+                    "UPDATE customer_organizations SET customer_org_id=? WHERE customer_org_id=?",
+                    [actor, customer],
+                ],
+                ["DELETE FROM customer_organizations WHERE customer_org_id=?", [customer]],
+                [
+                    "UPDATE customer_org_identifiers SET value_text='changed' WHERE customer_org_identifier_id=?",
+                    [claim],
+                ],
+                [
+                    "DELETE FROM customer_org_identifiers WHERE customer_org_identifier_id=?",
+                    [claim],
+                ],
+                [
+                    "UPDATE reference_lifecycle_events SET event_type='archived' WHERE reference_lifecycle_event_id=?",
+                    [event],
+                ],
+                [
+                    "DELETE FROM reference_lifecycle_events WHERE reference_lifecycle_event_id=?",
+                    [event],
+                ],
+            ],
+        }
+    ]
+
+
 def generate(root=ROOT, *, check=False):
     manifest = MigrationManifest.load(root / "src/core/soma/db/migrations")
     connection = load_sqlcipher_driver().connect(":memory:", isolation_level=None)
@@ -80,6 +158,8 @@ def generate(root=ROOT, *, check=False):
             if any(entry.migration_id == "M00.003" for entry in manifest.entries)
             else [],
         }
+        if any(entry.migration_id == "M01.001" for entry in manifest.entries):
+            value["append_only_probes"] += reference_probes()
     finally:
         connection.close()
     path = root / "src/core/soma/db/schema_manifest.json"

@@ -1,1 +1,1 @@
-"""Reference ports exposed to other SOMA capabilities."""\n
+"""Reference ports exposed to other SOMA capabilities."""

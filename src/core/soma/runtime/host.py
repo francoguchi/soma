@@ -46,11 +46,13 @@ class Host:
         copy_contracts=(),
         proof_actions=(),
         profile_participant=None,
+        reference=False,
     ):
         self.config, self.console, self.with_tray = config, console, tray
         self.job_contracts, self.job_handlers = job_contracts, job_handlers or {}
         self.copy_contracts, self.proof_actions = copy_contracts, proof_actions
         self.profile_participant = profile_participant
+        self.with_reference = reference
         self.state = "BOOTSTRAPPING"
         self.shutdown_requested = threading.Event()
         self.lease = None
@@ -98,6 +100,11 @@ class Host:
                 verify_schema(connection, self.manifest, instance_id=self.lease.instance_id)
             finally:
                 connection.close()
+            if self.with_reference:
+                from soma.composition import reference
+
+                self.reference = reference(self.factory)
+                self.profile_participant = self.reference.profile
             self.static = StaticAssets(self.config.checkout_root)
             self.requests = BoundedExecutor(4)
             self.jobs = JobWorkers(

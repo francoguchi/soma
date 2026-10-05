@@ -160,7 +160,7 @@ def main(argv=None):
             print("Verified SOMA READY " + verified[0]["origin"], flush=True)
             webbrowser.open(verified[0]["origin"])
             return 0
-        host = Host(config, console=args.action == "console")
+        host = Host(config, console=args.action == "console", reference=True)
         try:
             host.start()
         except SomaError as exc:

@@ -3,9 +3,9 @@ export const buildIdentity = {
   "application_version": "0.1.0.dev0",
   "runtime_protocol_version": 1,
   "contract_generation": 1,
-  "migration_generation": 6,
-  "schema_generation": 6,
-  "source_commit": "0a48013a18c555a8d7c893f3cd873a4db4717e80",
+  "migration_generation": 7,
+  "schema_generation": 7,
+  "source_commit": "051166f8bf185877c319d3e0c28a651521d78b7a",
   "dirty": true,
   "build_kind": "source"
 } as const;

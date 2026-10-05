@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generation": 6,
+  "generation": 7,
   "migrations": [
     {
       "migration_id": "M00.001",
@@ -51,6 +51,16 @@
       "path": "00/005_working_copies.sql",
       "content_sha256": "5a929c4ffbbfd40f0682d6d052e7d660c6262e1ef4597650f2b1cd84324a1a2d",
       "depends_on": [
+        "M00.006"
+      ]
+    },
+    {
+      "migration_id": "M01.001",
+      "owner_scope": "01",
+      "path": "01/001_customer_profile.sql",
+      "content_sha256": "5df3ef5fa84101e8f0f0de398f9949a5bd75f5e304f4bc9e68919a3ba515c3a1",
+      "depends_on": [
+        "M00.005",
         "M00.006"
       ]
     }

@@ -69,9 +69,127 @@
           ]
         ]
       ]
+    },
+    {
+      "observe": [
+        [
+          "SELECT singleton_guard,matching_profile_id FROM reference_metadata",
+          [],
+          [
+            [
+              1,
+              "UNICODE_MATCH_V1"
+            ]
+          ]
+        ]
+      ],
+      "reject": [
+        [
+          "DELETE FROM reference_metadata",
+          []
+        ],
+        [
+          "UPDATE local_user_profiles SET local_user_profile_id=? WHERE singleton_guard=1",
+          [
+            "84848484-8484-4484-8484-848484848484"
+          ]
+        ],
+        [
+          "DELETE FROM local_user_profiles",
+          []
+        ],
+        [
+          "UPDATE customer_organizations SET customer_org_id=? WHERE customer_org_id=?",
+          [
+            "87878787-8787-4787-8787-878787878787",
+            "84848484-8484-4484-8484-848484848484"
+          ]
+        ],
+        [
+          "DELETE FROM customer_organizations WHERE customer_org_id=?",
+          [
+            "84848484-8484-4484-8484-848484848484"
+          ]
+        ],
+        [
+          "UPDATE customer_org_identifiers SET value_text='changed' WHERE customer_org_identifier_id=?",
+          [
+            "85858585-8585-4585-8585-858585858585"
+          ]
+        ],
+        [
+          "DELETE FROM customer_org_identifiers WHERE customer_org_identifier_id=?",
+          [
+            "85858585-8585-4585-8585-858585858585"
+          ]
+        ],
+        [
+          "UPDATE reference_lifecycle_events SET event_type='archived' WHERE reference_lifecycle_event_id=?",
+          [
+            "86868686-8686-4686-8686-868686868686"
+          ]
+        ],
+        [
+          "DELETE FROM reference_lifecycle_events WHERE reference_lifecycle_event_id=?",
+          [
+            "86868686-8686-4686-8686-868686868686"
+          ]
+        ]
+      ],
+      "setup": [
+        [
+          "INSERT INTO command_receipts VALUES (?,?,?,?,?)",
+          [
+            "83838383-8383-4383-8383-838383838383",
+            "reference.probe",
+            "0000000000000000000000000000000000000000000000000000000000000000",
+            null,
+            0
+          ]
+        ],
+        [
+          "INSERT OR IGNORE INTO local_admin_credentials VALUES (1,?,'probe',1,0,0)",
+          [
+            "87878787-8787-4787-8787-878787878787"
+          ]
+        ],
+        [
+          "INSERT INTO local_user_profiles SELECT actor_id,1,'probe',1,0,0 FROM local_admin_credentials WHERE NOT EXISTS(SELECT 1 FROM local_user_profiles)",
+          []
+        ],
+        [
+          "INSERT INTO customer_organizations VALUES (?,'probe','probe','active',1,0,0)",
+          [
+            "84848484-8484-4484-8484-848484848484"
+          ]
+        ],
+        [
+          "INSERT INTO customer_org_identifiers VALUES (?,?,'customer_account_code','probe','probe','active',0,NULL,?,NULL)",
+          [
+            "85858585-8585-4585-8585-858585858585",
+            "84848484-8484-4484-8484-848484848484",
+            "83838383-8383-4383-8383-838383838383"
+          ]
+        ],
+        [
+          "INSERT INTO reference_lifecycle_events VALUES (?,'customer_organization',?,'created',0,?,NULL)",
+          [
+            "86868686-8686-4686-8686-868686868686",
+            "84848484-8484-4484-8484-848484848484",
+            "83838383-8383-4383-8383-838383838383"
+          ]
+        ],
+        [
+          "UPDATE customer_org_identifiers SET lifecycle_state='superseded',superseded_at_utc=0,superseded_command_id=? WHERE customer_org_identifier_id=?",
+          [
+            "83838383-8383-4383-8383-838383838383",
+            "85858585-8585-4585-8585-858585858585"
+          ]
+        ]
+      ]
     }
   ],
-  "generation": 6,
+  "generation": 7,
   "lineage": [
     [
       "M00.001",
@@ -102,6 +220,11 @@
       "M00.005",
       "00",
       "5a929c4ffbbfd40f0682d6d052e7d660c6262e1ef4597650f2b1cd84324a1a2d"
+    ],
+    [
+      "M01.001",
+      "01",
+      "5df3ef5fa84101e8f0f0de398f9949a5bd75f5e304f4bc9e68919a3ba515c3a1"
     ]
   ],
   "shape": {
@@ -216,6 +339,268 @@
         ],
         "table": "durable_jobs"
       },
+      "idx_customer_active_identifier_value": {
+        "flags": [
+          0,
+          "c",
+          1
+        ],
+        "keys": [
+          [
+            0,
+            2,
+            "identifier_type",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            1,
+            4,
+            "match_key",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            2,
+            1,
+            "customer_org_id",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            3,
+            -1,
+            null,
+            0,
+            "BINARY",
+            0
+          ]
+        ],
+        "table": "customer_org_identifiers"
+      },
+      "idx_customer_identifier_created_command": {
+        "flags": [
+          0,
+          "c",
+          0
+        ],
+        "keys": [
+          [
+            0,
+            8,
+            "created_command_id",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            1,
+            -1,
+            null,
+            0,
+            "BINARY",
+            0
+          ]
+        ],
+        "table": "customer_org_identifiers"
+      },
+      "idx_customer_identifier_history": {
+        "flags": [
+          0,
+          "c",
+          0
+        ],
+        "keys": [
+          [
+            0,
+            1,
+            "customer_org_id",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            1,
+            2,
+            "identifier_type",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            2,
+            6,
+            "created_at_utc",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            3,
+            0,
+            "customer_org_identifier_id",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            4,
+            -1,
+            null,
+            0,
+            "BINARY",
+            0
+          ]
+        ],
+        "table": "customer_org_identifiers"
+      },
+      "idx_customer_identifier_superseded_command": {
+        "flags": [
+          0,
+          "c",
+          1
+        ],
+        "keys": [
+          [
+            0,
+            9,
+            "superseded_command_id",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            1,
+            -1,
+            null,
+            0,
+            "BINARY",
+            0
+          ]
+        ],
+        "table": "customer_org_identifiers"
+      },
+      "idx_customer_org_active_name_match": {
+        "flags": [
+          0,
+          "c",
+          0
+        ],
+        "keys": [
+          [
+            0,
+            3,
+            "lifecycle_state",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            1,
+            2,
+            "name_match_key",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            2,
+            0,
+            "customer_org_id",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            3,
+            -1,
+            null,
+            0,
+            "BINARY",
+            0
+          ]
+        ],
+        "table": "customer_organizations"
+      },
+      "idx_reference_lifecycle_command": {
+        "flags": [
+          0,
+          "c",
+          0
+        ],
+        "keys": [
+          [
+            0,
+            5,
+            "command_id",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            1,
+            -1,
+            null,
+            0,
+            "BINARY",
+            0
+          ]
+        ],
+        "table": "reference_lifecycle_events"
+      },
+      "idx_reference_lifecycle_target": {
+        "flags": [
+          0,
+          "c",
+          0
+        ],
+        "keys": [
+          [
+            0,
+            1,
+            "target_type",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            1,
+            2,
+            "target_id",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            2,
+            4,
+            "occurred_at_utc",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            3,
+            0,
+            "reference_lifecycle_event_id",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            4,
+            -1,
+            null,
+            0,
+            "BINARY",
+            0
+          ]
+        ],
+        "table": "reference_lifecycle_events"
+      },
       "sqlite_autoindex_audit_event_results_1": {
         "flags": [
           1,
@@ -327,6 +712,58 @@
           ]
         ],
         "table": "command_receipts"
+      },
+      "sqlite_autoindex_customer_org_identifiers_1": {
+        "flags": [
+          1,
+          "pk",
+          0
+        ],
+        "keys": [
+          [
+            0,
+            0,
+            "customer_org_identifier_id",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            1,
+            -1,
+            null,
+            0,
+            "BINARY",
+            0
+          ]
+        ],
+        "table": "customer_org_identifiers"
+      },
+      "sqlite_autoindex_customer_organizations_1": {
+        "flags": [
+          1,
+          "pk",
+          0
+        ],
+        "keys": [
+          [
+            0,
+            0,
+            "customer_org_id",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            1,
+            -1,
+            null,
+            0,
+            "BINARY",
+            0
+          ]
+        ],
+        "table": "customer_organizations"
       },
       "sqlite_autoindex_durable_jobs_1": {
         "flags": [
@@ -440,6 +877,84 @@
         ],
         "table": "local_admin_credentials"
       },
+      "sqlite_autoindex_local_user_profiles_1": {
+        "flags": [
+          1,
+          "pk",
+          0
+        ],
+        "keys": [
+          [
+            0,
+            0,
+            "local_user_profile_id",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            1,
+            -1,
+            null,
+            0,
+            "BINARY",
+            0
+          ]
+        ],
+        "table": "local_user_profiles"
+      },
+      "sqlite_autoindex_local_user_profiles_2": {
+        "flags": [
+          1,
+          "u",
+          0
+        ],
+        "keys": [
+          [
+            0,
+            1,
+            "singleton_guard",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            1,
+            -1,
+            null,
+            0,
+            "BINARY",
+            0
+          ]
+        ],
+        "table": "local_user_profiles"
+      },
+      "sqlite_autoindex_reference_lifecycle_events_1": {
+        "flags": [
+          1,
+          "pk",
+          0
+        ],
+        "keys": [
+          [
+            0,
+            0,
+            "reference_lifecycle_event_id",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            1,
+            -1,
+            null,
+            0,
+            "BINARY",
+            0
+          ]
+        ],
+        "table": "reference_lifecycle_events"
+      },
       "sqlite_autoindex_schema_migrations_1": {
         "flags": [
           1,
@@ -550,6 +1065,40 @@
         ],
         "table": "ui_working_copies"
       },
+      "uq_customer_org_active_identifier_type": {
+        "flags": [
+          1,
+          "c",
+          1
+        ],
+        "keys": [
+          [
+            0,
+            1,
+            "customer_org_id",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            1,
+            2,
+            "identifier_type",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            2,
+            -1,
+            null,
+            0,
+            "BINARY",
+            0
+          ]
+        ],
+        "table": "customer_org_identifiers"
+      },
       "working_copies_expiry": {
         "flags": [
           0,
@@ -606,6 +1155,54 @@
       ],
       [
         "index",
+        "idx_customer_active_identifier_value",
+        "customer_org_identifiers",
+        "62e682794c78bbd540e9aa1ddba8bce5a0a1173925e79098679fd4c12198c353"
+      ],
+      [
+        "index",
+        "idx_customer_identifier_created_command",
+        "customer_org_identifiers",
+        "5713bd5dc9ecdb4eee12664af6444c73d9244f388d278ce3c63e0689ecbf9372"
+      ],
+      [
+        "index",
+        "idx_customer_identifier_history",
+        "customer_org_identifiers",
+        "2d0385165ef72e7990fb84f3e71248817ef874c9b35922b6da12d3ce1f524f4d"
+      ],
+      [
+        "index",
+        "idx_customer_identifier_superseded_command",
+        "customer_org_identifiers",
+        "145b9be36895975e739641e7997dcf55400b32ca89b5c2738dfef9decf257f84"
+      ],
+      [
+        "index",
+        "idx_customer_org_active_name_match",
+        "customer_organizations",
+        "a474795e9dd04b6a7a2c292505bdb20491945282e8045f74ceb4bea26816c8bf"
+      ],
+      [
+        "index",
+        "idx_reference_lifecycle_command",
+        "reference_lifecycle_events",
+        "242b23b9d5ba2153ec6e28b4334bbb273f2e208f2eb17c3c40b7adfe01875011"
+      ],
+      [
+        "index",
+        "idx_reference_lifecycle_target",
+        "reference_lifecycle_events",
+        "da0a5012746f812cdd575f9026ac0ef5fd57fa515bb0616eefcf7c27a71f1ca4"
+      ],
+      [
+        "index",
+        "uq_customer_org_active_identifier_type",
+        "customer_org_identifiers",
+        "9b70a8afb420ff250588f72bb615d7abb8e03c1e952416a0fd6b98f99bf6696f"
+      ],
+      [
+        "index",
         "working_copies_expiry",
         "ui_working_copies",
         "3776f5a1c75e67901a4cae4330f8bf213f9210318bd4f70aa2ad2ceb34616fff"
@@ -636,6 +1233,18 @@
       ],
       [
         "table",
+        "customer_org_identifiers",
+        "customer_org_identifiers",
+        "01019bc62980898eb69b5f65c84ca1637f86f30f943e78b250f4545fdd7e717b"
+      ],
+      [
+        "table",
+        "customer_organizations",
+        "customer_organizations",
+        "b0ece3ed3da1f009dbbc140d7f2ce9e2643a11a7e6b25ad8e44c10421009184c"
+      ],
+      [
+        "table",
         "durable_jobs",
         "durable_jobs",
         "a70f37c3527a81fd4ddb89928517b8b3d54216af39fef4f5f7e7060425fdba8d"
@@ -657,6 +1266,24 @@
         "local_admin_credentials",
         "local_admin_credentials",
         "6bad70ec3d0f743308dc0994bf379fd7b80479ca1ad505d671a8cb9c4161656e"
+      ],
+      [
+        "table",
+        "local_user_profiles",
+        "local_user_profiles",
+        "c3283c6a4addcdfc507a19c71903cc1c1c89ece8ce80db899084eb5b0d18294f"
+      ],
+      [
+        "table",
+        "reference_lifecycle_events",
+        "reference_lifecycle_events",
+        "a0b02df1a9613e764bf6284da44f27b6fb3db14d5c884d902424af2340c210ab"
+      ],
+      [
+        "table",
+        "reference_metadata",
+        "reference_metadata",
+        "f7cf7c0e0b02f979bc0dca9fdca696e9ea280eee8d71a666290948412ac6555c"
       ],
       [
         "table",
@@ -693,6 +1320,84 @@
         "audit_results_no_update",
         "audit_event_results",
         "6f7b91a1f5e06026053d20d13798c07bda2501c06a1604730a3c0c4dab2d49c2"
+      ],
+      [
+        "trigger",
+        "customer_identifier_history_delete_forbidden",
+        "customer_org_identifiers",
+        "7909167cf16455bbe5020916ba1443407aa69485d8242b32dbcc179105fada38"
+      ],
+      [
+        "trigger",
+        "customer_identifier_history_update_guard",
+        "customer_org_identifiers",
+        "38123cc8d0781663234535cbc9463c48de5de1ce1c3f1a45f621999bd93b248b"
+      ],
+      [
+        "trigger",
+        "customer_reference_generation_after_customer_insert",
+        "customer_organizations",
+        "e887229489e6c339dbf4f4a0097b02c0bef072ba1d7723586e8172183fe628fa"
+      ],
+      [
+        "trigger",
+        "customer_reference_generation_after_customer_update",
+        "customer_organizations",
+        "b3325d13704404568ea19141c721eada71f8c544fec44db9c91801fe232894f6"
+      ],
+      [
+        "trigger",
+        "customer_reference_generation_after_identifier_insert",
+        "customer_org_identifiers",
+        "fe58633129699b02aaad61a564787df7a26833e1babd06fb5ff8d493d80d2503"
+      ],
+      [
+        "trigger",
+        "customer_reference_generation_after_identifier_update",
+        "customer_org_identifiers",
+        "b17ea9a03121c5096f696ad86d474e103ee0dec4ad46ffb24e09585e26acd527"
+      ],
+      [
+        "trigger",
+        "local_user_profile_delete_forbidden",
+        "local_user_profiles",
+        "5ee27266e3afe172704da334b1d5a938f772c99a3a0acaffb4dc210788385dd8"
+      ],
+      [
+        "trigger",
+        "local_user_profile_update_guard",
+        "local_user_profiles",
+        "042635d5e75b612d5a63c772f4882bdad338de169b406b515b1b1e338feabca9"
+      ],
+      [
+        "trigger",
+        "reference_customer_organizations_delete_forbidden",
+        "customer_organizations",
+        "4fe9172eef32a5039d4c40559195c9970e351b4027f002873a6e092f36e9aa48"
+      ],
+      [
+        "trigger",
+        "reference_customer_organizations_update_guard",
+        "customer_organizations",
+        "a362aa06d8f76e3d5e5f4cb8fc31331f8cc2a5c7d2b7b039743b8b9dc9c3acdd"
+      ],
+      [
+        "trigger",
+        "reference_lifecycle_events_delete_forbidden",
+        "reference_lifecycle_events",
+        "3b7e1f848b50e166b30473249b6184fec95da703d629a83024a1b8760471368a"
+      ],
+      [
+        "trigger",
+        "reference_lifecycle_events_update_forbidden",
+        "reference_lifecycle_events",
+        "d055a5ec32d97fa3f8350a371fc41b7d2230bf04e7090d54de1968939bacc6a4"
+      ],
+      [
+        "trigger",
+        "reference_metadata_delete_forbidden",
+        "reference_metadata",
+        "2967cc13a65a6d84a19ae250a315c9e831be1c1d1746419a6f123a1a7ec7cae0"
       ]
     ],
     "tables": {
@@ -1052,6 +1757,212 @@
         ],
         "foreign_keys": []
       },
+      "customer_org_identifiers": {
+        "columns": [
+          [
+            0,
+            "customer_org_identifier_id",
+            "TEXT",
+            1,
+            null,
+            1,
+            0
+          ],
+          [
+            1,
+            "customer_org_id",
+            "TEXT",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            2,
+            "identifier_type",
+            "TEXT",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            3,
+            "value_text",
+            "TEXT",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            4,
+            "match_key",
+            "TEXT",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            5,
+            "lifecycle_state",
+            "TEXT",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            6,
+            "created_at_utc",
+            "INTEGER",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            7,
+            "superseded_at_utc",
+            "INTEGER",
+            0,
+            null,
+            0,
+            0
+          ],
+          [
+            8,
+            "created_command_id",
+            "TEXT",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            9,
+            "superseded_command_id",
+            "TEXT",
+            0,
+            null,
+            0,
+            0
+          ]
+        ],
+        "flags": [
+          "table",
+          10,
+          0,
+          1
+        ],
+        "foreign_keys": [
+          [
+            0,
+            0,
+            "command_receipts",
+            "superseded_command_id",
+            "command_id",
+            "RESTRICT",
+            "RESTRICT",
+            "NONE"
+          ],
+          [
+            1,
+            0,
+            "command_receipts",
+            "created_command_id",
+            "command_id",
+            "RESTRICT",
+            "RESTRICT",
+            "NONE"
+          ],
+          [
+            2,
+            0,
+            "customer_organizations",
+            "customer_org_id",
+            "customer_org_id",
+            "RESTRICT",
+            "RESTRICT",
+            "NONE"
+          ]
+        ]
+      },
+      "customer_organizations": {
+        "columns": [
+          [
+            0,
+            "customer_org_id",
+            "TEXT",
+            1,
+            null,
+            1,
+            0
+          ],
+          [
+            1,
+            "name",
+            "TEXT",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            2,
+            "name_match_key",
+            "TEXT",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            3,
+            "lifecycle_state",
+            "TEXT",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            4,
+            "revision",
+            "INTEGER",
+            1,
+            "1",
+            0,
+            0
+          ],
+          [
+            5,
+            "created_at_utc",
+            "INTEGER",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            6,
+            "updated_at_utc",
+            "INTEGER",
+            1,
+            null,
+            0,
+            0
+          ]
+        ],
+        "flags": [
+          "table",
+          7,
+          0,
+          1
+        ],
+        "foreign_keys": []
+      },
       "durable_jobs": {
         "columns": [
           [
@@ -1399,6 +2310,205 @@
         "flags": [
           "table",
           6,
+          0,
+          1
+        ],
+        "foreign_keys": []
+      },
+      "local_user_profiles": {
+        "columns": [
+          [
+            0,
+            "local_user_profile_id",
+            "TEXT",
+            1,
+            null,
+            1,
+            0
+          ],
+          [
+            1,
+            "singleton_guard",
+            "INTEGER",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            2,
+            "display_name",
+            "TEXT",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            3,
+            "revision",
+            "INTEGER",
+            1,
+            "1",
+            0,
+            0
+          ],
+          [
+            4,
+            "created_at_utc",
+            "INTEGER",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            5,
+            "updated_at_utc",
+            "INTEGER",
+            1,
+            null,
+            0,
+            0
+          ]
+        ],
+        "flags": [
+          "table",
+          6,
+          0,
+          1
+        ],
+        "foreign_keys": [
+          [
+            0,
+            0,
+            "local_admin_credentials",
+            "local_user_profile_id",
+            "actor_id",
+            "RESTRICT",
+            "RESTRICT",
+            "NONE"
+          ]
+        ]
+      },
+      "reference_lifecycle_events": {
+        "columns": [
+          [
+            0,
+            "reference_lifecycle_event_id",
+            "TEXT",
+            1,
+            null,
+            1,
+            0
+          ],
+          [
+            1,
+            "target_type",
+            "TEXT",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            2,
+            "target_id",
+            "TEXT",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            3,
+            "event_type",
+            "TEXT",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            4,
+            "occurred_at_utc",
+            "INTEGER",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            5,
+            "command_id",
+            "TEXT",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            6,
+            "reason_category",
+            "TEXT",
+            0,
+            null,
+            0,
+            0
+          ]
+        ],
+        "flags": [
+          "table",
+          7,
+          0,
+          1
+        ],
+        "foreign_keys": [
+          [
+            0,
+            0,
+            "command_receipts",
+            "command_id",
+            "command_id",
+            "RESTRICT",
+            "RESTRICT",
+            "NONE"
+          ]
+        ]
+      },
+      "reference_metadata": {
+        "columns": [
+          [
+            0,
+            "singleton_guard",
+            "INTEGER",
+            0,
+            null,
+            1,
+            0
+          ],
+          [
+            1,
+            "matching_profile_id",
+            "TEXT",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            2,
+            "customer_reference_generation",
+            "INTEGER",
+            1,
+            "0",
+            0,
+            0
+          ]
+        ],
+        "flags": [
+          "table",
+          3,
           0,
           1
         ],

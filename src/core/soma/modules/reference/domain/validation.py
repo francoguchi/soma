@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import re
+
 from soma.foundation.errors import SomaError
 
 from .matching import normalize_match_key
@@ -30,7 +32,10 @@ def validate_single_line_text(value: str, *, field: str, max_utf8_bytes: int) ->
 
 
 def validate_display_name(value: str) -> str:
-    return validate_single_line_text(value, field="display_name", max_utf8_bytes=512)
+    stored = validate_single_line_text(value, field="display_name", max_utf8_bytes=512)
+    if not stored.strip():
+        raise _invalid("display_name cannot be blank.")
+    return stored
 
 
 def validate_customer_name(value: str) -> tuple[str, str]:
@@ -48,7 +53,10 @@ def validate_account_code(value: str) -> tuple[str, str]:
 def validate_reason_category(value: str | None) -> str | None:
     if value is None:
         return None
-    return validate_single_line_text(value, field="reason_category", max_utf8_bytes=128)
+    stored = validate_single_line_text(value, field="reason_category", max_utf8_bytes=128)
+    if re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]*", stored) is None:
+        raise _invalid("reason_category must be a category code.")
+    return stored
 
 
 def validate_review_context_id(value: str | None) -> str | None:

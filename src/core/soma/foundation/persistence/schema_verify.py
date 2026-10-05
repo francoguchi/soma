@@ -1,6 +1,7 @@
 """Observational exact schema/lineage/integrity checks against committed truth."""
 
 import hashlib
+import re
 from importlib.resources import files
 
 from soma.foundation.errors import SomaError
@@ -85,10 +86,30 @@ def verify_fk_indexes(connection) -> None:
             columns = tuple(column for _, column in sorted(parts))
             covered = False
             for index in indexes:
-                # Initial schema has no measured exceptions or partial FK indexes.
-                # Future owners may add a proved closed partial policy when required.
                 if index[4]:
-                    continue
+                    # Nullable single-column FKs are covered by an exact IS NOT
+                    # NULL partial index: NULL child values never reference a parent.
+                    definition = connection.execute(
+                        "SELECT sql FROM sqlite_schema WHERE type='index' AND name=?",
+                        (index[1],),
+                    ).fetchone()[0]
+                    nullable = {
+                        row[1]
+                        for row in connection.execute(
+                            f"PRAGMA table_xinfo({quote_identifier(table)})"
+                        ).fetchall()
+                        if not row[3]
+                    }
+                    if (
+                        len(columns) != 1
+                        or columns[0] not in nullable
+                        or not re.search(
+                            r"\bWHERE\s+" + re.escape(columns[0]) + r"\s+IS\s+NOT\s+NULL\s*$",
+                            definition,
+                            re.I,
+                        )
+                    ):
+                        continue
                 keys = [
                     row[2]
                     for row in connection.execute(
@@ -185,6 +206,12 @@ def verify_schema(
         ):
             raise integrity_error()
         probes = expected["append_only_probes"]
+        # Owner-provided observational invariants also run on read-only snapshots.
+        # Foundation compares accepted truth without owning module semantics.
+        for probe in probes:
+            for sql, parameters, rows in probe.get("observe", []):
+                if [list(row) for row in connection.execute(sql, parameters).fetchall()] != rows:
+                    raise integrity_error()
         # A verified read-only snapshot cannot perform destructive probes. Exact
         # trigger SQL is still compared above; startup verifies behavior writable.
         if probes and connection.execute("PRAGMA query_only").fetchone() != (1,):

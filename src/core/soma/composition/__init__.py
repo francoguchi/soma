@@ -23,3 +23,9 @@ def capabilities():
         {"id": "foundation.runtime", "state": "available", "reason": None},
         {"id": "foundation.diagnostics", "state": "available", "reason": None},
     ]
+
+
+def reference(factory):
+    from soma.modules.reference.composition import compose
+
+    return compose(factory)

@@ -12,6 +12,7 @@ from soma.foundation.strict_json import canonical_json_bytes_bounded, loads_cano
 from soma.foundation.time import utc_epoch_seconds
 
 _active = ContextVar("soma_write_transaction", default=False)
+_NO_RECEIPT = object()
 BOUNDS = dict(max_bytes=524288, max_depth=8, max_collection_items=512)
 
 
@@ -84,6 +85,8 @@ class UnitOfWork:
             self.__connection = None
             del self.connection
             _active.reset(self.__token)
+        if value is not None and type(getattr(value, "sqlite_errorcode", None)) is int:
+            raise persistence_failure(value) from None
 
 
 @dataclass(frozen=True)
@@ -94,7 +97,15 @@ class ResultContract:
 
 
 class CommandBoundary:
-    def __init__(self, factory, result_contracts, audit_writer, *, utc_clock=utc_epoch_seconds, request_bounds=None):
+    def __init__(
+        self,
+        factory,
+        result_contracts,
+        audit_writer,
+        *,
+        utc_clock=utc_epoch_seconds,
+        request_bounds=None,
+    ):
         self.factory = factory
         self.audit = audit_writer
         self.clock = utc_clock
@@ -112,48 +123,41 @@ class CommandBoundary:
             self.contracts[key] = contract
 
     def execute(
-        self, command_id, command_type, request, result_contract, operation, *, correlation_id=None
+        self,
+        command_id,
+        command_type,
+        request,
+        result_contract,
+        operation,
+        *,
+        correlation_id=None,
+        preflight=None,
+        prepare=None,
     ):
         """operation(uow) returns (result, events) or explicit (result, events, changed)."""
         require_uuid4(command_id)
         if not command_type or len(command_type.encode()) > 256:
             raise ValidationError("Invalid command type.")
         digest = sha256(canonical_json_bytes_bounded(request, **self.request_bounds)).hexdigest()
+        if preflight is not None:
+            # Exact replay precedes expensive pure validation outside the writer.
+            from soma.foundation.persistence.read_snapshot import ReadSnapshot
+
+            with ReadSnapshot(self.factory) as snapshot:
+                replay = self._replay(snapshot.connection, command_id, command_type, digest)
+            if replay is not _NO_RECEIPT:
+                return replay
+            preflight()
         with UnitOfWork(self.factory) as uow:
             # Replay must precede owner preparation, current-state reads, and authorization.
-            receipt = uow.connection.execute(
-                "SELECT command_type,request_sha256 FROM command_receipts WHERE command_id=?",
-                (command_id,),
-            ).fetchone()
-            if receipt is not None:
-                if receipt != (command_type, digest):
-                    raise SomaError(
-                        "COMMAND_ID_CONFLICT",
-                        "Command identity was already used for a different request.",
-                    )
-                row = uow.connection.execute(
-                    "SELECT result_schema,result_version,result_json,result_sha256,result_bytes FROM command_receipt_results WHERE command_id=?",
-                    (command_id,),
-                ).fetchone()
-                try:
-                    contract = self.contracts[(row[0], row[1])]
-                    raw = row[2].encode("utf-8")
-                    if sha256(raw).hexdigest() != row[3] or len(raw) != row[4]:
-                        raise ValueError()
-                    result = loads_canonical_json(row[2], **BOUNDS)
-                    before = canonical(result)
-                    contract.validate(result)
-                    if canonical(result) != before:
-                        raise ValueError()
-                    return result
-                except Exception:
-                    raise SomaError(
-                        "COMMAND_REPLAY_UNAVAILABLE",
-                        "The exact historical command result is unavailable.",
-                    ) from None
+            replay = self._replay(uow.connection, command_id, command_type, digest)
+            if replay is not _NO_RECEIPT:
+                return replay
             contract = self.contracts.get(result_contract)
             if contract is None:
                 raise ValidationError("Command result contract is unavailable.")
+            if prepare is not None:
+                operation = prepare(uow)
             uow.connection.execute(
                 "INSERT INTO command_receipts VALUES (?,?,?,?,?)",
                 (command_id, command_type, digest, correlation_id, self.clock()),
@@ -170,7 +174,9 @@ class CommandBoundary:
             if canonical(result) != raw:
                 raise ValidationError("Contract validation changed the result.")
             if changed and not events:
-                raise ValidationError("Applied authoritative commands require owner audit evidence.")
+                raise ValidationError(
+                    "Applied authoritative commands require owner audit evidence."
+                )
             if not changed and events:
                 raise ValidationError("NO_CHANGE commands cannot append owner audit evidence.")
             for event in events:
@@ -189,3 +195,34 @@ class CommandBoundary:
                 ),
             )
             return loads_canonical_json(raw.decode(), **BOUNDS)
+
+    def _replay(self, connection, command_id, command_type, digest):
+        receipt = connection.execute(
+            "SELECT command_type,request_sha256 FROM command_receipts WHERE command_id=?",
+            (command_id,),
+        ).fetchone()
+        if receipt is None:
+            return _NO_RECEIPT
+        if receipt != (command_type, digest):
+            raise SomaError(
+                "COMMAND_ID_CONFLICT", "Command identity was already used for a different request."
+            )
+        row = connection.execute(
+            "SELECT result_schema,result_version,result_json,result_sha256,result_bytes FROM command_receipt_results WHERE command_id=?",
+            (command_id,),
+        ).fetchone()
+        try:
+            contract = self.contracts[(row[0], row[1])]
+            raw = row[2].encode("utf-8")
+            if sha256(raw).hexdigest() != row[3] or len(raw) != row[4]:
+                raise ValueError()
+            result = loads_canonical_json(row[2], **BOUNDS)
+            before = canonical(result)
+            contract.validate(result)
+            if canonical(result) != before:
+                raise ValueError()
+            return result
+        except Exception:
+            raise SomaError(
+                "COMMAND_REPLAY_UNAVAILABLE", "The exact historical command result is unavailable."
+            ) from None

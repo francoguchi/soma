@@ -8,8 +8,8 @@ This is the single current-state entry point for humans and agents. Do not appen
 |---|---|
 | Implementation scope | `01 — Identity / Reference` |
 | Implementation branch | `feat/01-identity-reference` |
-| Implementation goal | `IMP-01-01 — Reference kernel, profile and Customer` |
-| Implementation goal file | `docs/implementation/01/01.01.md` |
+| Implementation goal | `IMP-01-02 — Contacts and communication identity` |
+| Implementation goal file | `docs/implementation/01/01.02.md` |
 | Implementation migration ledger | `docs/LLD/01/migration.md` |
 | Queued next implementation | `02 — Tickets Core`, after Scope-02 design approval and required Scope-01 dependencies |
 | Design scope | `02 — Tickets Core` |
@@ -18,7 +18,7 @@ This is the single current-state entry point for humans and agents. Do not appen
 | Design migration ledger | `docs/LLD/02/migration.md` |
 | Overall migration map | `docs/LLD/MIGRATION.md` |
 | Mode | parallel design N+1 / implementation N |
-| Implementation note | Scope 00 merged through PR #1 at `429793fc`; Foundation is the accepted platform baseline. Scope 01 pre-coding reconciliation is complete, and `feat/01-identity-reference` already pins `unicodedata2==17.0.1`. The coding pass should execute the R01.01 map rather than make new ownership decisions. |
+| Implementation note | IMP-01-01 is working with closed R01.01-A..D. Profile/Customer application and M01.001 are implemented and live-tested on `feat/01-identity-reference`. IMP-01-02 is queued next; no Contact work has started. |
 | Design blocker | none; Scope 02 design resumes from the merged Foundation baseline |
 | Certification | deferred until whole-application implementation and live testing |
 
@@ -39,7 +39,7 @@ The intended handoff can be as small as:
 4. Implement, run the goal's focused checks plus directly affected tests, and fix failures.
 5. Update the goal's Run/Remaining/status, close its migration rows, then advance this file to the next implementation goal.
 
-Current checkpoint: Scope 00 is merged and working. `IMP-01-01` is active. Pre-coding migration now includes the complete low-risk R01.01-A slice plus prepared R01.01-B primitives: exact Beta Unicode-17 asset reuse, pinned/packaged `unicodedata2==17.0.1`, SQL-free matching/validation, persisted-profile adapter, pure Account-Code review document/fingerprint/freshness logic, current Foundation audit-contract registration, optional same-UoW Local Admin profile participation, and explicit audit-free `changed=False` NO_CHANGE replay with focused regressions. The next implementation work is deliberately narrow: finish Profile + Customer application/persistence/composition, write M01.001 and update manifest/schema truth, then migrate the remaining Customer/profile/replay/schema regressions. Do not redo the prepared donor slices and do not begin Contacts, Dispatch, Settings, public Reference API routes or feature UI.
+Current checkpoint: IMP-01-01 is working. Existing matching/review/audit/Foundation seams were reused and completed with Profile/Customer applications, bounded persistence adapters, same-UoW assembled setup and M01.001/schema generation 7. Final 69 focused Reference/command/bootstrap and separate 78 persistence/auth/tooling checks, Main build/typecheck, contracts/schema/Ruff/impact passed. Actual designated-instance trusted Stop/reset/source READY/Stop passed; it is stopped with a fresh database requiring first-run administrator setup. Generated identity/assets remain synchronized. Next read IMP-01-02 and only its Contact/channel/affiliation authorities and R01.02 donor rows. Do not begin generic matching/query/API/UI orchestration, Dispatch or Settings.
 
 ### Design lane
 
