@@ -134,6 +134,9 @@ Scope 01 provides the typed setting registry/store boundary:
 - `definitions_for_owner(owner)`
 - `get(snapshot, key) -> effective/default-or-persisted value`
 - `write(uow/application command, validated request) -> accepted setting result`
+- `upgrade(application command, exact registered origin/current contract and expected revision) -> accepted setting result`
+
+Upgrades are explicit commands. Reads never upgrade or rewrite stored bytes; an incompatible stored contract returns `SETTING_CONTRACT_MISMATCH` until an exact registered upgrade is accepted. Writes carry the expected semantic owner and contract/version, and owner state checks precede semantic NO_CHANGE inside the existing UnitOfWork.
 
 Semantic owners register definitions at composition time. Registration requires a closed contract and ordinary-nonsecret storage classification. Runtime plugins/arbitrary keys are not accepted.
 

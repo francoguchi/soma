@@ -103,6 +103,21 @@ def test_live_reference_composition_auth_setup_customer_workflow_restart(tmp_pat
                 )
             )
         )
+        appearance_definition = host.reference.settings.get_definition("foundation.appearance")
+        with ReadSnapshot(host.reference.customers.factory) as snapshot:
+            appearance = host.reference.settings.get(snapshot, appearance_definition.setting_key)
+            assert appearance.source == "DEFAULT" and appearance.revision is None
+        appearance_request = dict(
+            command_id=new_uuid4(),
+            setting_key=appearance_definition.setting_key,
+            semantic_owner=appearance_definition.semantic_owner,
+            contract_name=appearance_definition.contract_name,
+            contract_version=appearance_definition.current_version,
+            base_revision=None,
+            value="light",
+            actor_id=actor,
+        )
+        appearance_result = host.reference.settings.write(**appearance_request)
         assert host.state == "READY"
     finally:
         assert host.stop()
@@ -110,7 +125,15 @@ def test_live_reference_composition_auth_setup_customer_workflow_restart(tmp_pat
     restarted.start()
     try:
         assert restarted.reference.profile.get_singleton()["display_name"] == "Synthetic Operator"
-        assert restarted.manifest.generation == 9
+        assert restarted.manifest.generation == 10
+        assert restarted.reference.settings.write(**appearance_request) == appearance_result
+        with ReadSnapshot(restarted.reference.customers.factory) as snapshot:
+            persisted_appearance = restarted.reference.settings.get(
+                snapshot, "foundation.appearance"
+            )
+            assert (
+                persisted_appearance.source == "PERSISTED" and persisted_appearance.value == "light"
+            )
         assert restarted.reference.dispatch.create_standalone(**dispatch_request) == dispatch_result
         assert restarted.reference.lifecycle.archive_reference(**lifecycle_request) == archived
         preview = restarted.reference.lifecycle.preview(

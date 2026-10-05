@@ -3,6 +3,15 @@
 from soma.foundation.errors import SomaError, error_envelope
 
 ERRORS = {
+    "SETTING_UNKNOWN": ("Setting key is not registered.", "correct_input"),
+    "SETTING_CONTRACT_MISMATCH": (
+        "Setting requires a compatible registered contract or explicit upgrade.",
+        "none",
+    ),
+    "SETTING_SECRET_FORBIDDEN": (
+        "Secret settings belong to their security owner.",
+        "correct_input",
+    ),
     "REFERENCE_ARCHIVED": ("Reference is archived.", "refresh"),
     "ARCHIVE_BLOCKED": ("Reference archive is blocked.", "refresh"),
     "REACTIVATION_BLOCKED": ("Reference reactivation is blocked.", "refresh"),

@@ -2,9 +2,9 @@
   "application_version": "0.1.0.dev0",
   "runtime_protocol_version": 1,
   "contract_generation": 1,
-  "migration_generation": 9,
-  "schema_generation": 9,
-  "source_commit": "a681fdd0893736243863e66308e1a44e3c2f93cf",
+  "migration_generation": 10,
+  "schema_generation": 10,
+  "source_commit": "65abe4310981431e191bd7934e942a4e2dce3c27",
   "dirty": true,
   "build_kind": "source"
 }

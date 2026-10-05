@@ -164,6 +164,8 @@ def generate(root=ROOT, *, check=False):
             value["append_only_probes"] += contact_probes()
         if any(entry.migration_id == "M01.003" for entry in manifest.entries):
             value["append_only_probes"] += dispatch_probes()
+        if any(entry.migration_id == "M01.004" for entry in manifest.entries):
+            value["append_only_probes"] += setting_probes()
     finally:
         connection.close()
     path = root / "src/core/soma/db/schema_manifest.json"
@@ -262,6 +264,30 @@ def dispatch_probes():
                 ],
                 ["DELETE FROM dispatch_locations WHERE dispatch_location_id=?", [standalone]],
                 ["DELETE FROM dispatch_locations WHERE dispatch_location_id=?", [derived]],
+            ],
+        }
+    ]
+
+
+def setting_probes():
+    command = "98989898-9898-4898-8898-989898989898"
+    return [
+        {
+            "setup": [
+                [
+                    "INSERT INTO command_receipts VALUES (?, 'setting.probe', ?, NULL, 0)",
+                    [command, "0" * 64],
+                ],
+                [
+                    "INSERT INTO setting_values VALUES ('probe.key','ProbeV1',1,'true',1,0,?)",
+                    [command],
+                ],
+            ],
+            "reject": [
+                [
+                    "UPDATE setting_values SET setting_key='changed' WHERE setting_key='probe.key'",
+                    [],
+                ]
             ],
         }
     ]

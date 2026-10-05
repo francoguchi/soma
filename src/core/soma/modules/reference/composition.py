@@ -1,4 +1,7 @@
 from dataclasses import dataclass
+from soma.foundation.appearance import setting_registration
+from soma.modules.reference.application.settings import Settings
+from soma.modules.reference.domain.settings import SettingDefinition, SettingDefinitionRegistry
 
 from soma.modules.reference.application.dispatch import DispatchLocations
 from soma.modules.reference.application.lifecycle import ReferenceLifecycle
@@ -23,9 +26,17 @@ class Reference:
     communication: Communication
     dispatch: DispatchLocations
     lifecycle: ReferenceLifecycle
+    settings: Settings
 
 
-def compose(factory, *, dependency_validators=(), required_validator_ids=()):
+def compose(
+    factory, *, dependency_validators=(), required_validator_ids=(), setting_definitions=()
+):
+    settings = SettingDefinitionRegistry()
+    settings.register(SettingDefinition(**setting_registration()))
+    for definition in setting_definitions:
+        settings.register(definition)
+    settings.finalize()
     dependencies = ReferenceDependencyRegistry()
     for validator in dependency_validators:
         dependencies.register(validator)
@@ -38,6 +49,7 @@ def compose(factory, *, dependency_validators=(), required_validator_ids=()):
         Communication(),
         DispatchLocations(factory, writer),
         ReferenceLifecycle(factory, writer, dependencies),
+        Settings(factory, writer, settings),
     )
     with ReadSnapshot(factory) as snapshot:
         require_persisted_matching_profile(snapshot.connection)

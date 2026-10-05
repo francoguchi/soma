@@ -337,9 +337,32 @@
           ]
         ]
       ]
+    },
+    {
+      "reject": [
+        [
+          "UPDATE setting_values SET setting_key='changed' WHERE setting_key='probe.key'",
+          []
+        ]
+      ],
+      "setup": [
+        [
+          "INSERT INTO command_receipts VALUES (?, 'setting.probe', ?, NULL, 0)",
+          [
+            "98989898-9898-4898-8898-989898989898",
+            "0000000000000000000000000000000000000000000000000000000000000000"
+          ]
+        ],
+        [
+          "INSERT INTO setting_values VALUES ('probe.key','ProbeV1',1,'true',1,0,?)",
+          [
+            "98989898-9898-4898-8898-989898989898"
+          ]
+        ]
+      ]
     }
   ],
-  "generation": 9,
+  "generation": 10,
   "lineage": [
     [
       "M00.001",
@@ -385,6 +408,11 @@
       "M01.003",
       "01",
       "7208a9686e87e15b6242210f25d0bc98576acc1f85d6e5dac776893ede7e1aae"
+    ],
+    [
+      "M01.004",
+      "01",
+      "f43de4d414d13a3d6a4b1fdf93879aea970e8fee164cc85420569200b56aeb44"
     ]
   ],
   "shape": {
@@ -1089,6 +1117,32 @@
         ],
         "table": "reference_lifecycle_events"
       },
+      "idx_setting_values_command": {
+        "flags": [
+          0,
+          "c",
+          0
+        ],
+        "keys": [
+          [
+            0,
+            6,
+            "command_id",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            1,
+            -1,
+            null,
+            0,
+            "BINARY",
+            0
+          ]
+        ],
+        "table": "setting_values"
+      },
       "sqlite_autoindex_audit_event_results_1": {
         "flags": [
           1,
@@ -1573,6 +1627,32 @@
         ],
         "table": "schema_migrations"
       },
+      "sqlite_autoindex_setting_values_1": {
+        "flags": [
+          1,
+          "pk",
+          0
+        ],
+        "keys": [
+          [
+            0,
+            0,
+            "setting_key",
+            0,
+            "BINARY",
+            1
+          ],
+          [
+            1,
+            -1,
+            null,
+            0,
+            "BINARY",
+            0
+          ]
+        ],
+        "table": "setting_values"
+      },
       "sqlite_autoindex_ui_working_copies_1": {
         "flags": [
           1,
@@ -1863,6 +1943,12 @@
       ],
       [
         "index",
+        "idx_setting_values_command",
+        "setting_values",
+        "b93a07e95de437fb0e4c896e35d5b62e265ba01d4a59f522d59d6fd50028cf43"
+      ],
+      [
+        "index",
         "uq_contact_current_affiliation",
         "contact_affiliations",
         "da384fba710facdcba1ef323a3f0a7f1924637e35d189c89d92d8cd3bde94c43"
@@ -1986,6 +2072,12 @@
         "schema_migrations",
         "schema_migrations",
         "8725e32aec5b45234d77d2f3d43134b9e962d3f9fab769086590cf646af20bb3"
+      ],
+      [
+        "table",
+        "setting_values",
+        "setting_values",
+        "cad51edf247d623e437504ff34825581259147bc39a389e70be964b1289861e2"
       ],
       [
         "table",
@@ -2142,6 +2234,12 @@
         "reference_metadata_delete_forbidden",
         "reference_metadata",
         "2967cc13a65a6d84a19ae250a315c9e831be1c1d1746419a6f123a1a7ec7cae0"
+      ],
+      [
+        "trigger",
+        "setting_key_update_guard",
+        "setting_values",
+        "08abe2d8bc92aae02b377ddfe5c493a4c8f114da3b96e1d5bb96c1f633a1bf4d"
       ]
     ],
     "tables": {
@@ -3706,6 +3804,91 @@
           1
         ],
         "foreign_keys": []
+      },
+      "setting_values": {
+        "columns": [
+          [
+            0,
+            "setting_key",
+            "TEXT",
+            1,
+            null,
+            1,
+            0
+          ],
+          [
+            1,
+            "contract_name",
+            "TEXT",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            2,
+            "contract_version",
+            "INTEGER",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            3,
+            "value_json",
+            "TEXT",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            4,
+            "revision",
+            "INTEGER",
+            1,
+            "1",
+            0,
+            0
+          ],
+          [
+            5,
+            "updated_at_utc",
+            "INTEGER",
+            1,
+            null,
+            0,
+            0
+          ],
+          [
+            6,
+            "command_id",
+            "TEXT",
+            1,
+            null,
+            0,
+            0
+          ]
+        ],
+        "flags": [
+          "table",
+          7,
+          0,
+          1
+        ],
+        "foreign_keys": [
+          [
+            0,
+            0,
+            "command_receipts",
+            "command_id",
+            "command_id",
+            "RESTRICT",
+            "RESTRICT",
+            "NONE"
+          ]
+        ]
       },
       "ui_working_copies": {
         "columns": [

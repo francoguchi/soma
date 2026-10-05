@@ -43,7 +43,7 @@
       "id": "UI.APPEARANCE",
       "anchor": "ui-appearance",
       "depends_on": ["UI.TOKENS"],
-      "code_paths": ["src/main/styles/", "src/main/shared/appearance/"]
+      "code_paths": ["src/main/styles/", "src/main/shared/appearance/", "src/core/soma/foundation/appearance.py"]
     },
     {
       "id": "UI.TOKENS",

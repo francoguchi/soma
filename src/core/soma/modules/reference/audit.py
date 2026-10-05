@@ -174,6 +174,7 @@ def reference_audit_contracts() -> tuple[AuditContract, ...]:
         return False
 
     return (
+        AuditContract("setting.written", 1, "SettingWriteAuditV1", 1, _setting_written, safe),
         AuditContract(
             "reference.dispatch_location.created",
             1,
@@ -466,3 +467,33 @@ def _lifecycle_validator(new_state):
             raise ValidationError("Lifecycle reason is required.")
 
     return validate
+
+
+def _setting_written(value):
+    from soma.modules.reference.domain.settings import identifier, positive_version
+
+    value = _dict(
+        value,
+        {
+            "setting_key",
+            "semantic_owner",
+            "contract_name",
+            "contract_version",
+            "prior_revision",
+            "new_revision",
+            "change_kind",
+        },
+    )
+    for key in ("setting_key", "semantic_owner", "contract_name"):
+        identifier(value[key])
+    positive_version(value["contract_version"])
+    prior = value["prior_revision"]
+    new = _revision(value["new_revision"])
+    if value["change_kind"] == "CREATE":
+        if prior is not None or new != 1:
+            raise ValidationError("Invalid setting creation evidence.")
+    elif value["change_kind"] in {"UPDATE", "UPGRADE"}:
+        if new != _revision(prior) + 1:
+            raise ValidationError("Invalid setting revision evidence.")
+    else:
+        raise ValidationError("Invalid setting change classification.")

@@ -444,7 +444,7 @@ def test_preflight_guard_receipt_order_and_atomic_audit_failure(reference, monke
 def test_dispatch_schema_protection_and_exact_manifest(reference):
     ref, factory, manifest = reference
     identity = dispatch(ref)
-    assert manifest.generation == 9
+    assert manifest.generation == 10
     connection = factory.open()
     try:
         verify_schema(connection, manifest)

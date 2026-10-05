@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generation": 9,
+  "generation": 10,
   "migrations": [
     {
       "migration_id": "M00.001",
@@ -80,6 +80,15 @@
       "content_sha256": "7208a9686e87e15b6242210f25d0bc98576acc1f85d6e5dac776893ede7e1aae",
       "depends_on": [
         "M01.002"
+      ]
+    },
+    {
+      "migration_id": "M01.004",
+      "owner_scope": "01",
+      "path": "01/004_settings.sql",
+      "content_sha256": "f43de4d414d13a3d6a4b1fdf93879aea970e8fee164cc85420569200b56aeb44",
+      "depends_on": [
+        "M01.003"
       ]
     }
   ]
