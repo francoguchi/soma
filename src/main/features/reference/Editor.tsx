@@ -7,6 +7,7 @@ import {CustomerChooser, Field, useOwnerAction, type Detail, type Kind} from './
 
 export function Editor({kind, id, detail, application, accepted}: {kind: Kind; id: string; detail: Detail | null; application: RefObject<HTMLElement | null>; accepted: (id: string) => void}) {
   const creating = detail === null;
+  const singular = kind === 'customer_organization' ? 'Customer' : kind === 'contact' ? 'Contact' : 'Dispatch Location';
   const dispatch = detail && 'address_mode' in detail ? detail as C.ReferenceDispatchDetailV1 : null;
   const initial = kind === 'customer_organization' ? {name: detail?.name ?? '', account_code: ''} : kind === 'contact' ? {name: detail?.name ?? '', email: '', customer_id: ''} : {name: detail?.name ?? '', address: dispatch?.standalone_address_text ?? ''};
   const working = useWorkingIntent(initial as Record<string, string>, {contract_id: 'reference.edit.' + kind, contract_version: 1, target_type: kind, target_id: id, scope_key: 'metadata', base_revision: detail ? String(detail.revision) : 'NEW'}, application);
@@ -23,15 +24,15 @@ export function Editor({kind, id, detail, application, accepted}: {kind: Kind; i
     if (kind === 'contact') return commands.updateContact({id}, body);
     return commands.updateDispatch({id}, {...body, ...(dispatch?.address_mode === 'standalone' ? {address_text: draft['address']!} : {})});
   };
-  return <><h3>{creating ? 'Create ' + (kind === 'customer_organization' ? 'Customer' : kind === 'contact' ? 'Contact' : 'Dispatch Location') : detail.name}</h3>{detail && <p>Revision {detail.revision} · {detail.lifecycle_state}{inactive ? ' — history only until explicit reactivation' : ''}</p>}
+  return <><h3>{creating ? 'Create ' + singular : detail.name}</h3>{detail && <p>Revision {detail.revision} · {detail.lifecycle_state}{inactive ? ' — history only until explicit reactivation' : ''}</p>}
     <form className="operational-form" onSubmit={e => {e.preventDefault(); void action.run(JSON.stringify({id, revision: detail?.revision, draft}), async command => {
       const result = await save(command); await working.accepted(); accepted(result.target_id); return result;
     }, () => {});}}><fieldset disabled={action.busy || action.pending || inactive}><div className="operational-form">
       <Field label="Name" value={draft['name']!} change={v => edit('name', v)} required/>
       {creating && kind === 'customer_organization' && <Field label="Initial Account Code (optional)" value={draft['account_code']!} change={v => edit('account_code', v)} maximum={512}/>}
-      {creating && kind === 'contact' && <><Field label="Initial email (optional)" value={draft['email']!} change={v => edit('email', v)} maximum={2048}/><CustomerChooser value={draft['customer_id']!} change={v => edit('customer_id', v)}/><p>Zero channels and Unbound are valid.</p></>}
+      {creating && kind === 'contact' && <><Field label="Initial email (optional)" value={draft['email']!} change={v => edit('email', v)} maximum={2048}/><CustomerChooser value={draft['customer_id']!} change={v => edit('customer_id', v)}/><p>Email and Customer are optional.</p></>}
       {kind === 'dispatch_location' && <DispatchAddress detail={dispatch} value={draft['address']!} change={v => edit('address', v)}/>}
-      <button disabled={working.conflict || (!creating && !working.dirty)}>{action.busy ? 'Saving…' : creating ? 'Create reference explicitly' : kind === 'dispatch_location' && dispatch?.address_mode === 'standalone' ? 'Save name and standalone address' : 'Save name'}</button>
+      <button disabled={working.conflict || (!creating && !working.dirty)}>{action.busy ? 'Saving…' : creating ? 'Create ' + singular : kind === 'dispatch_location' && dispatch?.address_mode === 'standalone' ? 'Save name and standalone address' : 'Save name'}</button>
     </div></fieldset></form>{working.recovery}{action.feedback}
   </>;
 }

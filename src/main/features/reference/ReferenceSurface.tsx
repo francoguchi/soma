@@ -41,11 +41,20 @@ export function ReferenceSurface({path, navigate, application}: {path: string; n
   const open = (target: string) => navigate(referencePath(kind, target));
   const done = (target: string) => {setRevision(v => v + 1); if (target !== id) navigate(referencePath(kind, target));};
   const switchKind = (next: Kind) => navigate('/settings/reference-data/' + next);
-  return <div className="operational-surface"><div className="action-strip" role="group" aria-label="Reference data types">{(Object.keys(labels) as Kind[]).map(value => <button key={value} aria-pressed={kind === value} onClick={() => switchKind(value)}>{labels[value]}</button>)}<button onClick={() => navigate('/settings/reference-data/' + kind + '/new')}>New {kind === 'customer_organization' ? 'Customer' : kind === 'contact' ? 'Contact' : 'Dispatch Location'}</button><button onClick={() => setRevision(v => v + 1)}>Refresh current state</button></div>
-    <ConsolePanes label="Reference data pane" layout="workbench" focusRequest={{pane: id || creating ? 'work' : 'records', token: path}} panes={[
-      {id: 'records', title: labels[kind], content: <>{(Object.keys(labels) as Kind[]).map(value => <div key={value} hidden={value !== kind}><Records kind={value} refresh={revision} open={target => navigate(referencePath(value, target))}/></div>)}<Candidates key={kind} kind={kind} open={open}/></>},
-      {id: 'work', title: creating ? 'New reference' : 'Reference work', content: <RecordWork key={kind + ':' + (id ?? rawId ?? '')} kind={kind} id={id} refresh={revision} application={application} done={done} open={open} beginNew={creating}/>},
-      {id: 'evidence', title: 'Context and history', content: <RecordEvidence key={kind + ':' + id} kind={kind} id={id} refresh={revision} application={application} done={done}/>},
+  const singular = kind === 'customer_organization' ? 'Customer' : kind === 'contact' ? 'Contact' : 'Dispatch Location';
+  const mode = id ? 'open' : creating ? 'create' : 'browse';
+  return <div className="operational-surface" data-reference-mode={mode}>
+    <div className="action-strip" role="group" aria-label="Reference data types">{(Object.keys(labels) as Kind[]).map(value => <button key={value} aria-pressed={kind === value} onClick={() => switchKind(value)}>{labels[value]}</button>)}</div>
+    <ConsolePanes label="Reference data pane" layout={id ? 'workbench' : creating ? 'form' : 'single'} focusRequest={{pane: id || creating ? 'work' : 'records', token: path}} panes={[
+      {id: 'records', title: labels[kind], hidden: creating, content: <>
+        <div className="action-strip" role="group" aria-label="Collection actions"><button onClick={() => navigate('/settings/reference-data/' + kind + '/new')}>New {singular}</button><button onClick={() => setRevision(v => v + 1)}>Refresh</button></div>
+        {(Object.keys(labels) as Kind[]).map(value => <div key={value} hidden={value !== kind}><Records kind={value} refresh={revision} open={target => navigate(referencePath(value, target))}/>{value !== 'dispatch_location' && <details><summary>Find by exact evidence</summary><Candidates kind={value} open={target => navigate(referencePath(value, target))}/></details>}</div>)}
+      </>},
+      ...(id || creating ? [{id: 'work', title: creating ? 'New ' + singular : 'Reference work', content: <>
+        <div className="action-strip"><button onClick={() => switchKind(kind)}>Back to list</button></div>
+        <RecordWork key={kind + ':' + (id ?? rawId ?? '')} kind={kind} id={id} refresh={revision} application={application} done={done} open={open} beginNew={creating}/>
+      </>}] : []),
+      ...(id ? [{id: 'evidence', title: 'Context and history', content: <RecordEvidence key={kind + ':' + id} kind={kind} id={id} refresh={revision} application={application} done={done}/>}] : []),
     ]}/>
   </div>;
 }

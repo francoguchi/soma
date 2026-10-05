@@ -18,7 +18,7 @@ This is the single current-state entry point for humans and agents. Do not appen
 | Design migration ledger | `docs/LLD/02/migration.md` |
 | Overall migration map | `docs/LLD/MIGRATION.md` |
 | Mode | parallel design N+1 / implementation N |
-| Implementation note | IMP-01-06 is working; R01.06-A..B are closed. Settings-owned Reference, Profile and registered Preferences surfaces are implemented and exercised. Scope-01 implementation is at its final goal checkpoint; no later goal is allocated or started. |
+| Implementation note | IMP-01-06 is working after Browse/Create/Open and compact Settings visual acceptance. R01.06-A..C are closed. Collection return state and desktop/narrow geometry/screenshots pass. Scope-01 remains at its final goal; no later scope is started. |
 | Design blocker | none; Scope 02 design resumes from the merged Foundation baseline |
 | Certification | deferred until whole-application implementation and live testing |
 
@@ -39,7 +39,7 @@ The intended handoff can be as small as:
 4. Implement, run the goal's focused checks plus directly affected tests, and fix failures.
 5. Update the goal's Run/Remaining/status, close its migration rows, then advance this file to the next implementation goal.
 
-Current checkpoint: IMP-01-06 is working. All 203 affected Reference/recovery/runtime/browser checks passed across the focused run and corrected shared-browser rerun; all 60 Main tests, typecheck/build, contracts/Ruff/diff/impact passed. Real authenticated Chrome exercised Customer/Contact/Dispatch, conflict review, explicit ambiguity and bounded paging/history, lifecycle, Profile/registered Preferences, recovery/stale intent and responsive/forced-color panes. Schema remains generation 10 / M01.004; no reset was required and the canonical instance remains stopped. Generated identity/assets are synchronized. Scope-01 implementation ends at this checkpoint. Do not broaden into Scope-02 implementation; its design approval and goal allocation remain separate.
+Current checkpoint: IMP-01-06 visual/interaction refinement is working in the working tree based on `2d69648`. Browse is collection-only, Create is focused without pre-identity evidence, and Open retains the three-pane workbench. Collection actions are separate from type navigation; matching is secondary. Collection/filter/selection/page/scroll return state and compact unboxed Profile/Preferences pass. All 61 Main and 46 affected Core/browser checks passed across focused runs and corrected browser rerun; typecheck/build/contracts/Ruff/diff/impact passed with no mapping gaps. All 56 mode/settings captures at 1440/1040/1039/390px were reviewed. Final isolated-host teardown passed after one Windows connection-reset failure. R01.06-A..C are closed and Remaining is none. Domain/query/API/schema remain unchanged, generation 10 / M01.004; no reset and the canonical instance was untouched. Do not start Scope-02 implementation without its separate design approval/goal allocation.
 
 ### Design lane
 

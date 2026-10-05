@@ -27,3 +27,21 @@ test('pane activation preserves composite widget focus and safely restores a rem
   expect(work.dataset['paneActive']).toBe('true');
   expect(document.activeElement).toBe(work);
 });
+
+test('retained inactive panes keep their input while focus and narrow controls follow available panes', () => {
+  vi.stubGlobal('matchMedia', () => ({matches: false, addEventListener: () => {}, removeEventListener: () => {}}));
+  const records = {id: 'records', title: 'Records', content: <input aria-label="Collection filter" defaultValue=""/>};
+  const work = {id: 'work', title: 'Create', content: <input aria-label="New name"/>};
+  const {rerender} = render(<ConsolePanes panes={[records]} layout="single"/>);
+  const filter = screen.getByLabelText('Collection filter') as HTMLInputElement;
+  fireEvent.change(filter, {target: {value: 'Retained query'}});
+  rerender(<ConsolePanes panes={[{...records, hidden: true}, work]} layout="form"/>);
+  expect(screen.queryByRole('region', {name: 'Records'})).toBeNull();
+  expect(screen.getByRole('region', {name: 'Create'}).dataset['paneActive']).toBe('true');
+  expect(screen.queryByRole('button', {name: 'Records'})).toBeNull();
+  expect(document.activeElement).toBe(screen.getByRole('region', {name: 'Create'}));
+  rerender(<ConsolePanes panes={[records]} layout="single"/>);
+  expect(screen.getByLabelText('Collection filter')).toBe(filter);
+  expect(filter.value).toBe('Retained query');
+  expect(document.activeElement).toBe(screen.getByRole('region', {name: 'Records'}));
+});

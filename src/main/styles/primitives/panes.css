@@ -288,10 +288,37 @@
 
 [data-scroll-owner] { overscroll-behavior: contain; scrollbar-gutter: stable; }
 
+/* Two-pane forms use their content height, bounded by the available viewport.
+   Keep the shared pane bodies as scroll owners when content exceeds that bound. */
+.operational-console[data-pane-layout=content] { flex: 0 1 auto; }
+.diagnostics-grid[data-pane-layout=content] {
+  flex: 0 1 auto;
+  grid-template-columns: minmax(0,1.65fr) minmax(0,1fr);
+  grid-template-rows: auto;
+}
+
+/* Collection-only browsing keeps the operational viewport; short editing
+   surfaces share an unboxed, bounded form composition. */
+.diagnostics-grid[data-pane-layout=single] {
+  grid-template-columns: minmax(0,1fr);
+  grid-template-rows: minmax(0,1fr);
+}
+.operational-console[data-pane-layout=form] { flex: 0 1 auto; max-width: 52rem; }
+.diagnostics-grid[data-pane-layout=form] {
+  flex: 0 1 auto;
+  grid-template-columns: minmax(0,1fr);
+  grid-template-rows: auto;
+  border: 0;
+}
+.diagnostics-grid[data-pane-layout=form]>.panel { border: 0; background: transparent; }
+.diagnostics-grid[data-pane-layout=form]>.panel>h2 { background: transparent; padding-inline: var(--soma-space-3); }
+.diagnostics-grid[data-pane-layout=form]>.panel>.panel-body { padding-inline: var(--soma-space-3); }
+
 .diagnostics-grid[data-pane-layout=workbench] {
   grid-template-columns: minmax(0,.8fr) minmax(0,1.25fr) minmax(0,1fr);
   grid-template-rows: minmax(0,1fr);
 }
 @media (max-width:1039px) {
-  .diagnostics-grid[data-pane-layout=workbench] {grid-template-columns: minmax(0,1fr);}
+  .diagnostics-grid[data-pane-layout=workbench],
+  .diagnostics-grid[data-pane-layout=content] {grid-template-columns: minmax(0,1fr);}
 }

@@ -123,6 +123,8 @@ A stale metadata revision reloads current descriptive state while preserving rec
 <a id="ui-settings-registry"></a>
 ## UI.SETTINGS.REGISTRY
 
+Operator wording distinguishes the default preference from a saved choice without exposing storage state enums, persistence revisions or semantic-owner IDs in ordinary Preferences labels.
+
 Settings UI is generated/composed from registered semantic definitions rather than arbitrary key/value editing. It distinguishes `DEFAULT` from `PERSISTED` without creating rows merely by viewing defaults.
 
 Validation/errors remain setting-owner specific. Secret-classified definitions never expose raw values through the ordinary Settings surface.
@@ -133,7 +135,11 @@ Scope 01 provides the registry/store presentation substrate; later domain scopes
 
 The Settings routes are `/settings/profile`, `/settings/preferences`, and `/settings/reference-data/{customer_organization|contact|dispatch_location}[/{id|new}]`; contextual routes never add primary workspace labels. Core supplies the same closed route grammar to Foundation static serving. Settings capability availability comes from the actual composed Reference/Settings owner.
 
-The shared console's explicit workbench variation presents Records, Reference work, and Context/history. Opening or creating a reference requests the work pane; narrow pane switching retains the same DOM/state. Collection query keys identify filters/type, so refreshing data does not reset a page. Reference collection/matching/selection/scroll state stays mounted across Profile/Preferences visits; inactive working surfaces do not intercept another surface's navigation.
+Profile and Preferences consume the shared compact, unboxed, content-sized form composition with bounded width and pane-body scrolling when needed. They do not add an unnecessary Context panel or inherit the Reference workbench's viewport allocation. Primary Profile copy describes the display name and sign-in boundary rather than metadata/storage revisions.
+
+Reference has three semantic modes. Browse occupies the full-width collection surface and renders neither Reference work nor Context/history panes. Create presents a focused form for the selected type, with no history/evidence before an accepted identity exists. Open uses the existing three-pane Records / Reference work / Context/history workbench; narrow layouts switch one active pane while preserving its DOM/state. Entity navigation contains only Customers, Contacts and Dispatch Locations. New <type> and Refresh belong to collection actions; exact matching remains available in a secondary disclosure. Back to list returns from Create/Open through Foundation navigation guards.
+
+Collection query keys identify filters/type. Collection components remain mounted across modes and Profile/Preferences visits to retain collection/filter/selection/page/scroll state; inactive retained panes are excluded from narrow switching and focus. Refreshing accepted facts does not reset the collection page. Inactive working surfaces do not intercept another surface's navigation. Opening or creating requests the working pane; returning to Browse activates the collection.
 
 Reference registers closed Foundation recovery contracts for metadata, Account Code intent, channel correction, affiliation intent, and lifecycle reason; Profile and ordinary settings use their respective owner contracts. New-reference draft identities identify recovery only and never allocate accepted domain identity. Review fingerprints are not restored as authority. A changed base revision retains input but requires explicit review before submission; successful partial operations acknowledge only their declared fields. Unknown-response retries retain the exact captured command/body, while local request-validation failure permits correction without a network send.
 
