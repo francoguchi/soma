@@ -124,6 +124,12 @@
       "code_paths": ["src/main/shared/collections/", "src/main/shared/components/"]
     },
     {
+      "id": "UI.SEARCH",
+      "anchor": "ui-search",
+      "depends_on": ["UI.COLLECTIONS", "UI.ROUTING", "UI.ACCESSIBILITY"],
+      "code_paths": ["src/main/shared/search/", "src/main/shared/components/", "src/main/shared/interactions/"]
+    },
+    {
       "id": "UI.AUTOCOMPLETE",
       "anchor": "ui-autocomplete",
       "depends_on": ["UI.COLLECTIONS", "UI.SELECTION", "UI.SCROLL"],
@@ -282,6 +288,30 @@ Reuse provenance: Beta LLD-10 presentation lessons and LLD-09 chronology refinem
 
 **Side effects:** browser history/navigation state only.
 
+
+### Future interaction concept — SOMA command surface (deferred)
+
+This is a design placeholder, not an accepted current implementation item.
+
+A future SOMA command surface may expose shell-like local interaction such as:
+
+`operator@soma:~$ cd settings/profile`
+
+`operator@soma:~$ find <term>`
+
+The presentation may borrow shell syntax, but it is **not** an operating-system shell and never grants arbitrary process, filesystem, SQL, network or code execution.
+
+Any eventual parser maps a closed command vocabulary onto existing SOMA authorities:
+
+- navigation verbs resolve only through `UI.ROUTING` / `UI.WORKSPACE_REGISTRY`;
+- search/find verbs dispatch only to registered owner search contracts governed by `UI.SEARCH`;
+- mutation verbs, if ever accepted, use the same owner commands, authentication, validation, confirmation, replay and audit rules as graphical actions;
+- capability/unavailable state remains authoritative;
+- command completion/help enumerates only registered safe commands/routes;
+- user-entered text never becomes raw SQL, filesystem path, OS shell or subprocess input.
+
+The command surface is another interface to the same application semantics, never a second authority. No visible fake prompt or disabled command bar is required until a dedicated design/implementation goal accepts its grammar.
+
 <a id="ui-capability-state"></a>
 ## UI.CAPABILITY_STATE
 
@@ -320,6 +350,31 @@ Reuse provenance: Beta LLD-10 presentation lessons and LLD-09 chronology refinem
 **Failure:** Cursor/transport/stale error preserves current safe context and exposes refresh/retry rather than mixing result generations.
 
 **Side effects:** client collection/request state only.
+
+
+<a id="ui-search"></a>
+## UI.SEARCH
+
+**Trigger/input:** An owner exposes a bounded searchable collection, exact-evidence lookup, or search-capable chooser.
+
+**Visible result:** SOMA presents one recognisable search grammar with predictable placement, availability, loading, no-result and error state while preserving owner authority over what is actually searchable.
+
+**Rules:**
+- Shared search owns presentation and interaction mechanics; domain owners own query semantics, scope, ordering, bounds and result truth.
+- Search never silently filters only the currently loaded bounded page when the authoritative searchable set may be larger.
+- Search controls remain in a predictable collection-associated location.
+- Owner-specific search may use one field, multiple exact-evidence fields or a bounded chooser; those variations retain common search iconography/state/action grammar.
+- Search state distinguishes idle, disabled-empty-source, unavailable, loading, results, no-results, partial/additional-results and error.
+- A known-empty authoritative searchable source leaves the affordance recognisable but disabled with a concise accessible explanation.
+- An empty current page does not by itself imply that the searchable source is empty.
+- Enter submits/accepts only where the owner contract defines that behavior; clear/Escape never performs business mutation.
+- Search does not create entities, relationships or ownership implicitly.
+- Search/filter state participates in `UI.ROUTING` restoration where the owner promises return-state preservation.
+- Accessible name and disabled/unavailable meaning do not rely on the search icon or placeholder text alone.
+
+**Failure:** Missing/unavailable owner search remains visibly unavailable and never falls back to local fuzzy filtering or unbounded enumeration.
+
+**Side effects:** local query/presentation state plus bounded owner read/query calls only.
 
 <a id="ui-autocomplete"></a>
 ## UI.AUTOCOMPLETE
@@ -536,6 +591,14 @@ Reuse provenance: Beta LLD-10 safe-undo principle, moved into shared user-plane 
 **Visible result:** The interface uses a restrained terminal-inspired operational grammar: dense information, thin structural separation, compact controls, strong textual hierarchy, and multi-pane inspectability without becoming a literal terminal emulator.
 
 **Rules:**
+- Discoverability takes precedence over decorative terminal resemblance: operators should understand where to navigate, search, edit and act without interpreting internal architecture.
+- Navigation, search, command actions, selection and evidence use visibly distinct presentation roles; a surface must not render every interaction as the same bordered control.
+- Search presentation follows `UI.SEARCH` and remains spatially consistent across owner collections.
+- Empty-state copy is owner-facing and concise. Generic pagination/query-engine text does not replace simple domain statements such as `No Contacts yet.`.
+- Technical implementation detail such as byte encoding, persistence revision or semantic-owner identity remains secondary unless required for conflict/evidence handling.
+- Repeated information is removed unless the repetition communicates distinct state.
+- Whole-surface navigation is positioned at the scope it controls; a transition affecting the entire workbench does not appear to belong to one child pane.
+- Terminal comment syntax such as `//` may provide short secondary guidance, but ordinary usability never depends on understanding shell conventions.
 - Primary structure comes from alignment, whitespace rhythm, 1px separators/borders, typography, and pane boundaries. Large floating rounded cards are exceptional rather than the default container.
 - Initial surface radii are restrained: square/near-square operational panes and rows; controls may use a small radius. Large soft SaaS-style card radii/shadows are not the default visual hierarchy.
 - Operational chrome, navigation labels, status bands, identifiers, timestamps, metrics, command cues, table/list rows, evidence keys and compact section labels favor the approved local monospace stack. Long notes, explanations and form help may use the readable proportional stack.

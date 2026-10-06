@@ -109,6 +109,7 @@ The library owns at least these reusable visual primitives before future feature
 - key/value list;
 - metric grid;
 - bounded table/list/selectable row;
+- shared search bar / query-state affordance;
 - form field/input;
 - modal/confirmation;
 - warning/error/empty state;
@@ -127,6 +128,16 @@ Large pane chrome belongs to independent operational regions (Diagnostics and ex
 Shared SectionHeading, ConsoleComment, explicit command/quiet/destructive actions and flex FormActions establish hierarchy without changing default Foundation controls. Save/Create commands stay compact rather than inheriting grid stretch. Local functional icons are sparse inline SVG, roughly 16px with consistent stroke/currentColor, decorative aria-hidden markup and visible command text; icon-only actions require an accessible name. No remote assets, emoji or icon runtime dependency.
 
 Core Dark keeps controlled violet/lavender navigation/command identity and cyan/blue structural/secondary interaction accents. Dedicated presentation tokens `--soma-accent-navigation` and `--soma-accent-structure` never assert business state. Green/amber/red remain success/warning/destructive semantics; no large painted backgrounds or color-only state. Icons, selected rows and key section labels carry small deliberate accent moments. Concise muted `//` comments provide supporting context without prefixing every paragraph or emulating a shell.
+
+### Search and discoverability composition
+
+Shared search, navigation-tab and action variants are Foundation primitives. Feature scopes do not independently recreate their placement, disabled state, icon treatment, active-state grammar or ordinary empty/no-result copy.
+
+A search affordance follows `UI.SEARCH`: it is visually stable wherever owner search exists, reflects authoritative-source availability rather than current-page coincidence, and never masquerades client-side page filtering as complete search.
+
+Discoverability outranks decorative terminal resemblance. Navigation, search, commands, selection and evidence must remain distinguishable at a glance. Whole-surface navigation appears at the scope it controls. Concise `//` comments may support an action or state, but primary usability never requires shell literacy.
+
+Empty/content-sized surfaces avoid viewport-sized bordered chrome. Repeated facts, duplicate zero-result copy and technical persistence/encoding language are removed from ordinary paths unless they communicate a distinct operational state.
 
 ### Focus / selection / active distinction
 

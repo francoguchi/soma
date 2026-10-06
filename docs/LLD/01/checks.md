@@ -18,7 +18,8 @@
     {"id":"CHK01.SCHEMA","anchor":"chk01-schema","covers":["M01.001","M01.002","M01.003","M01.004"]},
     {"id":"CHK01.ADVERSARIAL","anchor":"chk01-adversarial","covers":[]},
     {"id":"CHK01.UI.REFERENCE","anchor":"chk01-ui-reference","covers":["UI.REF.WORKSPACE","UI.REF.CANDIDATES","UI.REF.ACCOUNT_CODE_REVIEW","UI.REF.CONTACT","UI.REF.DISPATCH","UI.REF.LIFECYCLE"]},
-    {"id":"CHK01.UI.SETTINGS","anchor":"chk01-ui-settings","covers":["UI.PROFILE.METADATA","UI.SETTINGS.REGISTRY"]}
+    {"id":"CHK01.UI.SETTINGS","anchor":"chk01-ui-settings","covers":["UI.PROFILE.METADATA","UI.SETTINGS.REGISTRY"]},
+    {"id":"CHK01.UI.POLISH","anchor":"chk01-ui-polish","covers":["UI.REF.WORKSPACE","UI.REF.CANDIDATES","UI.PROFILE.METADATA","UI.SETTINGS.REGISTRY"]}
   ],
   "tags": ["identity", "reference", "settings", "checks"]
 }
@@ -131,3 +132,31 @@ At 1440/1040/1039/390px, exercise Customer/Contact/Dispatch Browse/Create/Open a
 Browse has structured Name/Revision/quiet Open rows, a separate heading action area with primary New <type> and quiet Refresh, initially collapsed exact matching/history tools, and one pristine empty state without duplicate zero-count prose. Create has a visible Back action, bounded ordinary form, compact Cancel/Create commands and no collection/work/evidence pane chrome. Only Open renders exactly three operational panes and three desktop tracks at 1040px+, filling usable height with fixed pane headers and independent body scrolling; Details/Evidence sections use sparse icons/separators without nested panels. At 1039px and 390px, switch all retained Open panes; active tabs and forms remain usable without page overflow.
 
 Returning from Open and Create cancellation preserves collection rows, selection, matching/filter input, candidate page, collection cursor and actual scroll at desktop/narrow widths. Retain recovery, stale intent, Account Code ambiguity/review, Contact channels/affiliation, Dispatch address-source/lifecycle, typed settings and no-write defaults. Exercise keyboard navigation/focus and forced colors. Review actual captures for hierarchy, accents/icons, compact command placement, dead space, border purpose, tab clarity, table density and subsection rhythm before closing visual acceptance.
+
+<a id="chk01-ui-polish"></a>
+## CHK01.UI.POLISH
+
+Exercise the final Settings/Reference usability contract in real authenticated Main.
+
+Verify:
+
+- Settings primary tabs and Reference type tabs remain visually and semantically distinct from command buttons.
+- Foundation search affordances occupy the accepted collection-associated location wherever the owner exposes search.
+- a known-empty authoritative searchable source renders search visible but disabled with an accessible reason.
+- an empty current bounded page does not disable broader valid owner search.
+- no Reference search is implemented as current-loaded-page filtering while presented as authoritative search.
+- empty Browse shows one concise empty state rather than duplicate zero-record/count prose.
+- populated/query collections use correct singular/plural count grammar.
+- selected/opened/focus evidence is visually separate from the record name.
+- Browse/Create have no three-pane workbench chrome.
+- whole-surface Back navigation is outside the Details pane in Open mode.
+- Create does not expose redundant Back/Cancel controls unless they have distinct tested semantics.
+- Profile/Preferences do not redundantly repeat accepted values without distinct meaning.
+- ordinary forms do not lead with UTF-8 byte-storage terminology when human guidance is sufficient.
+- empty Channels/Affiliation/History use owner-language empty states.
+- Browse -> Open -> Browse and Create cancellation preserve collection/filter/selection/page/scroll/working-copy state.
+- desktop and narrow captures have no accidental dead fields, oversized empty borders or action-hierarchy ambiguity.
+- forced-colors and keyboard operation retain non-color navigation, search-disabled, selection and focus meaning.
+
+Manual screenshot review is required before closing R01.06-E; generated screenshots alone are not acceptance.
+
