@@ -22,36 +22,71 @@ async function showMatching() {
   if (!await disclosure.evaluate(node => node.parentElement.open)) await disclosure.click();
 }
 async function noOverflow() {assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));}
+async function tabsGrammar() {
+  const tabs = page.getByRole('navigation', {name: 'Settings sections'});
+  await expect(tabs.getByRole('link')).toHaveCount(3);
+  const current = tabs.locator('[aria-current=page]');
+  await expect(current).toHaveCount(1);
+  const style = await current.evaluate(node => ({border: getComputedStyle(node).borderBottomWidth, weight: getComputedStyle(node).fontWeight, box: getComputedStyle(node).borderTopWidth}));
+  assert.equal(style.border, '2px'); assert.equal(style.box, '0px'); assert(Number(style.weight) >= 600);
+  await current.focus();
+  assert.equal(await current.evaluate(node => getComputedStyle(node).outlineStyle), 'solid', 'keyboard focus is distinct from current underline');
+  await current.evaluate(node => node.blur());
+}
+async function unboxedForm(surface, command) {
+  assert.equal(await surface.locator('.panel, .diagnostics-grid').count(), 0);
+  const geometry = await surface.evaluate(node => ({height: node.getBoundingClientRect().height, width: node.getBoundingClientRect().width, border: getComputedStyle(node).borderLeftWidth}));
+  assert.equal(geometry.border, '0px'); assert(geometry.height < 650); assert(geometry.width <= 705);
+  const button = await command.boundingBox(), field = await surface.locator('input,select').first().boundingBox();
+  assert(button.width < field.width * .8, 'command must remain compact rather than stretch to form width');
+  await expect(surface.locator('.section-heading [data-icon]').first()).toBeVisible();
+}
 async function settingsGeometry() {
   for (const width of [1440, 1040, 1039, 390]) {
     await page.setViewportSize({width, height: 1000});
     for (const route of ['profile', 'preferences']) {
       await enter('/settings/' + route);
-      await expect(page.getByRole(route === 'profile' ? 'textbox' : 'combobox', {name: route === 'profile' ? 'Display name' : 'Appearance preference', exact: true})).toBeVisible();
-      const grid = page.locator('.diagnostics-grid');
-      assert.equal(await grid.locator(':scope > section').count(), 1, route + ': no unnecessary context panel');
-      const geometry = await grid.evaluate(node => {
-        const panel = node.firstElementChild, rect = panel.getBoundingClientRect();
-        const body = panel.querySelector('.panel-body'), last = body.lastElementChild.getBoundingClientRect();
-        return {height: rect.height, width: rect.width, trailing: rect.bottom - last.bottom, columns: getComputedStyle(node).gridTemplateColumns.split(' ').length, border: getComputedStyle(panel).borderRightWidth};
-      });
-      assert.equal(geometry.columns, 1);
-      assert.equal(geometry.border, '0px', route + ': unboxed form');
-      assert(geometry.height < 500, route + ': content-sized form');
-      assert(geometry.trailing < 65, route + ': no excess space below form');
-      assert(geometry.width <= 832, route + ': bounded form width');
+      await expect(page.getByRole('heading', {name: 'Settings', exact: true})).toBeVisible();
+      await expect(page.getByRole(route === 'profile' ? 'textbox' : 'combobox', {name: route === 'profile' ? 'Display name' : 'Theme', exact: true})).toBeVisible();
+      const surface = page.locator('[data-settings-section=' + route + ']');
+      assert.equal(await page.locator('.diagnostics-grid, [data-pane-body]').count(), 0);
+      await unboxedForm(surface, surface.getByRole('button', {name: route === 'profile' ? 'Save display name' : 'Save appearance', exact: true}));
+      await tabsGrammar();
       await expect(page.locator('.shell-session')).toContainText('Synthetic Operator');
       await expect(page.getByRole('contentinfo', {name: 'Operator status'})).toContainText('READY');
-      await expect(page.getByRole('group', {name: 'Settings pane', exact: true})).toBeHidden();
       if (route === 'preferences') {
-        await expect(page.getByRole('combobox', {name: 'Preference', exact: true})).toHaveText('Appearance');
-        assert(!/PERSISTED|semantic.owner|persisted override|revision [0-9]/iu.test(await grid.innerText()));
+        await expect(page.getByRole('combobox', {name: 'Preference', exact: true})).toHaveCount(0);
+        await expect(page.getByRole('heading', {name: 'Appearance', exact: true})).toBeVisible();
+        assert(!/PERSISTED|semantic.owner|persisted override|revision [0-9]/iu.test(await surface.innerText()));
       }
       await noOverflow();
       await page.screenshot({path: '../../.tmp/settings-' + route + '-' + width + '.png', fullPage: true});
     }
   }
   await page.setViewportSize({width: 1440, height: 1000});
+}
+async function browseGrammar(kind, empty = false) {
+  assert.equal(await page.locator('.diagnostics-grid, .panel, #console-work, #console-evidence').count(), 0);
+  const navigation = page.getByRole('navigation', {name: 'Reference data types'});
+  await expect(navigation.getByRole('link')).toHaveCount(3);
+  const actions = page.getByRole('group', {name: 'Collection actions'});
+  await expect(actions).toBeVisible();
+  assert.equal(await navigation.getByRole('button').count(), 0);
+  await expect(actions.locator('.action-command')).toHaveCount(1);
+  await expect(actions.locator('.action-quiet')).toHaveText('Refresh');
+  const collection = page.locator('[data-reference-collection]');
+  const tools = collection.locator('.advanced-tool').filter({visible: true});
+  for (const disclosure of await tools.all()) assert.equal(await disclosure.evaluate(node => node.open), false);
+  if (kind !== 'dispatch_location') await expect(page.getByRole('textbox', {name: 'Match name', exact: true})).toHaveCount(0);
+  if (empty) {
+    const label = kind === 'customer_organization' ? 'Customers' : 'Contacts';
+    await expect(collection.getByText('No ' + label + ' yet.', {exact: true})).toBeVisible();
+    assert(!/0 records|0 matching records|No records in this page/u.test(await collection.innerText()));
+    assert((await collection.boundingBox()).height < 300, 'empty browse ends with its information');
+  } else {
+    await expect(collection.getByRole('columnheader', {name: 'Name', exact: true})).toBeVisible();
+    await expect(collection.getByRole('columnheader', {name: 'Revision', exact: true})).toBeVisible();
+  }
 }
 async function referenceGeometry(identities) {
   for (const width of [1440, 1040, 1039, 390]) {
@@ -61,43 +96,55 @@ async function referenceGeometry(identities) {
         await enter('/settings/reference-data/' + kind + (mode === 'browse' ? '' : '/' + (mode === 'create' ? 'new' : id)));
         const surface = page.locator('[data-reference-mode]'), grid = surface.locator('.diagnostics-grid');
         await expect(surface).toHaveAttribute('data-reference-mode', mode);
-        await expect(page.getByRole('group', {name: 'Reference data types'})).toBeVisible();
-        assert.equal(await page.getByRole('group', {name: 'Reference data types'}).getByRole('button').count(), 3);
-        const work = grid.locator(':scope > #console-work'), evidence = grid.locator(':scope > #console-evidence');
-        assert.equal(await evidence.count(), mode === 'open' ? 1 : 0, mode + ': evidence requires accepted identity');
-        assert.equal(await work.count(), mode === 'browse' ? 0 : 1, mode + ': no empty work pane');
+        await expect(page.getByRole('navigation', {name: 'Reference data types'})).toBeVisible();
+        assert.equal(await page.locator('#console-work, #console-evidence').count(), mode === 'open' ? 2 : 0);
         if (mode === 'browse') {
           await expect(page.getByRole('grid', {name: 'Records'}).first()).toBeVisible();
-          await expect(page.getByRole('group', {name: 'Collection actions'})).toBeVisible();
-          const sizes = await grid.evaluate(node => ({grid: node.getBoundingClientRect().width, main: node.closest('main').clientWidth, pane: node.firstElementChild.getBoundingClientRect().width}));
-          assert(Math.abs(sizes.grid - sizes.pane) < 2, 'Browse occupies full grid width');
-          assert(sizes.grid > sizes.main * .9, 'Browse occupies full workspace width');
-          if (kind !== 'dispatch_location') assert.equal(await page.getByRole('textbox', {name: 'Match name', exact: true}).count(), 0);
+          await browseGrammar(kind);
+        } else if (mode === 'create') {
+          await expect(page.getByLabel('Name', {exact: true})).toHaveValue('');
+          assert.equal(await page.locator('.panel, .diagnostics-grid, [data-reference-collection]').count(), 0);
+          const form = page.locator('[data-create-surface]');
+          await expect(form.getByRole('button', {name: 'Back to list', exact: true})).toBeVisible();
+          await expect(form.getByRole('button', {name: 'Cancel', exact: true})).toBeVisible();
+          await unboxedForm(form, form.getByRole('button', {name: /^Create (Customer|Contact|Dispatch Location)$/u}));
         } else {
           await expect(page.getByLabel('Name', {exact: true})).toBeVisible();
-          if (mode === 'create') {
-            await expect(page.getByLabel('Name', {exact: true})).toHaveValue('');
-            await expect(grid.locator(':scope > #console-records')).toBeHidden();
-            await expect(work.getByRole('button', {name: /^Create (Customer|Contact|Dispatch Location)$/u})).toBeVisible();
-          } else {
-            if (width < 1040) await page.getByRole('group', {name: 'Reference data pane'}).getByRole('button', {name: 'Context and history', exact: true}).click();
-            await expect(evidence.getByText('Immutable identity', {exact: true})).toBeVisible();
-            if (width < 1040) await page.getByRole('group', {name: 'Reference data pane'}).getByRole('button', {name: 'Reference work', exact: true}).click();
-            assert.equal(await grid.locator(':scope > section').count(), 3);
+          // Opened identity is a separate marker from explicit selection.
+          await expect(page.locator('[data-reference-collection] [role=row][aria-current=true]')).toHaveCount(1);
+          assert.equal(await grid.locator(':scope > section').count(), 3);
+          assert.equal(await grid.locator(':scope > section:visible').count(), width >= 1040 ? 3 : 1);
+          assert.equal(await grid.evaluate(node => getComputedStyle(node).gridTemplateColumns.split(' ').length), width >= 1040 ? 3 : 1);
+          const geometry = await grid.evaluate(node => ({bottom: node.getBoundingClientRect().bottom, mainBottom: node.closest('main').getBoundingClientRect().bottom, height: node.getBoundingClientRect().height}));
+          assert(geometry.height > 550); assert(Math.abs(geometry.bottom - geometry.mainBottom) < 30, 'Open owns remaining usable height');
+          if (width >= 1040) {
+            for (const panel of await grid.locator(':scope > section').all()) {
+              const body = panel.locator('[data-pane-body]'), header = panel.locator(':scope > h2');
+              const before = await header.boundingBox();
+              await body.evaluate(node => {node.scrollTop = 150;});
+              assert.deepEqual(await header.boundingBox(), before, 'pane headers stay fixed while bodies scroll');
+              await body.evaluate(node => {node.scrollTop = 0;});
+            }
+          }
+          await expect(grid.locator('#console-work .section-heading [data-icon]').first()).toBeVisible();
+          assert.equal(await grid.locator('.panel .panel').count(), 0, 'no nested panel cards');
+          if (width >= 1040) {
+            const currentRow = page.locator('[data-reference-collection] [role=row][aria-current=true]');
+            assert((await currentRow.locator('[role=gridcell]').first().boundingBox()).width >= 72, 'opened marker must not squeeze collection names into vertical letters');
+            assert((await currentRow.boundingBox()).height < 100, 'simple opened row remains dense at split boundary');
+            assert((await page.locator('#console-evidence .compact-evidence dd').first().boundingBox()).width >= 100, 'evidence labels leave readable value width at split boundary');
           }
         }
-        assert.equal(await grid.locator(':scope > section:visible').count(), mode === 'open' && width >= 1040 ? 3 : 1);
-        assert.equal(await grid.evaluate(node => getComputedStyle(node).gridTemplateColumns.split(' ').length), mode === 'open' && width >= 1040 ? 3 : 1);
         await expect(surface.getByRole('status').filter({hasText: /Loading|Refreshing/u})).toHaveCount(0);
         await expect(page.getByRole('contentinfo', {name: 'Operator status'})).toContainText('READY');
-        await noOverflow();
+        await tabsGrammar(); await noOverflow();
         await page.screenshot({path: '../../.tmp/reference-' + kind + '-' + mode + '-' + width + '.png', fullPage: true});
         if (mode === 'open' && width < 1040) {
-          for (const pane of [kind === 'customer_organization' ? 'Customers' : kind === 'contact' ? 'Contacts' : 'Dispatch Locations', 'Context and history']) {
+          for (const pane of [kind === 'customer_organization' ? 'Customers' : kind === 'contact' ? 'Contacts' : 'Dispatch Locations', 'Evidence & history']) {
             await page.getByRole('group', {name: 'Reference data pane'}).getByRole('button', {name: pane, exact: true}).click();
             await expect(page.getByRole('region', {name: pane, exact: true})).toBeVisible();
             await noOverflow();
-            await page.screenshot({path: '../../.tmp/reference-' + kind + '-open-' + width + '-' + (pane === 'Context and history' ? 'evidence' : 'collection') + '.png', fullPage: true});
+            await page.screenshot({path: '../../.tmp/reference-' + kind + '-open-' + width + '-' + (pane === 'Evidence & history' ? 'evidence' : 'collection') + '.png', fullPage: true});
           }
         }
       }
@@ -106,10 +153,10 @@ async function referenceGeometry(identities) {
   await page.setViewportSize({width: 1440, height: 1000});
 }
 async function collectionReturnState() {
-  const pane = page.locator('#console-records'), records = pane.getByRole('grid', {name: 'Records'}).first();
+  const pane = page.locator('[data-reference-collection]'), records = pane.getByRole('grid', {name: 'Records'}).first();
   for (const width of [1440, 390]) {
     await page.setViewportSize({width, height: 1000});
-    const row = records.getByRole('row').nth(5);
+    const row = records.locator('[role=row]:not([data-collection-header])').nth(5);
     await row.click();
     await records.evaluate(node => {node.scrollTop = 120;});
     const before = await records.evaluate(node => ({scroll: node.scrollTop, rows: Array.from(node.children).map(row => row.textContent), selected: node.querySelector('[aria-selected=true]').textContent}));
@@ -124,17 +171,19 @@ async function collectionReturnState() {
     await expect(pane.getByText(/3 records in this page.*53 matching records/u)).toBeVisible();
     const after = await records.evaluate(node => ({scroll: node.scrollTop, rows: Array.from(node.children).map(row => row.textContent), selected: node.querySelector('[aria-selected=true]').textContent}));
     assert.deepEqual(after, before, 'Browse/Open/Browse retains collection rows, selection and scroll');
+    await expect(row).toBeFocused();
     await page.getByRole('group', {name: 'Collection actions'}).getByRole('button', {name: 'New Customer', exact: true}).click();
     await expect(page.locator('[data-reference-mode]')).toHaveAttribute('data-reference-mode', 'create');
     assert.equal(await page.locator('#console-evidence').count(), 0);
     await page.getByRole('button', {name: 'Back to list', exact: true}).click();
+    await expect(page.getByRole('group', {name: 'Collection actions'}).getByRole('button', {name: 'New Customer', exact: true})).toBeFocused();
     assert.deepEqual(await records.evaluate(node => ({scroll: node.scrollTop, rows: Array.from(node.children).map(row => row.textContent), selected: node.querySelector('[aria-selected=true]').textContent})), before, 'Create cancel retains collection state');
   }
   await page.setViewportSize({width: 1440, height: 1000});
   await pane.getByRole('button', {name: 'Next page', exact: true}).first().click();
-  await expect(records.getByRole('row')).toHaveCount(6);
+  await expect(records.locator('[role=row]:not([data-collection-header])')).toHaveCount(6);
   const pageRows = await records.innerText();
-  await records.getByRole('row').first().dblclick();
+  await records.locator('[role=row]:not([data-collection-header])').first().dblclick();
   await expect(page.getByLabel('Name', {exact: true})).toBeVisible();
   await page.getByRole('button', {name: 'Back to list', exact: true}).click();
   assert.equal(await records.innerText(), pageRows, 'Collection cursor/page survives open/return');
@@ -160,10 +209,19 @@ try {
   await page.getByLabel('Password', {exact: true}).fill('Synthetic Reference UI password 42');
   await page.getByLabel('Confirm password').fill('Synthetic Reference UI password 42');
   await page.getByRole('button', {name: 'Create password and sign in'}).click();
-  await expect(page.getByRole('heading', {name: 'Settings / Reference data'})).toBeVisible();
+  await expect(page.getByRole('heading', {name: 'Settings'})).toBeVisible();
   assert.equal(await page.getByRole('group', {name: 'Workspaces', exact: true}).getByRole('button').count(), 6);
   await expect(page.getByRole('group', {name: 'Workspaces', exact: true}).getByRole('button', {name: 'Settings', exact: true})).toBeEnabled();
   assert.equal(await page.getByRole('group', {name: 'Workspaces', exact: true}).getByRole('button', {name: 'Customers', exact: true}).count(), 0);
+  for (const kind of ['customer_organization', 'contact']) {
+    for (const width of [1440, 390]) {
+      await page.setViewportSize({width, height: 1000});
+      await enter('/settings/reference-data/' + kind);
+      await browseGrammar(kind, true); await tabsGrammar(); await noOverflow();
+      await page.screenshot({path: '../../.tmp/reference-' + kind + '-empty-' + width + '.png', fullPage: true});
+    }
+  }
+  await page.setViewportSize({width: 1440, height: 1000});
   const first = await create('customer_organization', 'Customer One', async () => page.getByLabel('Initial Account Code (optional)').fill('UI-CODE'));
   const second = await create('customer_organization', 'Customer Two');
   await page.getByLabel('Account Code', {exact: true}).fill('UI-CODE');
@@ -189,7 +247,7 @@ try {
   await page.getByRole('button', {name: 'Find candidates'}).click();
   await expect(page.getByRole('status').filter({hasText: 'AMBIGUOUS · 2 exact candidates'})).toBeVisible();
   await page.getByLabel('Name', {exact: true}).fill('Unsaved Customer intent');
-  await page.getByRole('button', {name: 'Profile', exact: true}).click();
+  await page.getByRole('link', {name: 'Profile', exact: true}).click();
   await expect(page.getByRole('dialog', {name: 'Leave unsaved changes?'})).toBeVisible();
   await page.getByRole('dialog').getByRole('button', {name: 'Cancel', exact: true}).click();
   await expect(page.getByLabel('Name', {exact: true})).toHaveValue('Unsaved Customer intent');
@@ -215,7 +273,7 @@ try {
   await expect(page.locator('.shell-session')).toContainText('Synthetic Operator');
   await enter('/settings/preferences');
   await expect(page.getByText('Using the default appearance.')).toBeVisible();
-  await page.getByRole('button', {name: 'Save appearance preference'}).click();
+  await page.getByRole('button', {name: 'Save appearance'}).click();
   await expect(page.getByText('Using your saved appearance preference.')).toBeVisible();
   assert.equal(await page.evaluate(() => document.documentElement.dataset.appearance), 'core-dark');
   await settingsGeometry();
@@ -247,20 +305,20 @@ try {
   await page.getByRole('button', {name: 'Reactivate reference…'}).click();
   await page.getByRole('dialog').getByRole('button', {name: 'Confirm lifecycle operation'}).click();
   await expect(page.getByLabel('Name', {exact: true})).toBeEnabled();
-  await expect(page.getByRole('region', {name: 'Context and history'})).toContainText('active');
+  await expect(page.getByRole('region', {name: 'Evidence & history'})).toContainText('active');
   await page.screenshot({path: '../../.tmp/reference-1440.png', fullPage: true});
   await page.setViewportSize({width: 390, height: 844});
-  await page.getByRole('group', {name: 'Reference data pane'}).getByRole('button', {name: 'Reference work', exact: true}).click();
+  await page.getByRole('group', {name: 'Reference data pane'}).getByRole('button', {name: 'Details', exact: true}).click();
   await expect(page.getByLabel('Name', {exact: true})).toHaveValue('Standalone Dispatch');
-  await page.getByRole('group', {name: 'Reference data pane'}).getByRole('button', {name: 'Context and history', exact: true}).click();
+  await page.getByRole('group', {name: 'Reference data pane'}).getByRole('button', {name: 'Evidence & history', exact: true}).click();
   await expect(page.getByRole('heading', {name: 'Address source'})).toBeVisible();
   assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
   await page.screenshot({path: '../../.tmp/reference-390.png', fullPage: true});
-  await page.getByRole('button', {name: 'Customers', exact: true}).click();
+  await page.getByRole('navigation', {name: 'Reference data types'}).getByRole('link', {name: 'Customers', exact: true}).click();
   await expect(page.locator('[data-reference-mode]')).toHaveAttribute('data-reference-mode', 'browse');
   assert.equal(await page.locator('#console-work, #console-evidence').count(), 0);
   await page.getByRole('button', {name: 'Open Customer One · active · revision 1'}).click();
-  await expect(page.getByRole('group', {name: 'Reference data pane'}).getByRole('button', {name: 'Reference work', exact: true})).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('group', {name: 'Reference data pane'}).getByRole('button', {name: 'Details', exact: true})).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByLabel('Name', {exact: true})).toHaveValue('Customer One');
   await page.setViewportSize({width: 1440, height: 1000});
   for (let i = 0; i < 53; i++) {
@@ -272,11 +330,11 @@ try {
   await page.getByRole('textbox', {name: 'Match name', exact: true}).fill('Paged Customer');
   await page.getByRole('button', {name: 'Find candidates'}).click();
   await expect(page.getByRole('status').filter({hasText: 'AMBIGUOUS · 53 exact candidates'})).toBeVisible();
-  const candidatePane = page.getByRole('region', {name: 'Customers', exact: true});
+  const candidatePane = page.locator('[data-reference-collection]');
   await candidatePane.getByRole('button', {name: 'Next page', exact: true}).last().click();
   await expect(candidatePane.getByText('3 records in this page · 53 matching records')).toBeVisible();
   await expect(page.getByRole('status').filter({hasText: 'AMBIGUOUS · 53 exact candidates'})).toBeVisible();
-  await page.getByRole('button', {name: 'Profile', exact: true}).click();
+  await page.getByRole('link', {name: 'Profile', exact: true}).click();
   await page.goBack();
   await expect(page.getByRole('textbox', {name: 'Match name', exact: true})).toHaveValue('Paged Customer');
   await expect(candidatePane.getByText('3 records in this page · 53 matching records')).toBeVisible();
@@ -288,7 +346,7 @@ try {
     assert.equal(result.status, 200); revision = result.value.revision;
   }
   await enter('/settings/reference-data/customer_organization/' + first);
-  const history = page.getByRole('region', {name: 'Context and history'});
+  const history = page.getByRole('region', {name: 'Evidence & history'});
   await expect(history.getByText('50 records in this page · 52 matching records')).toBeVisible();
   await history.getByRole('button', {name: 'Next page', exact: true}).click();
   await expect(history.getByText('2 records in this page · 52 matching records')).toBeVisible();
@@ -310,6 +368,21 @@ try {
   await page.emulateMedia({forcedColors: 'active'});
   assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
   await page.screenshot({path: '../../.tmp/reference-forced-colors.png', fullPage: true});
+  for (const route of ['profile', 'preferences', 'reference-data/customer_organization', 'reference-data/contact/new']) {
+    await enter('/settings/' + route);
+    if (route === 'profile') await expect(page.getByLabel('Display name', {exact: true})).toBeVisible();
+    else if (route === 'preferences') await expect(page.getByRole('combobox', {name: 'Theme', exact: true})).toBeVisible();
+    else if (route.endsWith('/new')) await expect(page.getByLabel('Name', {exact: true})).toBeVisible();
+    else await expect(page.getByRole('grid', {name: 'Records'}).first()).toBeVisible();
+    await expect(page.getByRole('status').filter({hasText: /Loading|Refreshing/u})).toHaveCount(0);
+    await expect(page.getByRole('contentinfo', {name: 'Operator status'})).toContainText('READY');
+    await tabsGrammar(); await noOverflow();
+    await page.screenshot({path: '../../.tmp/settings-forced-colors-' + route.replaceAll('/', '-') + '.png', fullPage: true});
+  }
+  await page.getByRole('navigation', {name: 'Settings sections'}).getByRole('link', {name: 'Preferences', exact: true}).focus();
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(new RegExp('/settings/preferences$'));
+  await expect(page.getByRole('heading', {name: 'Appearance', exact: true})).toBeVisible();
   assert.deepEqual(errors, []);
   console.log(JSON.stringify({first, second, contact, dispatch, checked: 'Reference/Settings live workflows, recovery/stale intent, narrow pane state'}));
 } finally {await browser.close();}

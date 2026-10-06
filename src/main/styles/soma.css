@@ -4,6 +4,7 @@
 @import "./base.css" layer(base);
 @import "./primitives/actions.css" layer(primitives);
 @import "./primitives/panes.css" layer(primitives);
+@import "./primitives/sections.css" layer(primitives);
 @import "./primitives/collections.css" layer(primitives);
 @import "./primitives/forms.css" layer(primitives);
 @import "./primitives/feedback.css" layer(primitives);

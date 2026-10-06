@@ -13,6 +13,8 @@
   --soma-current: #b7a2ff;
   --soma-current-title: #d2c7ff;
   --soma-info: #8fcbd6;
+  --soma-accent-navigation: #c3abff;
+  --soma-accent-structure: #75cfec;
   --soma-focus: #d0c2ff;
   --soma-selection: #30254f;
   --soma-warning: #d8b768;
@@ -64,6 +66,8 @@
     --soma-current-title: LinkText;
     --soma-command: LinkText;
     --soma-info: LinkText;
+    --soma-accent-navigation: LinkText;
+    --soma-accent-structure: LinkText;
     --soma-success: CanvasText;
     --soma-warning: CanvasText;
     --soma-destructive: CanvasText;

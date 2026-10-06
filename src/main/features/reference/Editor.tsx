@@ -1,3 +1,4 @@
+import {SectionHeading, FormActions, Action} from '../../shared/components/Section';
 import {type RefObject} from 'react';
 import {DispatchAddress} from './dispatch/Address';
 import {referenceApi as commands} from './api';
@@ -5,7 +6,7 @@ import type * as C from '../../shared/api/generated/contracts';
 import {useWorkingIntent} from '../../shared/interactions/use-working-intent';
 import {CustomerChooser, Field, useOwnerAction, type Detail, type Kind} from './model';
 
-export function Editor({kind, id, detail, application, accepted}: {kind: Kind; id: string; detail: Detail | null; application: RefObject<HTMLElement | null>; accepted: (id: string) => void}) {
+export function Editor({kind, id, detail, application, accepted, cancel}: {kind: Kind; id: string; detail: Detail | null; application: RefObject<HTMLElement | null>; accepted: (id: string) => void; cancel?: () => void}) {
   const creating = detail === null;
   const singular = kind === 'customer_organization' ? 'Customer' : kind === 'contact' ? 'Contact' : 'Dispatch Location';
   const dispatch = detail && 'address_mode' in detail ? detail as C.ReferenceDispatchDetailV1 : null;
@@ -24,7 +25,7 @@ export function Editor({kind, id, detail, application, accepted}: {kind: Kind; i
     if (kind === 'contact') return commands.updateContact({id}, body);
     return commands.updateDispatch({id}, {...body, ...(dispatch?.address_mode === 'standalone' ? {address_text: draft['address']!} : {})});
   };
-  return <><h3>{creating ? 'Create ' + singular : detail.name}</h3>{detail && <p>Revision {detail.revision} · {detail.lifecycle_state}{inactive ? ' — history only until explicit reactivation' : ''}</p>}
+  return <>{!creating && <SectionHeading level={3} icon={kind === 'customer_organization' ? 'customer' : kind === 'contact' ? 'contact' : 'dispatch'}>{detail.name}</SectionHeading>}{detail && <p>Revision {detail.revision} · {detail.lifecycle_state}{inactive ? ' — history only until explicit reactivation' : ''}</p>}
     <form className="operational-form" onSubmit={e => {e.preventDefault(); void action.run(JSON.stringify({id, revision: detail?.revision, draft}), async command => {
       const result = await save(command); await working.accepted(); accepted(result.target_id); return result;
     }, () => {});}}><fieldset disabled={action.busy || action.pending || inactive}><div className="operational-form">
@@ -32,7 +33,7 @@ export function Editor({kind, id, detail, application, accepted}: {kind: Kind; i
       {creating && kind === 'customer_organization' && <Field label="Initial Account Code (optional)" value={draft['account_code']!} change={v => edit('account_code', v)} maximum={512}/>}
       {creating && kind === 'contact' && <><Field label="Initial email (optional)" value={draft['email']!} change={v => edit('email', v)} maximum={2048}/><CustomerChooser value={draft['customer_id']!} change={v => edit('customer_id', v)}/><p>Email and Customer are optional.</p></>}
       {kind === 'dispatch_location' && <DispatchAddress detail={dispatch} value={draft['address']!} change={v => edit('address', v)}/>}
-      <button disabled={working.conflict || (!creating && !working.dirty)}>{action.busy ? 'Saving…' : creating ? 'Create ' + singular : kind === 'dispatch_location' && dispatch?.address_mode === 'standalone' ? 'Save name and standalone address' : 'Save name'}</button>
+      <FormActions>{creating && <Action onClick={cancel}>Cancel</Action>}<Action type="submit" variant="command" disabled={working.conflict || (!creating && !working.dirty)}>{action.busy ? 'Saving…' : creating ? 'Create ' + singular : kind === 'dispatch_location' && dispatch?.address_mode === 'standalone' ? 'Save name and standalone address' : 'Save name'}</Action></FormActions>
     </div></fieldset></form>{working.recovery}{action.feedback}
   </>;
 }

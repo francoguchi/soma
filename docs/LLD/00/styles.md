@@ -118,6 +118,16 @@ The library owns at least these reusable visual primitives before future feature
 
 A feature may compose these into its own workbench without copying their CSS.
 
+### Navigation, content and command composition
+
+Section navigation uses semantic links/current-page state, unboxed resting text and a vivid current underline/weight. Secondary navigation is smaller; keyboard focus has its own visible treatment. Tabs are not ordinary outlined command buttons.
+
+Large pane chrome belongs to independent operational regions (Diagnostics and explicitly opened inspection workbenches). Forms, empty collections, browse and create surfaces are ordinary content; they reserve no viewport-sized bordered panel or active-pane rail merely to obtain headings/spacing. Thin separators, typography and spacing replace nested cards. Every border identifies an actual input, data, pane, dialog, shell, selection or focus boundary. Split collection tracks and compact key/value evidence reserve readable text widths; opened/selected markers do not squeeze names into vertical letter columns. Bounded lists/tables own any necessary horizontal scrolling.
+
+Shared SectionHeading, ConsoleComment, explicit command/quiet/destructive actions and flex FormActions establish hierarchy without changing default Foundation controls. Save/Create commands stay compact rather than inheriting grid stretch. Local functional icons are sparse inline SVG, roughly 16px with consistent stroke/currentColor, decorative aria-hidden markup and visible command text; icon-only actions require an accessible name. No remote assets, emoji or icon runtime dependency.
+
+Core Dark keeps controlled violet/lavender navigation/command identity and cyan/blue structural/secondary interaction accents. Dedicated presentation tokens `--soma-accent-navigation` and `--soma-accent-structure` never assert business state. Green/amber/red remain success/warning/destructive semantics; no large painted backgrounds or color-only state. Icons, selected rows and key section labels carry small deliberate accent moments. Concise muted `//` comments provide supporting context without prefixing every paragraph or emulating a shell.
+
 ### Focus / selection / active distinction
 
 - DOM keyboard focus, logical active pane, row selection, opened record, hover and disabled state remain visually distinct.

@@ -634,7 +634,7 @@ Reuse provenance: Beta LLD-10 safe-undo principle, moved into shared user-plane 
 - Primary product navigation comes only from UI.WORKSPACE_REGISTRY; the shell never enumerates CAPABILITY.REGISTRY into guessed workspace labels.
 - Returning from a record preserves applicable filter/query, selected/active records, scroll context, and focus where the referenced result survives.
 - Deep operational surfaces favor dense inspectable information over decorative dashboard space.
-- Between top chrome and UI.OPERATOR_STATUS_STRIP, the shell provides a bounded working viewport that owner panes fill/stretch into. Facts remain top-aligned; owners use pane-local scroll rather than allowing a small content grid to end halfway down the application with an unrelated empty field below it.
+- Between top chrome and UI.OPERATOR_STATUS_STRIP, the shell provides a bounded working viewport. Actual multi-region inspection surfaces fill it with owner panes and pane-local scrolling; ordinary content-sized settings, browse and creation surfaces remain top-aligned without reserving viewport-sized bordered chrome. Shared tabs, section/icon/comment hierarchy and explicit command variants follow UI.STYLE_LIBRARY.
 - Jobs, warnings, imports, reviews, and recent processing may use a shared activity surface, but their facts remain owner-produced.
 
 **Failure:** Missing feature route shows explicit unavailable/not-found state and preserves safe navigation back to the prior context.

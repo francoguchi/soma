@@ -1,3 +1,4 @@
+import {FormActions, Action} from '../../../shared/components/Section';
 import {useCallback, useState} from 'react';
 import {api} from '../../../shared/api/client';
 import type * as C from '../../../shared/api/generated/contracts';
@@ -22,7 +23,7 @@ export function Candidates({kind, open, accountCode}: {kind: Kind; open: (id: st
   return <section><h3>Find {labels[kind].toLowerCase()} by exact evidence</h3>{!accountCode && <form className="operational-form" onSubmit={e => {e.preventDefault(); setRequest(kind === 'contact' ? {scope: scope || 'UNBOUND', ...(name ? {raw_name: name} : {}), ...(secondary ? {raw_email: secondary} : {})} : {...(name ? {raw_name: name} : {}), ...(secondary ? {raw_account_code: secondary} : {})});}}>
     <Field label="Match name" value={name} change={setName}/><Field label={kind === 'contact' ? 'Match email' : 'Match Account Code'} value={secondary} change={setSecondary} maximum={kind === 'contact' ? 2048 : 512}/>
     {kind === 'contact' && <CustomerChooser label="Matching affiliation scope" value={scope} change={setScope}/>}
-    <button>Find candidates</button>
+    <FormActions><Action icon="search" type="submit" variant="command">Find candidates</Action></FormActions>
   </form>}{request && <BoundedCollection<Identity> pageSize={50} queryKey={kind + key} load={load} emptyMessage="UNRESOLVED — no exact candidates. Create or select a reference explicitly." render={raw => {
     const {evidence} = raw as CandidatePage;
     return <><p role="status">{evidence.state} · {evidence.candidate_count} exact candidates</p><p>{evidence.explanation.replaceAll('_', ' ')}</p><p>Account Code evidence and descriptive-name evidence are independent. Opening a candidate does not accept a link or merge.</p><SelectableCollection rows={raw.items.map(row => ({id: row.reference_id, label: row.name + ' · revision ' + row.revision, eligible: row.lifecycle_state === 'active', route: {type: kind, id: row.reference_id}}))} selection={selection} change={setSelection} open={row => open(row.id)}/></>;

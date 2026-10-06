@@ -2,11 +2,20 @@ import {useLayoutEffect, useRef, useState, type ReactNode} from 'react';
 import {usePaneFocus} from '../interactions/pane-focus';
 import {ConsoleCue} from './ConsoleCue';
 
-export function ConsolePanes({panes, label = 'Diagnostics pane', layout = 'grid', focusRequest}: {panes: readonly {id: string; title: string; content: ReactNode; hidden?: boolean}[]; label?: string; layout?: 'grid' | 'workbench' | 'content' | 'single' | 'form'; focusRequest?: {pane: string; token: string}}) {
+export function ConsolePanes({panes, label = 'Diagnostics pane', layout = 'grid', focusRequest}: {panes: readonly {id: string; title: string; content: ReactNode; hidden?: boolean}[]; label?: string; layout?: 'grid' | 'workbench'; focusRequest?: {pane: string; token: string}}) {
   const available = panes.filter(pane => !pane.hidden);
   const [wide, setWide] = useState(false);
   const root = useRef<HTMLDivElement>(null);
   const {active, activate, activateFrom, pointerActivate} = usePaneFocus(root, available[0]!.id);
+  // Retained portal content follows its DOM pane, even when its React owner is outside this console.
+  useLayoutEffect(() => {
+    const node = root.current;
+    if (!node) return;
+    const pointer = (event: PointerEvent) => {if (event.target) pointerActivate(event.target);};
+    const focus = (event: FocusEvent) => {if (event.target) activateFrom(event.target);};
+    node.addEventListener('pointerdown', pointer, true); node.addEventListener('focusin', focus, true);
+    return () => {node.removeEventListener('pointerdown', pointer, true); node.removeEventListener('focusin', focus, true);};
+  }, [pointerActivate, activateFrom]);
   const selection = useRef(active);
   const fallbackPending = useRef(false);
   selection.current = active;
@@ -34,7 +43,7 @@ export function ConsolePanes({panes, label = 'Diagnostics pane', layout = 'grid'
     };
     update(); media.addEventListener('change', update); return () => media.removeEventListener('change', update);
   }, []);
-  return <div ref={root} className="operational-console" data-pane-layout={layout} data-layout={wide ? 'split' : 'switcher'} onPointerDown={event => pointerActivate(event.target)} onFocusCapture={event => activateFrom(event.target)}>
+  return <div ref={root} className="operational-console" data-pane-layout={layout} data-layout={wide ? 'split' : 'switcher'}>
     <div className="pane-switcher" role="group" aria-label={label} hidden={wide || available.length < 2}>
       {available.map(pane => <button key={pane.id} aria-pressed={active === pane.id} aria-controls={`console-${pane.id}`} onClick={() => activate(pane.id)}>{pane.title}</button>)}
     </div>

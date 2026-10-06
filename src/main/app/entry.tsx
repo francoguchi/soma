@@ -71,7 +71,7 @@ export function Application() {
     };
     addEventListener('popstate', pop); return () => removeEventListener('popstate', pop);
   }, []);
-  useEffect(() => {if (main.current) {main.current.scrollTop = context.current?.scrollTop ?? 0; main.current.focus();}}, [path, bootstrap?.auth_state]);
+  useEffect(() => {if (main.current) {main.current.scrollTop = context.current?.scrollTop ?? 0; if (!main.current.contains(document.activeElement) || !document.activeElement?.getClientRects().length) main.current.focus();}}, [path, bootstrap?.auth_state]);
   const reload = () => {setError(null); setRevision(value => value + 1);};
   if (error !== null) return <main className="auth-surface"><ErrorState error={error} retry={() => location.reload()}/></main>;
   if (!bootstrap) return <main className="auth-surface"><p role="status">Connecting to local SOMA...</p></main>;
