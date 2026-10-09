@@ -62,7 +62,7 @@
 <a id="ui-ref-workspace"></a>
 ## UI.REF.WORKSPACE
 
-Approved presentation authority is Foundation `../00/operational-ui.md`. The old unconditional three-column Reference Open layout is SUPERSEDED, not existing owner query/review/replay/working-copy semantics.
+Reference **interaction** baseline is Foundation `../00/operational-ui.md`; the V1 fixture/appearance was REJECTED. New visual design authority is DRAFT `../00/ui-v2-visual-goal.md`; actual editable frames need operator approval before Contact/Reference React work. The old unconditional three-column geometry remains superseded; accepted owner query/review/replay/working-copy semantics survive.
 
 Customers (`CustomerOrganization`), Contacts and Dispatch Locations are type subviews of the EXPANDED SAME Settings overlay, also reachable from owner-contextual invocation. No separate top-level Customers workspace. Existing /settings/profile, /settings/preferences, /settings/reference-data/{customer_organization|contact|dispatch_location}[/{id|new}] remain authenticated closed overlay-entry routes with safe origin fallback.
 

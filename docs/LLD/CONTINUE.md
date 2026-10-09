@@ -7,7 +7,7 @@ This is the single current-state entry point for humans and agents. Do not appen
 | Lane | Current value |
 |---|---|
 | Implementation scope | `01 — Identity / Reference` |
-| Implementation branch | `feat/01-identity-reference` |
+| Implementation branch | `feat/ui-v2-reconstruction` — isolated UI visual-design/reset branch (original preserved) |
 | Implementation goal | `IMP-01-06 — Reference and Settings workspaces` |
 | Implementation goal file | `docs/implementation/01/01.06.md` |
 | Implementation migration ledger | `docs/LLD/01/migration.md` |
@@ -17,8 +17,8 @@ This is the single current-state entry point for humans and agents. Do not appen
 | Design source | `SOMA Beta LLD-03 — Service Requests, RFCs, Device References, Ticket Relationships` |
 | Design migration ledger | `docs/LLD/02/migration.md` |
 | Overall migration map | `docs/LLD/MIGRATION.md` |
-| Mode | parallel design N+1 / implementation N |
-| Implementation note | SOMA-UI-ARCH-V1 Foundation Phase B synthetic fixture implemented/exercised; HUMAN VISUAL ACCEPTANCE pending. IMP-01-06 in_progress; R01.06-E pending owner searches; R01.06-F open for acceptance and live consumers. STOP before Contacts pilot. No Scope-02 implementation. |
+| Mode | UI V2 visual-design HOLD; Scope-02 design lane separate, no implementation |
+| Implementation note | V1 Phase-B TECHNICAL checks passed but operator VISUALLY REJECTED purple/cyan fixture. Draft Foundation UI.V2.VISUAL_GOAL is active; no UI code rollback yet and NO Codex or React work authorized. R01.06-E/F remain OPEN; IMP-01-06 in_progress. |
 | Design blocker | none; Scope 02 design resumes from the merged Foundation baseline |
 | Certification | deferred until whole-application implementation and live testing |
 
@@ -39,13 +39,13 @@ The intended handoff can be as small as:
 4. Implement, run the goal's focused checks plus directly affected tests, and fix failures.
 5. Update the goal's Run/Remaining/status, close its migration rows, then advance this file to the next implementation goal.
 
-Current checkpoint: 2026-10-09 Foundation Phase B synthetic fixture on `9164db0`: shared upper collection/conditional lower inspector, resizers, five-icon dock/context navigator, same-dialog Settings expansion and factual status exercised. 72 Main tests, typecheck/build/contracts, new and existing Foundation browser checks passed; 28 Chrome captures manually reviewed at `.tmp/operational-ui/`. New actual evidence is in IMP-01-06 Run, historical A..E runs retained. E and F OPEN; user visual acceptance pending. Live Reference/Settings consumers are not adapted yet.
+Current checkpoint: 2026-10-09 user rejected V1 synthetic fixture appearance despite 72 Main tests and 28 Chrome captures. Historical V1 interaction evidence remains intact but does not certify appearance. New clean isolated `feat/ui-v2-reconstruction` worktree at `0a5fe80`, original branch/worktree intact. UI V2 visual-design draft now lives in Foundation `docs/LLD/00/ui-v2-visual-goal.md`; references: supplied real SOMA Alpha/Zeus screenshots + sober btop borders. GitHub checkpoint is DOCUMENTATION ONLY; source UI still present, no rollback, no backend/DB changes.
 
-**Next agent action:** STOP for user visual acceptance of FOUNDATION fixture first. Read IMP-01-06 Run/Remaining and review `.tmp/operational-ui/review-all.png` plus full-size captures. Revise shared fixture if requested; do not begin Contacts until Foundation composition accepted. After that explicit acceptance, implement Contacts-first pilot using linked Foundation/Scope-01 authorities, then stop again for Contacts acceptance before Customer/Dispatch. Preserve owner rules and one-list semantics. No old permanent three-column Reference Open.
+**NEXT — HUMAN VISUAL DESIGN ONLY:** Build editable Figma/Penpot frames of icon-only dock, SOMA-only header, contextual navigation with reserved NONFUNCTIONAL command at its BOTTOM above separate factual full-width status, one upper collection/selected lower read-only Details and owner Context, square neutral-gray 1px separators, restrained blue focus, no violet/cyan/neon, compact same Settings-to-Reference overlay. Review real Ticket/SR and Contact/Reference representative frames at desktop/narrow/zoom, approve exact palette/spacing/font before React.
 
-**Hard gates:** Contact arbitrary-term name/email and Dispatch ordinary search require approved owner backend contracts. Cross-restart panel persistence requires approved Foundation storage. No fake Notes/mailbox, no working terminal, no database schema/reset or Scope-02 implementation.
+**DO NOT:** request Codex, implement React, integrate Contacts, remove source UI or reset DB as part of this design-only step. A separate explicitly authorized selective UI rollback must first inventory/preserve owner Core, auth/Diagnostics, TypeScript API/contracts/recovery, tests; `d89e616f...` is historical reference not wholesale reset. R01.06-E owner search and R01.06-F visual/live integration remain OPEN. No Scope-02 implementation.
 
-### Design lane
+### Design lane### Design lane
 
 1. Read the active design scope README and migration ledger.
 2. Read only the named Beta donor packet/files required for the behavior cluster being migrated.

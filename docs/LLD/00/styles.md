@@ -89,15 +89,7 @@ Required semantic token families include:
 - pane/status/navigation dimensions;
 - scrollbar track/thumb/hover/size.
 
-The initial Core Dark terminal-accent set is deliberately richer than the brand board while remaining semantic and restrained:
-
-- `command/current`: Electric-derived violet/lavender;
-- `info/section`: cool cyan/ice;
-- `success/ready`: muted green, never neon;
-- `warning`: subdued amber/gold;
-- `destructive/error`: muted coral/red.
-
-Strict complementary hue is **not** used for ordinary active-pane state when it would collide with warning/success semantics. Current-pane treatment uses a restrained Electric-derived rail/wash plus a friendlier highlighted title color; warning amber remains reserved for warnings.
+Historical V1 Core Dark uses Electric-derived violet/lavender for command/current and cyan for section structure. **V1 visual presentation was rejected by the operator. These are migration input, NOT UI V2 design authority.** V2 must use human-approved graphite neutrals, gray dividers and restrained blue focus/selection with semantic muted success/warning/destructive. Numeric proposals and visual gate: `ui-v2-visual-goal.md`.
 
 ### Shared primitives
 
@@ -119,9 +111,9 @@ The library owns at least these reusable visual primitives before future feature
 
 A feature may compose these into its own workbench without copying their CSS.
 
-### Approved SOMA operational visual grammar (2026-10-09)
+### UI V2 visual design gate (2026-10-09)
 
-Normative source: `operational-ui.md` SOMA-UI-ARCH-V1. Core Dark, SOMA-owned brand palette, semantic status colors and Diagnostics specialized layout remain. Violet/cyan are not mandatory as dominant decorative hues; do not assign arbitrary colors per workspace.
+**Visual direction:** `ui-v2-visual-goal.md` draft. V1 `operational-ui.md` remains an interaction reference only: the operator rejected its Phase-B purple/cyan look, and the prior screenshot set is not visual authority. Preserve functional Foundation and Diagnostics semantics; create editable visual frames for operator signoff before code.
 
 - Local consistent outline SVG icons: five-icon product dock, active subtle marker/background; global Settings gear; New plus, Search magnifier, Refresh arrow, pencil Edit and history clock. Accessible labels/focus/tooltip for icon-only commands.
 - Contextual second navigation column, stable collection toolbar, one upper list and selection-gated lower two panels. Creating shows only lower-left, no empty bordered Context.
@@ -139,7 +131,7 @@ Large pane chrome belongs to real independent regions (Diagnostics and selection
 
 Shared SectionHeading, ConsoleComment, explicit command/quiet/destructive actions and flex FormActions establish hierarchy without changing default Foundation controls. Save/Create commands stay compact rather than inheriting grid stretch. Local functional icons are sparse inline SVG, roughly 16px with consistent stroke/currentColor, decorative aria-hidden markup and visible command text; icon-only actions require an accessible name. No remote assets, emoji or icon runtime dependency.
 
-Core Dark keeps controlled violet/lavender navigation/command identity and cyan/blue structural/secondary interaction accents. Dedicated presentation tokens `--soma-accent-navigation` and `--soma-accent-structure` never assert business state. Green/amber/red remain success/warning/destructive semantics; no large painted backgrounds or color-only state. Icons, selected rows and key section labels carry small deliberate accent moments. Concise muted `//` comments provide supporting context without prefixing every paragraph or emulating a shell.
+V2 **prohibits violet/lavender navigation/command/current and decorative cyan structure**. Existing `--soma-accent-navigation`/`--soma-accent-structure` tokens are historical migration inputs, not final V2 values. Use approved neutral-gray borders, square panels, restrained blue selected/keyboard focus and semantic owner-provided green/amber/red only for actual states. No neon glow, gradients or decorative oversized cards.
 
 ### Search and discoverability composition
 

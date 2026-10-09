@@ -16,7 +16,7 @@
 
 # SOMA operational interface — SOMA-UI-ARCH-V1
 
-**Normative approved design, 2026-10-09. NOT implemented or certified by this document.** Foundation owns shared presentation/interactions, Scope 01 is first consuming implementation. Existing domain/query/auth/replay/UoW/audit/recovery authority is untouched. These UI items supersede the old permanent three-column Reference Open geometry, not historical tested behavior, deep links or owner contracts. MUST and MUST NOT are binding; SHOULD is a preference requiring reason to deviate.
+**Historical V1 INTERACTION reference — V1 VISUAL RESULT REJECTED by operator 2026-10-09.** Preserve selection/edit/Context/resizing/same-overlay interaction intent and existing domain/query/auth/replay/UoW/audit/recovery rules. The Phase-B fixture, V1 palette, exact visual geometry and screenshot are NOT approved for reuse. **For V2 appearance and before ANY new frontend rendering, see `ui-v2-visual-goal.md` (draft; explicit operator visual acceptance required).**
 
 ## Core invariant and visual map
 
@@ -28,7 +28,8 @@ One consistent SOMA desktop instrument: compact top chrome, FIVE workspace icon 
 [    ][       ][ONE UPPER COLLECTION                ]
 [    ][       ][=========== HORIZONTAL HANDLE =====]  <- selected only
 [    ][       ][DETAILS / EDITOR | CONTEXT          ]  <- selected only
-[STATUS + reserved future command area: run / READY]
+[BOTTOM OF CONTEXT NAV: reserved command] [WORKBENCH]
+[SEPARATE FULL-WIDTH STATUS: run / READY / schema]
 ```
 
 - No selected record: lower Details and Context and both split handles are ABSENT; upper list expands. Do not render empty placeholder panels.
@@ -136,7 +137,7 @@ One consistent SOMA desktop instrument: compact top chrome, FIVE workspace icon 
 
 **Visible result:** compact factual bottom strip showing run, READY, schema/trust etc; small space reserved for future shell-like command interface.
 
-- Not an editable fake `user@soma:~$` prompt. No current shell, arbitrary process, SQL, filesystem or network execution. Do not remove existing runtime truth.
+- V2 reserved command space sits at BOTTOM OF CONTEXTUAL NAVIGATION, LEFT of the workbench and ABOVE the separate full-width status strip. It is NOT an editable fake `user@soma:~$` prompt. No arbitrary process, SQL, filesystem or network execution. Do not remove runtime truth.
 - Future closed `cd settings/profile` resolves only via UI.ROUTING; `find <term>` only via real UI.SEARCH owner; separate approved parser goal required. Mutations would still use accepted auth/command/confirmation/replay/audit.
 - Narrow preserves readiness/run and labelled secondary fact access.
 

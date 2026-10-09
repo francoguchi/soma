@@ -4,7 +4,8 @@ Provide the runtime, persistence, security, time, API-contract, interaction, and
 
 - [Backend](backend.md)
 - [Frontend](frontend.md)
-- [Operational UI contract](operational-ui.md)
+- [Operational UI interaction history](operational-ui.md)
+- [UI V2 visual goal — draft](ui-v2-visual-goal.md)
 - [Style library](styles.md)
 - [Checks](checks.md)
 - [Contracts](contracts/README.md)

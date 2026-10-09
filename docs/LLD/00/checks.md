@@ -230,6 +230,7 @@
       "covers": ["TOOLING.IMPACT"]
     }
     ,{"id":"CHK00.UI.OPERATIONAL_ARCH","anchor":"chk-ui-operational-arch","covers":["UI.OPERATIONAL_LAYOUT","UI.RECORD_INSPECTOR","UI.CONTEXT_REGION","UI.PANEL_RESIZE","UI.ADAPTIVE_OVERLAY","UI.PROGRESS_SEGMENTED","UI.COMMAND_RESERVATION"]}
+    ,{"id":"CHK00.UI.V2.VISUAL_REVIEW","anchor":"chk-ui-v2-visual-review","covers":["UI.V2.VISUAL_GOAL","UI.VISUAL_GRAMMAR","UI.STYLE_LIBRARY","UI.OPERATIONAL_LAYOUT"]}
   ],
   "tags": ["foundation", "checks"]
 }
@@ -332,7 +333,7 @@ At wide desktop verify:
 - pane sizing may be intentionally asymmetric when information density differs; an equal four-card dashboard is not required;
 - navigation/status/data chrome uses the intended monospace hierarchy while long explanatory/help text remains readable;
 - page title, pane heading and compact label/value/evidence text are visibly distinct hierarchy levels;
-- Electric-blue-derived accent identifies the current interaction locus sparingly rather than decorating every heading;
+- Old Electric-derived V1 accent is not V2 acceptance. V2 requires a human-approved sparse BLUE current/focus with neutral graphite backgrounds and gray delimiters, no purple/lavender and no cyan/green decorative glow;
 - normal controls are compact/flat enough to read as operational actions and large full-width CTA treatment is limited to genuine gates/consequential narrow actions;
 - no decorative whitespace occupies more visual attention than the facts/actions it separates.
 
@@ -532,3 +533,12 @@ With synthetic owner-neutral fixture prove: one upper list without selection and
 Test horizontal+vertical resize pointer/keyboard, clamp/reset, per-workspace session ratios, no accidental row selection or unapproved persistent storage. Test 1440/1040/1039/390px, constrained height, 200% zoom, forced colors/reduced motion, independent scroll and correct footer.
 
 Compact Settings overlays a synthetic dirty workspace; SAME dialog expands Reference Manager and collapses; origin selected record, focus, tab, scroll, query and draft survive. Verify safe closed deep route and unsaved dismissal. No invented Notes/messages, arbitrary owner search or fake CLI. Segmented progress only uses actual owner numbers. Manually inspect screenshots; historical green tests are not V1 acceptance.
+
+<a id="chk-ui-v2-visual-review"></a>
+## CHK00.UI.V2.VISUAL_REVIEW
+
+Human design gate, NOT green merely because synthetic Phase-B tests passed. Compare editable desktop (1440x900), 1040px, 390px, constrained-height and 200%-zoom frames side by side with the operator's SOMA Alpha/Zeus workbench screenshots and sober btop framing. Verify accessible 100% text and keyboard/focus/forced-colors legibility.
+
+MUST show: SOMA title without “Local Operations”; five icon-only workspace dock with labels via tooltip/ARIA; contextual navigation; **reserved command at contextual-nav BOTTOM** above SEPARATE factual full-width status; one upper list expanding if unselected; selection-gated lower-left read-only/pencil edit and lower-right real owner Context; resizable gray lines; near-square compact controls; same-dialog compact-to-expanded Settings preserving background.
+
+MUST reject: purple/lavender chrome, green/teal/cyan neon, gradients/glows, giant empty panel, fictional Notes/mailbox/provider data, fake CLI, duplicated collections, unreadably tiny text, missing real screenshot access, or modal replacing workspace. Record final design-file version, actual visual comparisons, operator acceptance date and final dimensions/tokens BEFORE code. Existing V1 tests/screenshots are historical interaction evidence only; NO V2 visual acceptance is claimed now.

@@ -130,7 +130,7 @@ Retain Profile/display-name/auth isolation, no username field, default-vs-persis
 <a id="chk01-ui-polish"></a>
 ## CHK01.UI.POLISH
 
-Normative NEW visual authority: `../00/operational-ui.md`, NOT old three-column Reference workbench. Using Customer/Contact/Dispatch real owner data assert:
+V1 interaction checks remain regressions, but V1 fixture FAILED operator visual acceptance. UI V2 visual work FIRST: `../00/ui-v2-visual-goal.md` and CHK00.UI.V2.VISUAL_REVIEW. No new Contact/Reference React integration or visual-complete claim until accepted editable frames. Using Customer/Contact/Dispatch real owner data assert:
 
 - No selection -> ONE full-height upper list; no empty lower panes or splitter handles.
 - Clicking eligible record -> lower-left read-only Details plus lower-right real owner Context; selection does not auto Edit/mutate/link. Switching updates both safely, supersedes stale reads and retains query/page/cursor/scroll.
