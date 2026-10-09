@@ -51,7 +51,7 @@ export function useOwnerAction() {
 }
 export function Field({label, value, change, multiline = false, disabled = false, required = false, maximum = 1024}: {label: string; value: string; change: (value: string) => void; multiline?: boolean; disabled?: boolean; required?: boolean; maximum?: number}) {
   const id = useId(), bytes = new TextEncoder().encode(value).length;
-  return <div className="form-field"><label htmlFor={id}>{label}</label>{multiline ? <textarea id={id} aria-describedby={id + '-bound'} value={value} disabled={disabled} required={required} rows={4} onChange={e => change(e.target.value)}/> : <input id={id} aria-describedby={id + '-bound'} value={value} disabled={disabled} required={required} onChange={e => change(e.target.value)}/>}<small id={id + '-bound'}>{bytes > maximum ? `${bytes} UTF-8 bytes exceeds the ${maximum}-byte field bound. Correct the value before saving.` : `Maximum ${maximum} UTF-8 bytes.`}</small></div>;
+  return <div className="form-field"><label htmlFor={id}>{label}</label>{multiline ? <textarea id={id} aria-describedby={bytes > maximum ? id + '-bound' : undefined} value={value} disabled={disabled} required={required} rows={4} onChange={e => change(e.target.value)}/> : <input id={id} aria-describedby={bytes > maximum ? id + '-bound' : undefined} value={value} disabled={disabled} required={required} onChange={e => change(e.target.value)}/>} {bytes > maximum && <small id={id + '-bound'} role="alert">Shorten this value before saving. {bytes} UTF-8 bytes exceeds the {maximum}-byte field bound.</small>}</div>;
 }
 export function Section({title, children}: {title: string; children: ReactNode}) {return <section><h3>{title}</h3>{children}</section>;}
 

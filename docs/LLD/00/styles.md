@@ -133,7 +133,7 @@ Core Dark keeps controlled violet/lavender navigation/command identity and cyan/
 
 Shared search, navigation-tab and action variants are Foundation primitives. Feature scopes do not independently recreate their placement, disabled state, icon treatment, active-state grammar or ordinary empty/no-result copy.
 
-A search affordance follows `UI.SEARCH`: it is visually stable wherever owner search exists, reflects authoritative-source availability rather than current-page coincidence, and never masquerades client-side page filtering as complete search.
+A compact search toolbar and sticky collection command zone follow `UI.SEARCH`; expert fields use collapsed disclosure and never displace the list navigator. A search affordance follows `UI.SEARCH`: it is visually stable wherever owner search exists, reflects authoritative-source availability rather than current-page coincidence, and never masquerades client-side page filtering as complete search.
 
 Discoverability outranks decorative terminal resemblance. Navigation, search, commands, selection and evidence must remain distinguishable at a glance. Whole-surface navigation appears at the scope it controls. Concise `//` comments may support an action or state, but primary usability never requires shell literacy.
 

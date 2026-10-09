@@ -18,7 +18,7 @@ This is the single current-state entry point for humans and agents. Do not appen
 | Design migration ledger | `docs/LLD/02/migration.md` |
 | Overall migration map | `docs/LLD/MIGRATION.md` |
 | Mode | parallel design N+1 / implementation N |
-| Implementation note | IMP-01-06 is reopened for final usability/polish acceptance. R01.06-A..D remain closed; R01.06-E is the active refinement. The Browse/Create/Open ownership model is accepted, but search consistency, discoverability, copy, empty states, collection-row state, action placement and workbench-level navigation still require polish. Scope-01 remains at its final goal; no Scope-02 implementation is started. |
+| Implementation note | IMP-01-06 remains in_progress; R01.06-A..D are closed and E is pending. One retained collection, compact supported Customer search, collapsed expert matching/history and fixed commands are implemented and exercised. Contact arbitrary-term name-or-email and Dispatch default search lack approved owner contracts; see goal Remaining/frontend gap proposals. No Scope-02 implementation. |
 | Design blocker | none; Scope 02 design resumes from the merged Foundation baseline |
 | Certification | deferred until whole-application implementation and live testing |
 
@@ -39,7 +39,7 @@ The intended handoff can be as small as:
 4. Implement, run the goal's focused checks plus directly affected tests, and fix failures.
 5. Update the goal's Run/Remaining/status, close its migration rows, then advance this file to the next implementation goal.
 
-Current checkpoint: pushed UI checkpoint `20dfdcdaa72f1c47858e21dac3bc6f464e8b1650` completed R01.06-D's visual-grammar restoration, but subsequent review found remaining usability friction. R01.06-E is now the active Scope-01 implementation refinement.
+Current checkpoint: the single-collection correction is implemented in the existing working tree on feat/01-identity-reference. All 69 Main, 15 consumed owner query/API/shared-browser and the authenticated Reference/Settings workflow passed; actual results and reviewed capture evidence are in IMP-01-06. R01.06-E is deliberately open for the default-search contract gaps.
 
 Accepted and preserved:
 - Browse is collection/search oriented and renders no empty Work/Evidence panes.
@@ -48,7 +48,7 @@ Accepted and preserved:
 - collection/filter/selection/page/scroll/working-copy context survives accepted navigation and return paths.
 - current Foundation navigation/icon/accent/action grammar remains the baseline.
 
-R01.06-E must standardize shared owner-backed search placement/state, remove duplicate or technical operator copy, correct collection-row selected/open/focus presentation, clarify command versus navigation hierarchy, resolve redundant Back/Cancel semantics, move whole-workbench navigation outside child panes, improve empty/no-result states, and preserve vivid but restrained SOMA Core Dark hierarchy.
+Next Scope-01 decision: approve owner-backed Contact term search within an explicit affiliation scope and bounded Dispatch exact-name search. Existing Contact raw_email requires email syntax; Dispatch exposes no search/match route. Until approved, retain truthful unavailable default controls and existing advanced matching. Do not change the backend silently, close E, or start Scope-02 implementation.
 
 Foundation now records `UI.SEARCH` as the common search contract. A future shell-like SOMA command surface is also recorded as **deferred design only**: examples such as `operator@soma:~$ cd settings/profile` and `operator@soma:~$ find <term>` may later map onto closed routing and owner search contracts. It is not arbitrary OS shell execution and no fake/disabled command bar is required in this refinement.
 

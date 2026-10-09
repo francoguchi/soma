@@ -1,13 +1,16 @@
 import {useRef, useState} from 'react';
 import {afterEach, expect, test, vi} from 'vitest';
-import {cleanup, fireEvent, render, screen, waitFor} from '@testing-library/react';
+import {cleanup, fireEvent, render, screen, waitFor, within} from '@testing-library/react';
 import {api, ApiError, ApiInputError, ApiClient} from '../shared/api/client';
 import {resolveRoute} from '../app/router';
-import {Candidates} from '../features/reference/components/Candidates';
+import {ReferenceCollection} from '../features/reference/ReferenceCollection';
 import {Field, useOwnerAction} from '../features/reference/model';
 import {useWorkingIntent} from '../shared/interactions/use-working-intent';
 import {AppearancePreference} from '../shared/appearance-preference';
 import {Lifecycle} from '../features/reference/components/Lifecycle';
+import {ReferenceSurface} from '../features/reference/ReferenceSurface';
+import {SelectableCollection} from '../shared/collections/SelectableCollection';
+import {emptySelection} from '../shared/interactions/selection';
 
 afterEach(() => {cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals();});
 const id = '4d204e28-3a66-43cb-81ca-a31cc94c9b11';
@@ -20,17 +23,89 @@ test('contextual reference routes remain under Settings and reject unknown or in
 });
 
 test('an exact unique candidate is evidence and opens only after explicit activation', async () => {
-  vi.spyOn(api, 'request').mockImplementation(async path => (path.endsWith('/identities') ? {items: [{reference_id: id, name: 'Customer', lifecycle_state: 'active', revision: 1}]} : {candidate_ids: [id], state: 'UNIQUE_CANDIDATE', candidate_count: 1, explanation: 'ACCOUNT_CODE_MATCH', continuation: null}) as never);
+  vi.spyOn(api, 'request').mockImplementation(async path => (path.endsWith('/identities') ? {items: [{reference_id: id, name: 'Customer', lifecycle_state: 'active', revision: 1}]} : path.includes('/match/') ? {candidate_ids: [id], state: 'UNIQUE_CANDIDATE', candidate_count: 1, explanation: 'ACCOUNT_CODE_MATCH', continuation: null} : {items: [{reference_id: id, name: 'Customer', lifecycle_state: 'active', revision: 1}], exact_count: 1, continuation: null, as_of_utc_s: 0}) as never);
   const open = vi.fn();
-  render(<Candidates kind="customer_organization" open={open}/>);
+  render(<ReferenceCollection kind="customer_organization" refresh={0} currentId={null} open={open}/>);
+  await waitFor(() => expect(screen.getByRole('search').getAttribute('data-search-source')).toBe('available'));
+  fireEvent.click(screen.getByRole('button', {name: 'Advanced search'}));
   fireEvent.change(screen.getByLabelText('Match Account Code'), {target: {value: 'CODE'}});
   fireEvent.click(screen.getByRole('button', {name: 'Find candidates'}));
-  await screen.findByText('UNIQUE_CANDIDATE · 1 exact candidates');
+  await screen.findByText('Unique candidate · 1 exact candidate');
+  expect(screen.getByText(/Matched by Account Code/)).toBeTruthy();
+  expect(screen.getAllByRole('grid')).toHaveLength(1);
+  expect(screen.queryByText('1 record')).toBeNull();
+  expect(screen.getByRole('button', {name: 'Advanced search'}).getAttribute('aria-expanded')).toBe('false');
   expect(open).not.toHaveBeenCalled();
-  fireEvent.click(screen.getByRole('row'));
+  fireEvent.click(screen.getByRole('button', {name: 'Open Customer'}).closest('[role=row]')!);
   expect(open).not.toHaveBeenCalled();
-  fireEvent.click(screen.getByRole('button', {name: 'Open Customer · revision 1'}));
+  fireEvent.click(screen.getByRole('button', {name: 'Open Customer'}));
   expect(open).toHaveBeenCalledExactlyOnceWith(id);
+});
+
+test.each([0, 7])('search uses the authoritative count (%i), not the current empty page', async count => {
+  vi.spyOn(api, 'request').mockResolvedValue({items: [], continuation: null, exact_count: count, as_of_utc_s: 0} as never);
+  function Fixture() {const root = useRef<HTMLDivElement>(null); return <div ref={root}><ReferenceSurface path="/settings/reference-data/customer_organization" navigate={() => {}} application={root}/></div>;}
+  render(<Fixture/>);
+  await waitFor(() => expect(screen.getByRole('search', {name: 'Search Customers'}).getAttribute('data-search-source')).toBe(count === 0 ? 'empty' : 'available'));
+  const input = within(screen.getByRole('search', {name: 'Search Customers'})).getByRole('textbox', {name: 'Search Customers'}) as HTMLInputElement;
+  expect(input.matches(':disabled')).toBe(count === 0);
+  if (count === 0) expect(screen.getByRole('search', {name: 'Search Customers'}).textContent).toContain('No active records to search yet.');
+  else {fireEvent.change(input, {target: {value: 'Beyond this page'}}); expect((within(screen.getByRole('search', {name: 'Search Customers'})).getByRole('button', {name: 'Search'}) as HTMLButtonElement).matches(':disabled')).toBe(false);}
+});
+
+test('an unavailable source exposes a reason and disables owner search without a local fallback', async () => {
+  const request = vi.spyOn(api, 'request').mockRejectedValue(new Error('Unavailable'));
+  function Fixture() {const root = useRef<HTMLDivElement>(null); return <div ref={root}><ReferenceSurface path="/settings/reference-data/customer_organization" navigate={() => {}} application={root}/></div>;}
+  render(<Fixture/>);
+  await waitFor(() => expect(screen.getByRole('search', {name: 'Search Customers'}).getAttribute('data-search-source')).toBe('unavailable'));
+  expect((within(screen.getByRole('search', {name: 'Search Customers'})).getByRole('textbox', {name: 'Search Customers'}) as HTMLInputElement).matches(':disabled')).toBe(true);
+  expect(screen.getByRole('search', {name: 'Search Customers'}).textContent).toContain('Search is unavailable.');
+  expect(request.mock.calls.some(call => call[0].includes('/match/'))).toBe(false);
+});
+
+test('default search changes the one collection with owner union evidence and clear restores browsing', async () => {
+  const row = {reference_id: id, name: 'Customer', lifecycle_state: 'active', revision: 1};
+  const request = vi.spyOn(api, 'request').mockImplementation(async path => (path.endsWith('/identities') ? {items: []} : path.includes('/match/') ? {candidate_ids: [], state: 'UNRESOLVED', candidate_count: 0, explanation: 'NO_CANONICAL_CANDIDATE', continuation: null} : {items: [row], exact_count: 1, continuation: null, as_of_utc_s: 0}) as never);
+  render(<ReferenceCollection kind="customer_organization" refresh={0} currentId={null} open={() => {}}/>);
+  await screen.findByText('1 record');
+  const input = screen.getByRole('textbox', {name: 'Search Customers'});
+  fireEvent.change(input, {target: {value: 'Missing'}});
+  fireEvent.click(screen.getByRole('button', {name: 'Search'}));
+  await screen.findByText('No exact candidates');
+  expect(screen.queryByRole('button', {name: 'Open Customer'})).toBeNull();
+  expect(document.body.textContent).not.toMatch(/0 records|0 matching|0 exact/u);
+  expect(request.mock.calls.find(call => call[0].includes('/match/'))?.[2]?.body).toEqual({raw_name: 'Missing', raw_account_code: 'Missing', limit: 50});
+  expect(input.matches(':disabled')).toBe(false);
+  fireEvent.click(screen.getByRole('button', {name: 'Clear search'}));
+  await screen.findByText('1 record');
+  expect(screen.getAllByRole('grid')).toHaveLength(1);
+});
+
+test('default Contact and Dispatch search disclose contract gaps while advanced Contact matching remains available', async () => {
+  vi.spyOn(api, 'request').mockResolvedValue({items: [], exact_count: 1, continuation: null, as_of_utc_s: 0} as never);
+  const view=render(<ReferenceCollection kind="contact" refresh={0} currentId={null} open={() => {}}/>);
+  await screen.findByText(/Name-or-email search is not supported/);
+  expect(screen.getByRole('textbox', {name: 'Search Contacts'}).matches(':disabled')).toBe(true);
+  fireEvent.click(screen.getByRole('button', {name: 'Advanced search'}));
+  await waitFor(() => expect(screen.getByLabelText('Match name').matches(':disabled')).toBe(false));
+  view.unmount();
+  render(<ReferenceCollection kind="dispatch_location" refresh={0} currentId={null} open={() => {}}/>);
+  await screen.findByText('Search is not available for Dispatch Locations.');
+  expect(screen.getByRole('textbox', {name: 'Search Dispatch Locations'}).matches(':disabled')).toBe(true);
+});
+
+test('selection, opened identity and arrow focus preserve the clean record name', () => {
+  const rows = [{id, label: 'Customer', cells: ['Customer', 1], eligible: true, route: {type: 'customer_organization', id}}, {id: 'other', label: 'Other', cells: ['Other', 1], eligible: true, route: {type: 'customer_organization', id: 'other'}}];
+  function Fixture() {const [selection, change] = useState(emptySelection); return <SelectableCollection rows={rows} columns={['Name', 'Revision']} currentId={id} selection={selection} change={change} open={() => {}}/>;}
+  render(<Fixture/>);
+  const row = screen.getByRole('button', {name: 'Open Customer'}).closest('[role=row]')!;
+  fireEvent.click(row);
+  expect(row.querySelector('[data-record-name]')?.textContent).toBe('Customer');
+  expect(row.querySelector('.collection-row-state')?.textContent).toBe('SelectedOpened');
+  fireEvent.keyDown(row, {key: 'ArrowDown'});
+  expect(row.getAttribute('aria-selected')).toBe('true');
+  expect(row.getAttribute('aria-current')).toBe('true');
+  expect(screen.getByRole('button', {name: 'Open Other'}).closest('[role=row]')).toBe(document.activeElement);
 });
 
 test('oversized UTF-8 intent remains intact and is rejected before sending a command', async () => {
@@ -103,4 +178,20 @@ test('blocked or unavailable dependency evidence never enables archive', async (
   fireEvent.click(screen.getByRole('button', {name: 'Preview archive dependencies'}));
   await screen.findByText('Dependency validation is unavailable.');
   expect((screen.getByRole('button', {name: 'Archive reference…'}) as HTMLButtonElement).disabled).toBe(true);
+});
+test('clearing a search restores the ordinary cursor instead of restarting its first page', async () => {
+  const first={reference_id:id,name:'First',lifecycle_state:'active',revision:1};
+  const second={...first,reference_id:'other',name:'Second'};
+  const request=vi.spyOn(api,'request').mockImplementation(async path => (path.endsWith('/identities') ? {items: []} : path.includes('/match/') ? {candidate_ids: [],state:'UNRESOLVED',candidate_count:0,explanation:'NO_CANONICAL_CANDIDATE',continuation:null} : {items:[path.includes('after=more') ? second : first],exact_count:2,continuation:path.includes('limit=1') || path.includes('after=more') ? null : 'more',as_of_utc_s:0}) as never);
+  render(<ReferenceCollection kind="customer_organization" refresh={0} currentId={null} open={()=>{}}/>);
+  await screen.findByRole('button',{name:'Open First'});
+  fireEvent.click(screen.getByRole('button',{name:'Next page'}));
+  await screen.findByRole('button',{name:'Open Second'});
+  fireEvent.change(screen.getByRole('textbox',{name:'Search Customers'}),{target:{value:'Missing'}});
+  fireEvent.click(screen.getByRole('button',{name:'Search'}));
+  await screen.findByText('No exact candidates');
+  fireEvent.click(screen.getByRole('button',{name:'Clear search'}));
+  await screen.findByRole('button',{name:'Open Second'});
+  await waitFor(()=>expect(request.mock.calls.filter(call=>call[0].includes('after=more'))).toHaveLength(2));
+  expect(screen.queryByRole('button',{name:'Open First'})).toBeNull();
 });

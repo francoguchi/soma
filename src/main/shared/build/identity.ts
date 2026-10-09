@@ -5,7 +5,7 @@ export const buildIdentity = {
   "contract_generation": 1,
   "migration_generation": 10,
   "schema_generation": 10,
-  "source_commit": "fe7392e740df8e6add486273565c6844ac184dd8",
+  "source_commit": "f4a6a961399e8b33ed3f3ca6dbfd60dee66e7539",
   "dirty": true,
   "build_kind": "source"
 } as const;

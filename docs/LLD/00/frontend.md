@@ -343,7 +343,7 @@ The command surface is another interface to the same application semantics, neve
 - Default requested page size is 100 and no shared collection requests more than QUERY.PAGE's maximum 200.
 - Main never decodes or edits opaque server cursor internals.
 - At most 200 rows/items from one collection surface are retained in the ordinary DOM at once unless an owning item explicitly defines a stricter/specialized presentation.
-- New filter/order input supersedes prior request identity; stale responses are discarded.
+- New filter/order input supersedes prior request identity; stale responses are discarded. A shared collection may retain at most eight bounded query-page/cursor/scroll contexts for accepted return/Clear behavior while rendering only one page. Revisited evidence is stale until the owner query refreshes.
 - Reaching a bound exposes partial/additional-results state and never silently drops selected IDs, warnings, dirty fields, or accepted rows.
 - Server/owner owns total/filter/order semantics; UI does not resort a partial page as though it were the complete dataset.
 
@@ -362,7 +362,8 @@ The command surface is another interface to the same application semantics, neve
 **Rules:**
 - Shared search owns presentation and interaction mechanics; domain owners own query semantics, scope, ordering, bounds and result truth.
 - Search never silently filters only the currently loaded bounded page when the authoritative searchable set may be larger.
-- Search controls remain in a predictable collection-associated location.
+- Search controls remain compact in a predictable collection-associated command zone across browsing and an opened inspection workbench. Supported default search uses one entry field; expert evidence fields remain in a collapsed Advanced search disclosure.
+- Search replaces the query represented by the owner's primary collection instead of adding a competing result list. Ordinary collection and exact-candidate modes remain semantically distinguishable; owner evidence/count/ambiguity is presented once and opening a result is never implicit acceptance.
 - Owner-specific search may use one field, multiple exact-evidence fields or a bounded chooser; those variations retain common search iconography/state/action grammar.
 - Search state distinguishes idle, disabled-empty-source, unavailable, loading, results, no-results, partial/additional-results and error.
 - A known-empty authoritative searchable source leaves the affordance recognisable but disabled with a concise accessible explanation.

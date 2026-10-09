@@ -62,17 +62,16 @@
   background: var(--soma-selection);
 }
 
-.selectable-collection [aria-selected=true] [role=gridcell]:first-child:before {
-  content: 'Selected';
-  font-size: 11px;
-  font-weight: 700;
-}
+.collection-row-state {display:flex; flex-wrap:wrap; gap:6px; font:10px var(--soma-font-code); color:var(--soma-accent-navigation);}
+.collection-row-state:empty {display:none;}
+.collection-controls {position:sticky; top:0; z-index:2; background:var(--soma-canvas); padding-block:var(--soma-space-2);}
+.collection-summary p {font-size:12px; margin-block:var(--soma-space-2); overflow-wrap:anywhere;}
 
 .selectable-collection [aria-disabled=true] {
   color: var(--soma-text-disabled);
 }
 
-.selectable-collection .active-row {
+.selectable-collection [role=row]:focus-visible {
   border-inline-start: 3px solid var(--soma-focus);
 }
 
@@ -117,4 +116,3 @@
 
 .selectable-collection [aria-current=true] {border-inline-start:2px solid var(--soma-accent-navigation);}
 .selectable-collection[data-structured=true] [role=gridcell]:first-child {display:block;}
-.selectable-collection [aria-current=true] [role=gridcell]:first-child:after {display:block; white-space:nowrap;content:'Opened'; color:var(--soma-accent-navigation); font-size:10px;}

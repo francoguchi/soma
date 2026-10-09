@@ -71,20 +71,13 @@ Reference workspaces expose immutable identity and lifecycle/revision evidence w
 
 ### Browse/search composition
 
-Reference Browse consumes Foundation `UI.SEARCH` wherever the current owner exposes bounded search or exact-evidence lookup. Search placement is stable across Customer, Contact and Dispatch browse surfaces even when owner-specific fields differ.
+For each reference type there is one primary collection and one selection model across Browse and Open. The ordinary active-list query, default exact search and expert matching are distinct query modes of that same visual list; no candidate grid is rendered alongside the ordinary grid. One server-owned count/ambiguity summary accompanies the active query. A unique candidate is still read-only evidence; explicit Open never accepts a relationship. Account Code review can show claimants in the primary collection without creating a second grid inside Details.
 
-The search affordance reflects the authoritative owner/search source:
+The fixed collection command zone owns New/Refresh. A compact Foundation search input plus Search/Clear/Advanced search controls appears immediately above the list in Browse and the Open collection pane. Advanced search begins collapsed and closes on submission/open; exact fields, Contact affiliation scope and historical identity lookup remain available there. Search inputs, query mode, selected/opened identity, cursor/page and scroll survive Open/return and Settings visits. Clear restores the retained ordinary collection context. At most eight bounded query-page contexts are cached by the shared collection; only one page is rendered. Focus and selection remain Foundation-owned and independent of explicit Open. Create remains a guarded focused form.
 
-- known searchable source with eligible records -> enabled;
-- authoritative searchable source known empty -> remains recognisable but disabled with a concise accessible reason;
-- source/capability unavailable -> disabled/unavailable with a concise reason;
-- empty current bounded page alone -> does not disable broader valid owner search.
+Current supported default search: Customer sends the same term to the existing exact `raw_name` and `raw_account_code` match fields, under their common 512-byte input ceiling. It preserves union/ambiguity evidence and signed owner paging rather than claiming fuzzy/general list filtering. Longer exact names use Advanced search. Contact's existing match route requires one Customer UUID or `UNBOUND` and fully validates any supplied `raw_email` as an email address; passing arbitrary free text to both name and email is invalid. No unqualified or global name-or-email term contract exists. Dispatch has an active-list route but no search/match route. Those default search inputs remain visibly disabled with concise explanations; expert scoped Contact matching remains enabled whenever the authoritative source permits it. These are open acceptance limitations, not implemented backend extensions.
 
-Reference never filters only the currently loaded bounded page while presenting that subset as complete search truth.
-
-Browse empty state shows one primary explanation and one useful next action. Generic page/count machinery stays hidden when it adds no operator value.
-
-Collection rows present record identity separately from selection/open/focus evidence. `Selected`, `Opened`, lifecycle state and revision never concatenate into the human-readable record name.
+Safest owner proposal, pending approval: define a separate bounded read-only Contact term-search contract with mandatory accepted affiliation scope, owner-controlled name/email applicability and deduplicated exact union/count/signed cursor evidence; retain strict expert matching unchanged. Define a bounded Dispatch exact-name search contract using its existing name authority, with explicit fields/bounds/order/cursor/empty/error semantics. No fuzzy/global API, unbounded enumeration, client page filtering or schema/audit/replay/UoW change is authorized by this correction.
 
 <a id="ui-ref-candidates"></a>
 ## UI.REF.CANDIDATES
@@ -162,9 +155,9 @@ When only one registered preference is currently renderable, Settings presents i
 
 The Settings routes are `/settings/profile`, `/settings/preferences`, and `/settings/reference-data/{customer_organization|contact|dispatch_location}[/{id|new}]`; contextual routes never add primary workspace labels. Core supplies the same closed route grammar to Foundation static serving. Settings capability availability comes from the actual composed Reference/Settings owner.
 
-Settings uses Foundation section/tab grammar: one `$ Settings` page title, Profile/Preferences/Reference data sub-navigation and specific content headings. Profile is a bounded ordinary section with current display-name evidence, editable field, compact Save and sign-in comment. Preferences renders the sole registered Appearance definition directly; multiple definitions use compact registry-generated sub-navigation, never arbitrary key/value editing.
+Settings uses Foundation section/tab grammar: one `$ Settings` page title, Profile/Preferences/Reference data sub-navigation and specific content headings. Profile is a bounded ordinary section with one editable display-name field, compact Save and sign-in comment. Preferences renders the sole registered Appearance definition directly; multiple definitions use compact registry-generated sub-navigation, never arbitrary key/value editing.
 
-Reference type navigation is secondary to Settings navigation. Browse is ordinary content, with entity heading and New <type>/quiet Refresh actions, structured Name/Revision/Open rows and one pristine empty message. Exact matching and historical identity tools are collapsed utilities. Create is a bounded non-pane form with secondary back/cancel and compact primary creation command; it has no collection/work/evidence chrome before an accepted identity.
+Reference type navigation is secondary to Settings navigation. Browse is ordinary content, with entity heading and New <type>/quiet Refresh actions, structured Name/Revision/Open rows and one pristine empty message. Compact default search sits above the single list; exact matching and historical lookup belong to collapsed Advanced search. Create is a bounded non-pane form with one Cancel return action and compact primary creation command; it has no collection/work/evidence chrome before an accepted identity.
 
 Only Open uses the retained three-pane collection / Details / Evidence & history workbench. Section labels identify entity details, Account Code, Lifecycle, Identity, Channels, Affiliation, Address source and History as applicable. Narrow mode switches the same three panes. Collection models and DOM are retained independently of presentation containers across Browse/Open/Create and Settings visits, preserving filters, selection, cursor/page, matching inputs, scroll and open/return context. Back/Cancel consumes Foundation unsaved-navigation/recovery protections. Refresh does not reset collection pagination.
 
