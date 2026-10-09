@@ -22,19 +22,19 @@
 }
 
 .modal {
-  max-width: 680px;
-  width: 100%;
-  max-height: calc(100dvh - 32px);
+  max-width: var(--soma-modal-max-width,680px);
+  width: var(--soma-modal-width,100%);
+  max-height: var(--soma-modal-max-height,calc(100dvh - 32px));
   overflow: auto;
-  padding: 24px;
+  padding: var(--soma-modal-padding,24px);
   background: var(--soma-surface);
   border: 1px solid var(--soma-border);
   border-radius: var(--soma-radius-control);
 }
 
-.modal h2 {
+.modal>h2 {
   position: sticky;
-  top: -24px;
+  top: var(--soma-modal-title-top,-24px);
   background: var(--soma-surface);
   padding-block: 12px;
   z-index: 1;

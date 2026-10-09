@@ -18,7 +18,7 @@ This is the single current-state entry point for humans and agents. Do not appen
 | Design migration ledger | `docs/LLD/02/migration.md` |
 | Overall migration map | `docs/LLD/MIGRATION.md` |
 | Mode | parallel design N+1 / implementation N |
-| Implementation note | Approved SOMA-UI-ARCH-V1 is **DESIGN ONLY** in `docs/LLD/00/operational-ui.md`. IMP-01-06 in_progress; R01.06-E remains pending Contact/Dispatch owner searches; R01.06-F pending new Foundation upper collection/lower Details+Context, resizing, same-overlay Settings and Contacts-first pilot. No Scope-02 implementation. |
+| Implementation note | SOMA-UI-ARCH-V1 Foundation Phase B synthetic fixture implemented/exercised; HUMAN VISUAL ACCEPTANCE pending. IMP-01-06 in_progress; R01.06-E pending owner searches; R01.06-F open for acceptance and live consumers. STOP before Contacts pilot. No Scope-02 implementation. |
 | Design blocker | none; Scope 02 design resumes from the merged Foundation baseline |
 | Certification | deferred until whole-application implementation and live testing |
 
@@ -39,13 +39,13 @@ The intended handoff can be as small as:
 4. Implement, run the goal's focused checks plus directly affected tests, and fix failures.
 5. Update the goal's Run/Remaining/status, close its migration rows, then advance this file to the next implementation goal.
 
-Current checkpoint: 2026-10-09 approved user wireframe/prototype reconciled as normative **SOMA-UI-ARCH-V1** in `docs/LLD/00/operational-ui.md`, Foundation frontend/styles/checks, Scope-01 frontend/checks, implementation goal and ledgers. This is DOCUMENTATION ONLY; no new UI code or V1 green-browser results claimed. Existing R01.06-A..D closure history intact; E and F OPEN.
+Current checkpoint: 2026-10-09 Foundation Phase B synthetic fixture on `9164db0`: shared upper collection/conditional lower inspector, resizers, five-icon dock/context navigator, same-dialog Settings expansion and factual status exercised. 72 Main tests, typecheck/build/contracts, new and existing Foundation browser checks passed; 28 Chrome captures manually reviewed at `.tmp/operational-ui/`. New actual evidence is in IMP-01-06 Run, historical A..E runs retained. E and F OPEN; user visual acceptance pending. Live Reference/Settings consumers are not adapted yet.
 
-**Next agent action:** Read AGENTS.md, this pointer, Foundation `operational-ui.md` + referenced `frontend.md`/`styles.md`/`checks.md`, Scope-01 `frontend.md`/`checks.md`/`01.06.md` and R01.06-E/F ledger. First inspect actual existing UI, build Foundation synthetic upper-list/selection-gated lower Details+Context, two-axis resize, icon dock/context navigation and SAME compact-to-expanded Settings overlay. Then implement Contacts pilot; STOP for user visual acceptance BEFORE Customer/Dispatch. Preserve owner rules and one-list semantics. No old permanent three-column Reference Open.
+**Next agent action:** STOP for user visual acceptance of FOUNDATION fixture first. Read IMP-01-06 Run/Remaining and review `.tmp/operational-ui/review-all.png` plus full-size captures. Revise shared fixture if requested; do not begin Contacts until Foundation composition accepted. After that explicit acceptance, implement Contacts-first pilot using linked Foundation/Scope-01 authorities, then stop again for Contacts acceptance before Customer/Dispatch. Preserve owner rules and one-list semantics. No old permanent three-column Reference Open.
 
 **Hard gates:** Contact arbitrary-term name/email and Dispatch ordinary search require approved owner backend contracts. Cross-restart panel persistence requires approved Foundation storage. No fake Notes/mailbox, no working terminal, no database schema/reset or Scope-02 implementation.
 
-### Design lane### Design lane
+### Design lane
 
 1. Read the active design scope README and migration ledger.
 2. Read only the named Beta donor packet/files required for the behavior cluster being migrated.

@@ -4,7 +4,7 @@
   "contract_generation": 1,
   "migration_generation": 10,
   "schema_generation": 10,
-  "source_commit": "f4a6a961399e8b33ed3f3ca6dbfd60dee66e7539",
+  "source_commit": "9164db0d99c5d760d8ec837d84a02ff03e5a25e8",
   "dirty": true,
   "build_kind": "source"
 }

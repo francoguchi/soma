@@ -1,5 +1,12 @@
 import type {SVGProps} from 'react';
 const shapes = {
+  overview: 'M2 2h5v5H2zM9 2h5v5H9zM2 9h5v5H2zM9 9h5v5H9z',
+  tickets: 'M2 3h12v3a2 2 0 0 0 0 4v3H2v-3a2 2 0 0 0 0-4V3M8 3v10',
+  objectives: 'M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1M8 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8M8 7v2',
+  inventory: 'M2 5l6-3 6 3v8l-6 2-6-2V5M2 5l6 3 6-3M8 8v7',
+  infrastructure: 'M5 1h6v4H5zM1 11h5v4H1zM10 11h5v4h-5zM8 5v3M3 11V8h10v3',
+  settings: 'M6 1h4l1 3 3 1v4l-3 1-1 4H6l-1-4-3-1V5l3-1 1-3M8 5a3 3 0 1 0 0 6 3 3 0 0 0 0-6',
+  edit: 'M2 11l8-8 3 3-8 8H2v-3M9 4l3 3',
   profile: 'M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6M2 15v-2c0-4 12-4 12 0v2',
   preferences: 'M2 4h12M2 12h12M5 2v4M11 10v4',
   reference: 'M2 4c0-3 12-3 12 0v8c0 3-12 3-12 0V4M2 4c0 3 12 3 12 0M2 8c0 3 12 3 12 0',

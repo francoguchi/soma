@@ -11,5 +11,6 @@
 @import "./primitives/scrollbars.css" layer(primitives);
 @import "./primitives/status.css" layer(primitives);
 @import "./primitives/shell.css" layer(primitives);
+@import "./primitives/operational.css" layer(primitives);
 @import "./components.css" layer(components);
 @import "./utilities.css" layer(utilities);
