@@ -528,7 +528,7 @@ Reuse provenance: Beta LLD-10 safe-undo principle, moved into shared user-plane 
 **Rules:**
 - Canonical permanent assets live under `src/main/assets/brand/`; `.tmp/` screenshots/design candidates are never runtime dependencies.
 - Historical canonical brand palette includes Electric `#5A33FF`, Slate `#0F1115`, Mist `#ECEEF2`, and Pure `#FFFFFF`. **UI V2 does NOT require or permit violet/lavender visual chrome**. The old brand assets are retained until a separately approved asset replacement. See `ui-v2-visual-goal.md`; semantic state still uses owner truth.
-- The brand blue may be used freely for the logo, large graphic accents, and sufficiently contrasted surfaces.
+- Historical brand Electric may remain in archived logo masters, but V2 operational chrome, large graphic accents, text/current/focus and panels MUST NOT display it unless a separate future operator-approved rebrand explicitly changes UI.V2.VISUAL_GOAL. Neutral SOMA wordmark is acceptable while design is pending.
 - Small dark-mode text/focus/status use a derived semantic accent that meets current accessibility contrast targets rather than forcing the raw brand-blue value.
 - Do not copy third-party product branding/trade dress from directional references.
 

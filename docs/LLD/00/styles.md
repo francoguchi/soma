@@ -163,7 +163,7 @@ The CLI-inspired hierarchy is presentation-generated, not literal punctuation co
 - pane/major section: `-- Current run`, `-- Runtime activity`;
 - nested subsection when useful: `> Durable jobs`, `> Runtime chronology`.
 
-Shared heading components/classes/data attributes own the cue through CSS pseudo-elements or equivalent decorative markup so feature authors provide semantic text only. Cue glyphs are decorative and excluded from accessible names. Command/current cues use the Electric-derived family; major section cues may use the cool info/cyan family; warnings/errors keep their semantic colors.
+Shared heading components/classes/data attributes own the cue through CSS pseudo-elements or equivalent decorative markup so feature authors provide semantic text only. Cue glyphs are decorative and excluded from accessible names. Historical V1 command/current cues were Electric-derived and section cues cool cyan; that hue assignment is superseded for V2. All V2 cue styles wait for approved neutral gray/quiet-blue design tokens; warnings/errors keep their true semantic colors.
 
 ### Scrollable pane structure
 
