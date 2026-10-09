@@ -7,7 +7,7 @@
     {
       "id": "UI.REF.WORKSPACE",
       "anchor": "ui-ref-workspace",
-      "depends_on": ["UI.SHELL", "UI.WORKSPACE_REGISTRY", "UI.COLLECTIONS", "UI.SEARCH", "REF.QUERY"],
+      "depends_on": ["UI.SHELL", "UI.WORKSPACE_REGISTRY", "UI.COLLECTIONS", "UI.SEARCH", "UI.OPERATIONAL_LAYOUT", "UI.RECORD_INSPECTOR", "UI.CONTEXT_REGION", "UI.ADAPTIVE_OVERLAY", "REF.QUERY"],
       "code_paths": ["src/main/features/reference/"]
     },
     {
@@ -43,13 +43,13 @@
     {
       "id": "UI.PROFILE.METADATA",
       "anchor": "ui-profile-metadata",
-      "depends_on": ["PROFILE.LOCAL_USER", "UI.WORKING_COPY"],
+      "depends_on": ["PROFILE.LOCAL_USER", "UI.WORKING_COPY", "UI.ADAPTIVE_OVERLAY"],
       "code_paths": ["src/main/features/settings/profile/"]
     },
     {
       "id": "UI.SETTINGS.REGISTRY",
       "anchor": "ui-settings-registry",
-      "depends_on": ["SETTING.REGISTRY", "SETTING.VALUE", "UI.WORKING_COPY"],
+      "depends_on": ["SETTING.REGISTRY", "SETTING.VALUE", "UI.WORKING_COPY", "UI.ADAPTIVE_OVERLAY"],
       "code_paths": ["src/main/features/settings/"]
     }
   ],
@@ -62,22 +62,19 @@
 <a id="ui-ref-workspace"></a>
 ## UI.REF.WORKSPACE
 
-Provide dense Reference-data surfaces for **Customers** (domain `CustomerOrganization`), Contacts, and Dispatch Locations using Foundation shell/collection/selection/working-copy primitives. Their primary navigation entry is **Settings → Reference data** under Foundation `UI.WORKSPACE_REGISTRY`; scope 01 does not create a top-level Customers workspace. Contextual deep links from owning workflows may open the same surfaces directly. Lists are bounded and preserve filters, active/selected identity, scroll and open-workbench context.
+Approved presentation authority is Foundation `../00/operational-ui.md`. The old unconditional three-column Reference Open layout is SUPERSEDED, not existing owner query/review/replay/working-copy semantics.
 
-Active references are available for new work; archived references remain history-visible and visually ineligible until explicit reactivation.
+Customers (`CustomerOrganization`), Contacts and Dispatch Locations are type subviews of the EXPANDED SAME Settings overlay, also reachable from owner-contextual invocation. No separate top-level Customers workspace. Existing /settings/profile, /settings/preferences, /settings/reference-data/{customer_organization|contact|dispatch_location}[/{id|new}] remain authenticated closed overlay-entry routes with safe origin fallback.
 
-Reference workspaces expose immutable identity and lifecycle/revision evidence without turning raw UUIDs into primary operator labels.
+Each reference type uses ONE upper collection with fixed New/Refresh/Search/Advanced controls. Without selection, upper list expands and lower regions are ABSENT. Clicking a record selects and reveals lower-left read-only Details plus lower-right real owner Context; fixed pencil explicitly enables editing. New opens lower-left creation only, no accepted ID or empty right panel. Successful creation selects accepted identity. Both lower splits are resizable when their adjacent regions exist. Record focus, selected/open state, archived eligibility, query/page/cursor/scroll and working-copy intent retain Foundation semantics.
 
+Contact lower-left owns name/lifecycle edit; right Context may show actual channels, Customer affiliation/history, identity/lifecycle chronology; email channel is NOT an inbox, Notes need real provider. Customer preserves reviewed Account Code conflict/shared/reassignment evidence. Dispatch preserves standalone vs Site-derived address ownership; no editing Infrastructure Site data here.
 
 ### Browse/search composition
 
-For each reference type there is one primary collection and one selection model across Browse and Open. The ordinary active-list query, default exact search and expert matching are distinct query modes of that same visual list; no candidate grid is rendered alongside the ordinary grid. One server-owned count/ambiguity summary accompanies the active query. A unique candidate is still read-only evidence; explicit Open never accepts a relationship. Account Code review can show claimants in the primary collection without creating a second grid inside Details.
+UI.SEARCH uses one shared visible primary collection for ordinary list/exact-match modes, not a duplicate candidate grid. Advanced matching/historical tools start collapsed and retain exact UNRESOLVED/UNIQUE/AMBIGUOUS semantics; selection never accepts an identity/relationship implicitly. One bounded count/ambiguity summary; no repeated engine zero counts. Up to eight existing bounded query/page contexts may be retained, only one rendered.
 
-The fixed collection command zone owns New/Refresh. A compact Foundation search input plus Search/Clear/Advanced search controls appears immediately above the list in Browse and the Open collection pane. Advanced search begins collapsed and closes on submission/open; exact fields, Contact affiliation scope and historical identity lookup remain available there. Search inputs, query mode, selected/opened identity, cursor/page and scroll survive Open/return and Settings visits. Clear restores the retained ordinary collection context. At most eight bounded query-page contexts are cached by the shared collection; only one page is rendered. Focus and selection remain Foundation-owned and independent of explicit Open. Create remains a guarded focused form.
-
-Current supported default search: Customer sends the same term to the existing exact `raw_name` and `raw_account_code` match fields, under their common 512-byte input ceiling. It preserves union/ambiguity evidence and signed owner paging rather than claiming fuzzy/general list filtering. Longer exact names use Advanced search. Contact's existing match route requires one Customer UUID or `UNBOUND` and fully validates any supplied `raw_email` as an email address; passing arbitrary free text to both name and email is invalid. No unqualified or global name-or-email term contract exists. Dispatch has an active-list route but no search/match route. Those default search inputs remain visibly disabled with concise explanations; expert scoped Contact matching remains enabled whenever the authoritative source permits it. These are open acceptance limitations, not implemented backend extensions.
-
-Safest owner proposal, pending approval: define a separate bounded read-only Contact term-search contract with mandatory accepted affiliation scope, owner-controlled name/email applicability and deduplicated exact union/count/signed cursor evidence; retain strict expert matching unchanged. Define a bounded Dispatch exact-name search contract using its existing name authority, with explicit fields/bounds/order/cursor/empty/error semantics. No fuzzy/global API, unbounded enumeration, client page filtering or schema/audit/replay/UoW change is authorized by this correction.
+Existing Customer default term uses bounded exact name/Account Code (512-byte common ceiling), not fuzzy matching. Contact arbitrary-term name/email with explicit affiliation scope and Dispatch ordinary human-name search are UNAPPROVED owner-contract gaps (R01.06-E); Contact raw_email requires real email syntax, Dispatch no default query route. No UI-only page filtering or malformed input submission. Show truthful source capability and preserve expert matching until owner contract approved.
 
 <a id="ui-ref-candidates"></a>
 ## UI.REF.CANDIDATES
@@ -153,18 +150,9 @@ When only one registered preference is currently renderable, Settings presents i
 
 ## Composition boundaries
 
-The Settings routes are `/settings/profile`, `/settings/preferences`, and `/settings/reference-data/{customer_organization|contact|dispatch_location}[/{id|new}]`; contextual routes never add primary workspace labels. Core supplies the same closed route grammar to Foundation static serving. Settings capability availability comes from the actual composed Reference/Settings owner.
+Compact Settings uses UI.ADAPTIVE_OVERLAY and shows Profile/registered Appearance as simple bounded forms. Reference Data expands SAME dialog into Reference Manager; origin workspace stays preserved. Manager selection only inspects, never silently links an identity to a Ticket/other workflow; distinguish Manage from Choose invocation.
 
-Settings uses Foundation section/tab grammar: one `$ Settings` page title, Profile/Preferences/Reference data sub-navigation and specific content headings. Profile is a bounded ordinary section with one editable display-name field, compact Save and sign-in comment. Preferences renders the sole registered Appearance definition directly; multiple definitions use compact registry-generated sub-navigation, never arbitrary key/value editing.
-
-Reference type navigation is secondary to Settings navigation. Browse is ordinary content, with entity heading and New <type>/quiet Refresh actions, structured Name/Revision/Open rows and one pristine empty message. Compact default search sits above the single list; exact matching and historical lookup belong to collapsed Advanced search. Create is a bounded non-pane form with one Cancel return action and compact primary creation command; it has no collection/work/evidence chrome before an accepted identity.
-
-Only Open uses the retained three-pane collection / Details / Evidence & history workbench. Section labels identify entity details, Account Code, Lifecycle, Identity, Channels, Affiliation, Address source and History as applicable. Narrow mode switches the same three panes. Collection models and DOM are retained independently of presentation containers across Browse/Open/Create and Settings visits, preserving filters, selection, cursor/page, matching inputs, scroll and open/return context. Back/Cancel consumes Foundation unsaved-navigation/recovery protections. Refresh does not reset collection pagination.
-
-
-Whole-Reference navigation such as `Back to list` belongs to the Reference surface context, not inside the Details pane. Create cancellation and surface navigation do not present duplicate controls for the same transition; if their semantics differ because of unsaved working intent, that distinction is explicit and tested.
-
-Open-mode owner subsections use concise owner-language empty states such as `No channels yet.` or `No affiliation history.` rather than generic zero-page text when pagination evidence is not useful.
+The old left-list / middle work / right evidence three-column layout is superseded by one UPPER list and conditional lower Details+Context. Whole-modal close/collapse actions live at modal scope, pencil/lifecycle commands in lower-left, channels/affiliation/history operations in their actual lower-right contextual tabs. New pre-identity form uses lower-left only. Dirty selection/close guarded; ratio changes only UI presentation. Deep links resolve overlay state, not new background Settings workspace.
 
 Reference registers closed Foundation recovery contracts for metadata, Account Code intent, channel correction, affiliation intent, and lifecycle reason; Profile and ordinary settings use their respective owner contracts. New-reference draft identities identify recovery only and never allocate accepted domain identity. Review fingerprints are not restored as authority. A changed base revision retains input but requires explicit review before submission; successful partial operations acknowledge only their declared fields. Unknown-response retries retain the exact captured command/body, while local request-validation failure permits correction without a network send.
 

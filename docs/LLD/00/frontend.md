@@ -279,6 +279,7 @@ Reuse provenance: Beta LLD-10 presentation lessons and LLD-09 chronology refinem
 
 **Rules:**
 - Route IDs/patterns are statically registered by the owning feature; arbitrary strings do not become executable feature routes.
+- Legacy /settings/* URLs are authenticated closed overlay-entry states using UI.ADAPTIVE_OVERLAY, never a replacement background workspace; cold reload uses safe origin fallback.
 - A route records enough restoration context to preserve filters, active/selected IDs, pane/tab, scroll anchor, and focus token where applicable.
 - Back/forward navigation replays navigation state, not accepted business mutation.
 - Unknown/unavailable capability routes show explicit unavailable/not-found state and safe return navigation.
@@ -566,11 +567,12 @@ Reuse provenance: Beta LLD-10 safe-undo principle, moved into shared user-plane 
 3. **Objectives**
 4. **Inventory**
 5. **Infrastructure**
-6. **Settings**
+6. **Settings** — registered global overlay entry, not sixth product icon
 
 **System surface:** **Diagnostics** is a Foundation/System destination and is visually separated from product workspaces. It is not inserted into the product workspace sequence merely because it is available.
 
 **Rules:**
+- Five operational workspaces occupy the icon dock; the registered Settings entry opens UI.ADAPTIVE_OVERLAY over the preserved active workspace. Diagnostics remains separate.
 - Workspace names/order are product contract, not inferred from capability IDs, module names, database tables, Beta packet names, or agent guesses.
 - Capability availability controls whether a declared workspace is active/development/unavailable; it never creates a new top-level workspace.
 - Declared-but-unavailable product workspaces remain visible with concise unavailable state.
@@ -673,7 +675,7 @@ Reuse provenance: Beta LLD-10 safe-undo principle, moved into shared user-plane 
 
 **Rules:**
 - Example wide presentation: `run 1cf8147f · READY · schema M00.005 · development · loopback/encrypted`.
-- The strip is factual status, not a warning/event log and not a second navigation bar.
+- The strip is factual status, not a warning/event log and not a second navigation bar. UI.COMMAND_RESERVATION is future design, not a fake editable shell.
 - Normal READY/startup state uses neutral/brand-current emphasis; warning/error emphasis appears only for actual degraded/failed conditions.
 - Run/build/schema/trust facts come from current Foundation providers and never from feature-local guesses.
 - Values are compact and bounded; exact/canonical detail remains available through Diagnostics when needed.
@@ -694,10 +696,11 @@ Reuse provenance: Beta LLD-10 safe-undo principle, moved into shared user-plane 
 
 **Rules:**
 - Shell navigation does not own business truth.
+- For collection-oriented owners use normative UI.OPERATIONAL_LAYOUT in operational-ui.md: five-icon dock, contextual navigator, one upper collection and only on selection lower-left Details/right Context; global Settings as SAME compact-to-expanded overlay.
 - Domain features own their workbench content/actions; shared shell owns placement and navigation mechanics.
 - Primary product navigation comes only from UI.WORKSPACE_REGISTRY; the shell never enumerates CAPABILITY.REGISTRY into guessed workspace labels.
 - Returning from a record preserves applicable filter/query, selected/active records, scroll context, and focus where the referenced result survives.
-- Deep operational surfaces favor dense inspectable information over decorative dashboard space.
+- Deep operational surfaces favor dense inspectable information over decorative dashboard space. UI.OPERATIONAL_LAYOUT (operational-ui.md) supersedes old always-on three-column Reference geometry.
 - Between top chrome and UI.OPERATOR_STATUS_STRIP, the shell provides a bounded working viewport. Actual multi-region inspection surfaces fill it with owner panes and pane-local scrolling; ordinary content-sized settings, browse and creation surfaces remain top-aligned without reserving viewport-sized bordered chrome. Shared tabs, section/icon/comment hierarchy and explicit command variants follow UI.STYLE_LIBRARY.
 - Jobs, warnings, imports, reviews, and recent processing may use a shared activity surface, but their facts remain owner-produced.
 
@@ -744,8 +747,8 @@ Reuse provenance: Beta LLD-12 package lifecycle/technology design (`Shell_Notify
 **Visible result:** Focus, active row, single selection, multi-selection membership, expansion, opened record, and nested-control activation remain distinct states.
 
 **Rules:**
-- Primary single click selects/activates; it does not open.
-- `Enter` on the active eligible row and double-click on the row body open the same default destination.
+- Primary single click selects/activates; it does not dispatch deep Open. On UI.OPERATIONAL_LAYOUT it reveals read-only lower Details/actual Context, never edits or mutates.
+- `Enter` on the active eligible row and double-click on the row body invoke the same registered Open/focus action; for this layout focus the inspector or explicitly justified owner view, never implicit edit, merge, duplicate list or mutation.
 - Arrow keys move active focus without opening.
 - On multi-select surfaces, `Space` controls membership; arrows never silently change membership.
 - Nested buttons, links, checkboxes, menus, expanders, and actions perform only their own behavior.
@@ -789,8 +792,8 @@ Reuse provenance: Beta LLD-10 `SCROLL_OWNERSHIP_V1`.
 **Visible result:** SOMA reflows without losing capability, material facts, warnings, actions, selection, drafts, or pane context.
 
 **Rules:**
-- Initial workbench prototype uses `1040 CSS px` as the wide split baseline; live testing may revise this value by updating this item.
-- Wide layouts use compact persistent workspace/context navigation plus owner panes; operational list/work area and context/communications/evidence may coexist where useful.
+- Old 1040 CSS px workbench threshold is a regression probe, not fixed breakpoint for new upper/lower UI; recompose according to measured panel minima, test 1440/1040/1039/390 and 200% zoom.
+- Wide collection-oriented operational views use upper list and conditional lower Details/Context split with accessible resizers; unselected list expands. Overview/Diagnostics retain justified special views.
 - Narrow layouts must **recompose**, not merely stack every wide-layout panel vertically. Primary workspace navigation becomes a compact labelled tab/command strip with bounded horizontal scrolling or an explicit overflow control; owner workbench panes switch one-at-a-time/drawer/stack as appropriate.
 - Diagnostics narrow mode presents one operational panel at a time in deliberate order and preserves access to all facts/actions without forcing a page-length copy of the desktop grid.
 - Tables remain tabular inside bounded horizontal scroll rather than causing page overflow.

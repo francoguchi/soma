@@ -122,6 +122,10 @@ Third live Foundation review found three implementation-level design-system gaps
 
 Fourth live Foundation review corrected two prior interpretations and one launcher gap: the Durable-jobs orphan cell should remain naturally asymmetric while its **contents** are vertically centered; the UI needs a richer semantic terminal accent family plus shared `$` / `--` / `>` generated cues and muted-green READY; and detached `soma_run.bat` must retain no host console. Explicit Stop becomes the safe recovery action for a proven-dead exact-owned stale runtime registration, while untrusted/unreachable/live ambiguity remains fail-closed.
 
+## Later shared UI design reconciliation (2026-10-09)
+
+SOMA-UI-ARCH-V1 in `operational-ui.md` is a NEW approved Foundation presentation contract, not missed Beta donor and not a retroactive failure of closed Scope-00 implementation. Its first real fixture and consumer are tracked in Scope-01 R01.06-F; old Reference three-pane composition is replaced but Diagnostics special panes, owner APIs and security remain. Cross-restart panel-size storage is an explicit pending Foundation ownership decision.
+
 ## Completion rule
 
 Before an implementation goal becomes `working`, every migration row for that goal must be checked and carry an explicit disposition. Reuse is never assumed: reading a donor may result in `REWRITTEN` or `REJECTED`.

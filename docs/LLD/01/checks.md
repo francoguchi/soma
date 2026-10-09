@@ -125,47 +125,18 @@ Using synthetic/reference data, exercise list->workbench return context, archive
 <a id="chk01-ui-settings"></a>
 ## CHK01.UI.SETTINGS
 
-Verify Profile display-name editing remains visibly separate from password/login, no username control appears, Settings distinguish DEFAULT/PERSISTED, secret values are absent, and stale revisions preserve safe working intent.
-
-At 1440/1040/1039/390px, exercise Customer/Contact/Dispatch Browse/Create/Open and both Settings routes with browser geometry and screenshots. Profile/Preferences and Browse/Create render no ConsolePanes/panel regions, viewport-sized border or active-pane stripe. Settings uses a single `$ Settings` heading and shared unboxed link tabs with current underline/weight plus distinct keyboard focus. Profile/Appearance have functional section icons, bounded fields and compact Save commands. The sole Appearance registration renders directly with no redundant Preference chooser or storage/owner jargon.
-
-Browse has structured Name/Revision/quiet Open rows, a separate heading action area with primary New <type> and quiet Refresh, one compact default search above the sole primary list, with expert matching/historical lookup under collapsed Advanced search, and one pristine empty state without duplicate zero-count prose. Create has a bounded ordinary form and compact Cancel/Create commands and no collection/work/evidence pane chrome. Only Open renders exactly three operational panes and three desktop tracks at 1040px+, filling usable height with fixed pane headers and independent body scrolling; Details/Evidence sections use sparse icons/separators without nested panels. At 1039px and 390px, switch all retained Open panes; active tabs and forms remain usable without page overflow.
-
-Returning from Open and Create cancellation preserves collection rows, selection, matching/filter input, candidate page, collection cursor and actual scroll at desktop/narrow widths. Retain recovery, stale intent, Account Code ambiguity/review, Contact channels/affiliation, Dispatch address-source/lifecycle, typed settings and no-write defaults. Exercise keyboard navigation/focus and forced colors. Review actual captures for hierarchy, accents/icons, compact command placement, dead space, border purpose, tab clarity, table density and subsection rhythm before closing visual acceptance.
+Retain Profile/display-name/auth isolation, no username field, default-vs-persisted Appearance meaning without default write, secret protection, stale draft. In real native/authenticated Main, open Settings modal over dirty Tickets/other owner without resetting background route, selected record, tab, query, scroll, working copy or focus. Expand SAME dialog to Reference Manager, collapse/Close safely and restore origin. Deep-link cold reload uses closed auth/capability route and deterministic safe origin. Compact Profile/Appearance remain ordinary bounded forms.
 
 <a id="chk01-ui-polish"></a>
 ## CHK01.UI.POLISH
 
-Exercise the final Settings/Reference usability contract in real authenticated Main.
+Normative NEW visual authority: `../00/operational-ui.md`, NOT old three-column Reference workbench. Using Customer/Contact/Dispatch real owner data assert:
 
-Verify:
-
-- Settings primary tabs and Reference type tabs remain visually and semantically distinct from command buttons.
-- exactly one primary visible grid/count exists across ordinary browsing, default search, advanced candidates and Open; the query changes the same collection rather than appending a candidate grid.
-- default Customer search submits supported exact name-or-Account-Code owner evidence under the common bound; no field choice, local filtering or implicit acceptance occurs.
-- Advanced search begins collapsed, preserves expert fields/Contact scope/history, and closes after submission/open.
-- claimant review can target the collection without a competing Details grid.
-- opening a second Contact updates Details/Evidence and still guards dirty intent; single click only selects.
-- Search/Clear/Advanced and New/Refresh occupy fixed shared command zones in Browse and Open.
-- clearing search restores ordinary cursor/page; Open/return and Settings return retain query, selection and scroll.
-- Foundation search affordances occupy the accepted collection-associated location wherever the owner exposes search.
-- real-browser searched/no-result/ambiguous captures contain one result summary and no duplicate ordinary-list count.
-- Contact arbitrary name-or-email and Dispatch default-search acceptance remains open until approved owner contracts exist; unavailable controls expose the precise limitation while advanced scoped Contact matching remains usable.
-- a known-empty authoritative searchable source renders search visible but disabled with an accessible reason.
-- an empty current bounded page does not disable broader valid owner search.
-- no Reference search is implemented as current-loaded-page filtering while presented as authoritative search.
-- empty Browse shows one concise empty state rather than duplicate zero-record/count prose.
-- populated/query collections use correct singular/plural count grammar.
-- selected/opened/focus evidence is visually separate from the record name.
-- Browse/Create have no three-pane workbench chrome.
-- whole-surface Back navigation is outside the Details pane in Open mode.
-- Create does not expose redundant Back/Cancel controls unless they have distinct tested semantics.
-- Profile/Preferences do not redundantly repeat accepted values without distinct meaning.
-- ordinary forms do not lead with UTF-8 byte-storage terminology when human guidance is sufficient.
-- empty Channels/Affiliation/History use owner-language empty states.
-- Browse -> Open -> Browse and Create cancellation preserve collection/filter/selection/page/scroll/working-copy state.
-- desktop and narrow captures have no accidental dead fields, oversized empty borders or action-hierarchy ambiguity.
-- forced-colors and keyboard operation retain non-color navigation, search-disabled, selection and focus meaning.
-
-Manual screenshot review is required before closing R01.06-E; generated screenshots alone are not acceptance.
-
+- No selection -> ONE full-height upper list; no empty lower panes or splitter handles.
+- Clicking eligible record -> lower-left read-only Details plus lower-right real owner Context; selection does not auto Edit/mutate/link. Switching updates both safely, supersedes stale reads and retains query/page/cursor/scroll.
+- Pencil Edit -> working-copy form, accepted Save only after owner response, guarded Cancel/swap/close. New -> lower-left pre-identity Create and no fabricated Context or accepted ID. Success selects accepted identity.
+- Contact real channels/affiliation/history; no fake Notes/mailbox. Customer Account Code snapshot/claimant/ambiguity and Dispatch Site-address ownership remain correct with owner lifecycle/replay.
+- One primary collection and one count across browse/search/expert evidence; fixed New/Refresh/Search/Advanced, expert collapsed. Unapproved Contact/Dispatch ordinary search stays truthfully unavailable; no local-page fake global query.
+- Overlay compact->expanded->compact, direct invocation, safe deep-link, dirty close and restored background state.
+- Pointer and keyboard two-axis resize, bounded min size/Reset/session per-workspace ratio, accessible separator focus and no side effects/storage violations.
+- Screenshot 1440/1040/1039/390px, constrained height, 200% zoom, keyboard, forced colors/reduced motion, accurate footer, independent scroll, readable icons/buttons/progress. Manual capture review required; earlier passing A..E tests do not close F.

@@ -119,11 +119,23 @@ The library owns at least these reusable visual primitives before future feature
 
 A feature may compose these into its own workbench without copying their CSS.
 
+### Approved SOMA operational visual grammar (2026-10-09)
+
+Normative source: `operational-ui.md` SOMA-UI-ARCH-V1. Core Dark, SOMA-owned brand palette, semantic status colors and Diagnostics specialized layout remain. Violet/cyan are not mandatory as dominant decorative hues; do not assign arbitrary colors per workspace.
+
+- Local consistent outline SVG icons: five-icon product dock, active subtle marker/background; global Settings gear; New plus, Search magnifier, Refresh arrow, pencil Edit and history clock. Accessible labels/focus/tooltip for icon-only commands.
+- Contextual second navigation column, stable collection toolbar, one upper list and selection-gated lower two panels. Creating shows only lower-left, no empty bordered Context.
+- Compact monospace for technical IDs/cues/metrics, readable long note text, sensible font-size/zoom, thin separators not gratuitous card borders.
+- Read-only Details look like facts, not disabled inputs; pencil fixed in Details header. Context only real owner capabilities; dated Notes/actual messages are not decorative placeholders.
+- Shared split handles keyboard/pointer access, bounded minimums and saved session ratios by workspace; avoid per-feature CSS overrides.
+- Shared compact action variants and truthful segmented progress with numeric owner units; semantic warning/success/danger reserved for real states.
+- Bottom status retains actual runtime facts and reserved nonfunctional future command space. No fake terminal.
+
 ### Navigation, content and command composition
 
 Section navigation uses semantic links/current-page state, unboxed resting text and a vivid current underline/weight. Secondary navigation is smaller; keyboard focus has its own visible treatment. Tabs are not ordinary outlined command buttons.
 
-Large pane chrome belongs to independent operational regions (Diagnostics and explicitly opened inspection workbenches). Forms, empty collections, browse and create surfaces are ordinary content; they reserve no viewport-sized bordered panel or active-pane rail merely to obtain headings/spacing. Thin separators, typography and spacing replace nested cards. Every border identifies an actual input, data, pane, dialog, shell, selection or focus boundary. Split collection tracks and compact key/value evidence reserve readable text widths; opened/selected markers do not squeeze names into vertical letter columns. Bounded lists/tables own any necessary horizontal scrolling.
+Large pane chrome belongs to real independent regions (Diagnostics and selection-gated lower Details/Context); no-selection Browse expands the upper collection; creation may show lower-left only. Compact Settings is ordinary bounded form. No empty full-height panels. Thin separators, typography and spacing replace nested cards. Every border identifies an actual input, data, pane, dialog, shell, selection or focus boundary. Split collection tracks and compact key/value evidence reserve readable text widths; opened/selected markers do not squeeze names into vertical letter columns. Bounded lists/tables own any necessary horizontal scrolling.
 
 Shared SectionHeading, ConsoleComment, explicit command/quiet/destructive actions and flex FormActions establish hierarchy without changing default Foundation controls. Save/Create commands stay compact rather than inheriting grid stretch. Local functional icons are sparse inline SVG, roughly 16px with consistent stroke/currentColor, decorative aria-hidden markup and visible command text; icon-only actions require an accessible name. No remote assets, emoji or icon runtime dependency.
 

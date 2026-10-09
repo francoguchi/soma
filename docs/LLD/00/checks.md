@@ -229,6 +229,7 @@
       "anchor": "chk-doc-impact",
       "covers": ["TOOLING.IMPACT"]
     }
+    ,{"id":"CHK00.UI.OPERATIONAL_ARCH","anchor":"chk-ui-operational-arch","covers":["UI.OPERATIONAL_LAYOUT","UI.RECORD_INSPECTOR","UI.CONTEXT_REGION","UI.PANEL_RESIZE","UI.ADAPTIVE_OVERLAY","UI.PROGRESS_SEGMENTED","UI.COMMAND_RESERVATION"]}
   ],
   "tags": ["foundation", "checks"]
 }
@@ -522,3 +523,12 @@ Exercise a synthetic registered deliberate action. Verify continuous 3000 ms cli
 ## CHK00.DOC.IMPACT
 
 Validate metadata/index creation, modify one item and one mapped source path, and verify direct/indirect impact paths. Remove an edge and verify baseline/current union still reports the former dependent. Unmapped changed code is reported as a gap. Verify `docs/LLD/CONTINUE.md` resolves to an existing scope/goal/ledger, duplicate or malformed migration-row IDs fail validation, and a goal marked `working` fails while any matching `RNN.KK-*` row remains unchecked/PENDING.
+
+<a id="chk-ui-operational-arch"></a>
+## CHK00.UI.OPERATIONAL_ARCH
+
+With synthetic owner-neutral fixture prove: one upper list without selection and no lower panels/handles; selecting row reveals read-only Details/real Context, switching updates both without mutation; pencil alone enters edit; New opens only lower-left Create without accepted identity; guarded Cancel/Save; one collection and correct query/focus/selection state.
+
+Test horizontal+vertical resize pointer/keyboard, clamp/reset, per-workspace session ratios, no accidental row selection or unapproved persistent storage. Test 1440/1040/1039/390px, constrained height, 200% zoom, forced colors/reduced motion, independent scroll and correct footer.
+
+Compact Settings overlays a synthetic dirty workspace; SAME dialog expands Reference Manager and collapses; origin selected record, focus, tab, scroll, query and draft survive. Verify safe closed deep route and unsaved dismissal. No invented Notes/messages, arbitrary owner search or fake CLI. Segmented progress only uses actual owner numbers. Manually inspect screenshots; historical green tests are not V1 acceptance.
